@@ -1,9 +1,8 @@
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
- 
-package droplet.droplet
 
+package droplet.droplet
 
 public interface AnyRequestOptions {
     func getFields(): Int64
@@ -37,6 +36,8 @@ public interface AnyRequestOptions {
     func getOptions(): DropletOptions
 
     func getDiskCacheStrategy(): DiskCacheStrategy
+
+    func getTransitionOption(): Option<TransitionOption>
 
     func getTransformations(): CachedHashCodeArrayMap<TransformationKey, AnyKey>
 
@@ -108,6 +109,8 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
 
     public var diskCacheStrategy: DiskCacheStrategy = DiskCacheStrategyALL();
 
+    public var transitionOption: Option<TransitionOption> = Option<TransitionOption>.None
+
     public func getFields(): Int64 {
         return fields
     }
@@ -126,6 +129,10 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
 
     public func getOnlyRetrieveFromCache(): Bool {
         return onlyRetrieveFromCache
+    }
+
+    public func getTransitionOption(): Option<TransitionOption> {
+        return transitionOption
     }
 
     public func getSignature(): AnyKey {
@@ -166,7 +173,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
     }
 
     public func setOptions(option: String, value: String): T {
-        setOptions(option,value,(this as T).getOrThrow())
+        setOptions(option, value, (this as T).getOrThrow())
     }
 
     public func setOptions(option: String, value: String, t: T): T {
@@ -329,7 +336,6 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return self();
     }
 
-
     public func apply(v: AnyRequestOptions, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
@@ -399,7 +405,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
     // TODO skipMemoryCache改成disableMemoryCache
 
     public func skipMemoryCache(skip: Bool): T {
-       skipMemoryCache(skip,(this as T).getOrThrow())
+        skipMemoryCache(skip, (this as T).getOrThrow())
     }
 
     public func skipMemoryCache(skip: Bool, t: T): T {
@@ -414,8 +420,8 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return t.selfOrThrowIfLocked();
     }
 
-    public func onlyRetrieveFromCachecj(flag: Bool): T{
-        return onlyRetrieveFromCachecj(flag,(this as T).getOrThrow())
+    public func onlyRetrieveFromCachecj(flag: Bool): T {
+        return onlyRetrieveFromCachecj(flag, (this as T).getOrThrow())
     }
 
     public func onlyRetrieveFromCachecj(flag: Bool, t: T): T {
@@ -426,6 +432,19 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         t.onlyRetrieveFromCache = flag
         t.fields |= ONLY_RETRIEVE_FROM_CACHE
 
+        return t.selfOrThrowIfLocked();
+    }
+
+    public func transition(transitionOption: TransitionOption): T {
+        return transition(transitionOption, (this as T).getOrThrow())
+    }
+
+    public func transition(transitionOption: TransitionOption, t: T): T {
+        if (getIsAutoCloneEnabled()) {
+            var t2 = clone(t)
+            return t2.transition(transitionOption, t2);
+        }
+        t.transitionOption = transitionOption
         return t.selfOrThrowIfLocked();
     }
 
