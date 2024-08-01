@@ -26,9 +26,11 @@ droplet是一个图像加载缓存库，致力于更高效、更轻便、更简�
 
 - 🌍 支持三级缓存策略。
 
-- 🚀 支持transform图像变换效果
+- 🚀 支持transform图像变换效果。
 
-- 🚀 支持自定义组件的形式加载图片
+- 🚀 支持过渡动画。
+
+- 🚀 支持自定义组件的形式加载图片。
 
 
 ## 软件架构
@@ -122,6 +124,8 @@ class MyView {
 
     @State var textTmp: String = ""
 
+    var transitionOption:TransitionOption = TransitionOption(TransitionType.Opacity,0.0,1.0,1000) //透明度
+
 
     @State
     var option: DropletRequestOption = DropletRequestOption (
@@ -131,7 +135,9 @@ class MyView {
         errholder: Option<CJResource>.Some(@r(app.media.img)),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
         strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
         label: Option<String>.Some("page"),                                       // 生命周期标签 （可选）
-        signature:Option<String>.Some("1111") //不同的signature可保证缓存key的唯一    （可选）                                
+        signature:Option<String>.Some("1111") //不同的signature可保证缓存key的唯一    （可选）   
+        transformCate:Option<PixelMapTransformation>.Some(BrightnessFilterTransformation(0.6)), //transform动画 （可选）
+        transitionOption:Option<TransitionOption>.Some(transitionOption)  //过渡动画 （可选）
     )
 
     public func onAppear(): Unit {
@@ -165,9 +171,6 @@ load成功
 ## 约束与限制
 
 当前基于 OpenHarmony Cangjie Mobile B100 版本实现的
-
-1.暂未支持过渡动画
-
 
 ## 开源协议
 

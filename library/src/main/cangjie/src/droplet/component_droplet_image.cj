@@ -10,8 +10,6 @@ protected import ohos.base.*
 protected import ohos.component.*
 protected import ohos.image.Component as ImageComponent
 protected import ohos.image.Image as ImageImage
-
-
 internal import ohos.image.PixelMap
 internal import ohos.image.InitializationOptions
 internal import ohos.image.PixelMapFormat
@@ -24,8 +22,6 @@ internal import ohos.image.ImageSource
 internal import ohos.image.SourceOptions
 internal import ohos.image.DecodingOptions
 internal import ohos.image.ImageInfo
-
-
 protected import ohos.ability.*
 protected import ohos.concurrency.*
 protected import net.http.*
@@ -45,12 +41,11 @@ protected import std.sync.*
 protected import ohos.resource_manager.*
 protected import std.format.Formatter
 protected import std.overflow.*
-
+protected import ohos.animator.*
 
 /**
  * Created on 2024/3/4
  */
-
 @Observed
 public class DropletRequestOption {
 
@@ -74,7 +69,8 @@ public class DropletRequestOption {
     public var transformCate: Option<PixelMapTransformation> = Option<PixelMapTransformation>.None
     //是否禁用内存缓存
     @Publish
-    public var transformListCate: Option<ArrayList<PixelMapTransformation>> = Option<ArrayList<PixelMapTransformation>>.None
+    public var transformListCate: Option<ArrayList<PixelMapTransformation>> = Option<ArrayList<PixelMapTransformation>>.
+        None
 
     @Publish
     public var isSkipMemory: Option<Bool> = Option<Bool>.None
@@ -102,6 +98,9 @@ public class DropletRequestOption {
     //signature
     @Publish
     public var signature: Option<String> = Option<String>.None
+    //trisition
+    @Publish
+    public var transitionOption: Option<TransitionOption> = Option<TransitionOption>.None
 }
 
 @Component
@@ -118,6 +117,19 @@ public class DropletImageComponent {
     /*错误状态*/
     @State
     var isError: Bool = false
+
+    /*加载状态*/
+    @State
+    var opacityValue: Float64 = 1.0 //默认不透明
+
+    @State
+    var rotateValue: Float32 = 0.0
+
+    @State
+    var scaleValue: Float32 = 1.0
+
+    @State
+    var TranslateValue: Float64 = 0.0
 
     @Prop
     var beginFn: () -> Unit
@@ -155,7 +167,8 @@ public class DropletImageComponent {
 
             var dropletManager = Option<RequestManager>.None
             if (let Some(v) <- option.useDefaultRequestOption) {
-                dropletManager = Droplet.withContext(globalContext.getOrThrow(), option.label).useDefaultRequestOptions(v)
+                dropletManager = Droplet.withContext(globalContext.getOrThrow(), option.label).useDefaultRequestOptions(
+                    v)
             } else {
                 dropletManager = Droplet.withContext(globalContext.getOrThrow(), option.label)
             }
@@ -171,6 +184,10 @@ public class DropletImageComponent {
 
             if (let Some(v) <- option.isSkipMemory) {
                 droplet = droplet.skipMemoryCache(v, droplet)
+            }
+
+            if (let Some(v) <- option.transitionOption) {
+                droplet = droplet.transition(v, droplet)
             }
 
             if (let Some(v) <- option.thumbnail) {
@@ -227,20 +244,51 @@ public class DropletImageComponent {
                     return false
                 },
                 {
-                    e: DropletException, model: Model, target: Target<Drawable>, isFirstResource: Bool =>
-                    return false
+                    e: DropletException, model: Model, target: Target<Drawable>, isFirstResource: Bool => return false
                 }
             ).into(
                 {
-                    p: PixelMap =>
-                    launch {
+                    p: PixelMap => launch {
                         isLoading = false
                         pixelMap = p
+                        if (let Some(i) <- option.transitionOption) {
+                            //创建动画对象
+                            var backAnimator: ?AnimatorResult = AnimatorResult(
+                                AnimatorOptions(
+                                    duration: i.getDuration(),
+                                    easing: "linear",
+                                    delay: 0,
+                                    fill: AnimatorFill.Forwards,
+                                    direction: AnimatorDirection.Normal,
+                                    iterations: 1,
+                                    begin: i.getBegin(),
+                                    end: i.getEnd()
+                                )
+                            )
+                            //表明有动画
+                            match (i.getTransType()) {
+                                case Opacity => backAnimator?.onframe = {
+                                    value: Float64 => this.opacityValue = value
+                                }
+                                case Rotate => backAnimator?.onframe = {
+                                    value: Float64 => this.rotateValue = (Float32(value))
+                                }
+                                case Scale => backAnimator?.onframe = {
+                                    value: Float64 => this.scaleValue = (Float32(value))
+                                }
+                                case Translate => backAnimator?.onframe = {
+                                    value: Float64 => this.TranslateValue = value
+                                }
+                                case _ => false
+                            }
+                            let callBackGet2 = backAnimator?.onframe
+                            let fun2 = callBackGet2.getOrThrow()
+                            backAnimator?.play()
+                        }
                     }
                 },
                 {
-                    cjres: CJResource, isErrorPic: Bool =>
-                    if (isErrorPic) {
+                    cjres: CJResource, isErrorPic: Bool => if (isErrorPic) {
                         launch {
                             isError = true
                         }
@@ -296,7 +344,8 @@ public class DropletImageComponent {
                         )
                     }
                 } else {
-                    Image(pixelMap).width(100.percent).objectFit(ImageFit.ScaleDown)
+                    Image(pixelMap).width(100.percent).objectFit(ImageFit.ScaleDown).opacity(opacityValue).rotate(
+                        rotateValue).scale(scaleValue).translateX(TranslateValue)
                 }
             }
         }

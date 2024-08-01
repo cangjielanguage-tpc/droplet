@@ -10,6 +10,7 @@
 - 加载 gif 图片资源
 - 支持三级缓存策略
 - 支持transform动画转换
+- 支持过渡动画
 - 支持自定义组件方式加载
 
 ### 1 Droplet 图片处理库
@@ -209,6 +210,15 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
      */   
      public func dontTransform(): T
         
+        
+     /**
+     * 设置过渡动画
+     *
+     * @参数 transitionOption - TransitionOption过渡动画选项
+     * @返回值  T 泛型数据类型
+     */   
+     public func transition(transitionOption:TransitionOption):T
+        
      /**
      * 是否设置DiskCacheStrategy
      * 
@@ -240,6 +250,13 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
      */           
     public func getSignature(): AnyKey
             
+            
+    /**
+     * 获取设置得过渡动画配置
+     * 
+     * @返回值  Option<TransitionOption> 过渡动画配置
+     */            
+    public func getTransitionOption():Option<TransitionOption>
             
     /**
      * 设置dropletoption
@@ -440,6 +457,94 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
      */
      public override func clearAnimationCallbacks(): Unit {
             
+}
+```
+
+#### 1.7 TransitionOption
+```cangjie
+public class TransitionOption {
+   
+   /**
+    * 构造函数
+    * @参数 transType - TransitionType 过渡动画类型，有四种，透明度，旋转，缩放,平移
+    * @参数 begin - Float64 对应动画的起始参数
+    * @参数 end: - Float64 对应动画的结束参数
+    * @参数 duration - Int32 动画执行时长
+    */
+   public init(transType: TransitionType, begin: Float64, end: Float64, duration: Int32) {
+
+        
+    /**
+     * 获取动画类型
+     *   
+     * @返回值 TransitionType 过渡动画的类型   
+     */
+    public func getTransType(): TransitionType {
+        return transType
+    }
+
+    /**
+     * 获取开始点参数
+     *    
+     * @返回值 Float64 开始点的参数
+     */
+    public func getBegin(): Float64 {
+        return begin
+    }
+
+    /**
+     * 获取结束点参数
+     *    
+     * @返回值 Float64 结束点的参数
+     */
+    public func getEnd(): Float64 {
+        return end
+    }
+
+    /**
+     * 获取过渡动画时长
+     *    
+     * @返回值 Int32 过渡动画时长
+     */
+    public func getDuration(): Int32 {
+        return duration
+    }
+
+    /**
+     * 设置动画类型
+     *   
+     * @参数 transType - TransitionType 过渡动画的类型     
+     */
+    public func setTransType(transType: TransitionType): Unit {
+        this.transType = transType
+    }
+
+    /**
+     * 设置开始点值
+     *
+     * @参数 begin - Float64 动画开始点的参数值
+     */
+    public func setBegin(begin: Float64): Unit {
+        this.begin = begin
+    }
+
+    /**
+     * 设置结束点
+     *
+     * @参数 end - Float64 动画结束点的参数值    
+     */
+    public func setEnd(end: Float64): Unit {
+        this.end = end
+    }
+
+    /**
+     * 设置时长
+     *
+     * @参数 duration - Int32 动画的时长        
+     */
+    public func setDuration(duration: Int32): Unit {
+        this.duration = duration
+    }     
 }
 ```
 
@@ -745,7 +850,6 @@ import ohos.ability.*
 import cj_res_entry.app
 import droplet.droplet.*
 
-
 @Entry
 @Component
 class MyView {
@@ -754,7 +858,8 @@ class MyView {
 
     @State var textTmp: String = ""
 
-
+    var transitionOption:TransitionOption = TransitionOption(TransitionType.Opacity,0.0,1.0,1000) //透明度
+    
     @State
     var option: DropletRequestOption = DropletRequestOption (
         // 加载一张本地的jpg资源（必选）
@@ -763,7 +868,9 @@ class MyView {
         errholder: Option<CJResource>.Some(@r(app.media.img)),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
         strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
         label: Option<String>.Some("page"),                                       // 生命周期标签 （可选）
-        signature:Option<String>.Some("1111") //不同的signature可保证缓存key的唯一    （可选）  
+        signature:Option<String>.Some("1111") //不同的signature可保证缓存key的唯一    （可选）   
+        transformCate:Option<PixelMapTransformation>.Some(BrightnessFilterTransformation(0.6)), //transform动画 （可选）
+        transitionOption:Option<TransitionOption>.Some(transitionOption)  //过渡动画 （可选）
     )
 
     public func onAppear(): Unit {
