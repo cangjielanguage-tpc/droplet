@@ -99,7 +99,25 @@ droplet是一个图像加载缓存库，致力于更高效、更轻便、更简�
 
 ### 功能示例
 
-#### 网络图片加载 功能示例
+#### 1. 把droplet作为三方库依赖引入
+当前仓颉语言三方库还不支持中心仓库，可以把依赖库克隆到本地引入，具体步骤如下：
+a. 目标工程把依赖库作为git submodule引入
+
+```shell
+> cd $工程根目录
+>mkdir third-party
+>cd  third-party
+>git submodule add "https://gitcode.com/Cangjie-TPC/droplet.git"
+```
+
+b. 打开 .\entry\src\main\cangjie\cjpm.toml，添加依赖
+
+```toml
+[dependencies]
+  droplet = {path = "../../../../third-party/droplet/library/src/main/cangjie", version = "1.0.0"}
+```
+
+#### 2. 在UI代码中使用Droplet组件（DropletImageComponent）
 功能示例描述: 加载一个网络图片，支持的图片类型为：bmp、jpg、png、wbep。
 
 示例代码如下：
@@ -113,6 +131,7 @@ import ohos.state_macro_manage.*
 import ohos.base.*
 import ohos.ability.*
 
+import ohos_app_cangjie_entry.js.globalAbilityContext
 import cj_res_entry.app
 import droplet.droplet.*
 
@@ -135,7 +154,7 @@ class MyView {
         errholder: Option<CJResource>.Some(@r(app.media.img)),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
         strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
         label: Option<String>.Some("page"),                                       // 生命周期标签 （可选）
-        signature:Option<String>.Some("1111") //不同的signature可保证缓存key的唯一    （可选）   
+        signature:Option<String>.Some("1111"), //不同的signature可保证缓存key的唯一    （可选）   
         transformCate:Option<PixelMapTransformation>.Some(BrightnessFilterTransformation(0.6)), //transform动画 （可选）
         transitionOption:Option<TransitionOption>.Some(transitionOption)  //过渡动画 （可选）
     )
