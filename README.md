@@ -155,7 +155,7 @@ class MyView {
         strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
         label: Option<String>.Some("page"),                                       // 生命周期标签 （可选）
         signature:Option<String>.Some("1111"), //不同的signature可保证缓存key的唯一    （可选）   
-        transformCate:Option<PixelMapTransformation>.Some(BrightnessFilterTransformation(0.6)), //transform动画 （可选）
+        transformCate:Option<PixelMapTransformation>.Some(RoundedCorners(50)), //transform效果 （可选）
         transitionOption:Option<TransitionOption>.Some(transitionOption)  //过渡动画 （可选）
     )
 
