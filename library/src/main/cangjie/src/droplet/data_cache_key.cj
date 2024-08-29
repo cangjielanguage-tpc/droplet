@@ -14,7 +14,7 @@ public class DataCacheKey <: AnyKey {
     this.signature = signature;
   }
 
-  public func getSourceKey(): AnyKey {
+   func getSourceKey(): AnyKey {
     return sourceKey;
   }
 

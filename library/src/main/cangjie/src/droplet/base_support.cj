@@ -116,7 +116,7 @@ public class DropletFile <: DropletAny<DropletFile> {
         this(parent.filePath.join(child))
     }
 
-    public func openFile() {
+    func openFile() {
         if(Directory.exists(this.filePath) && this.filePath.isDirectory()) {
             this.directory = Some(Directory(this.filePath))
         } else if(File.exists(this.filePath) && this.filePath.isFile()) {
@@ -128,7 +128,7 @@ public class DropletFile <: DropletAny<DropletFile> {
         }
     }
 
-    public func safeOpenFile() {
+     func safeOpenFile() {
         if(match(this.file) {
             case Some(x) => true
             case _ => false
@@ -141,35 +141,35 @@ public class DropletFile <: DropletAny<DropletFile> {
         }
     }
 
-    public func close(): Unit {
+     func close(): Unit {
         if(!this.file.getOrThrow().isClosed()) {
             this.file.getOrThrow().close()
         }
     }
 
-    public func getStringReader(): StringReader<File> {
+     func getStringReader(): StringReader<File> {
         safeOpenFile()
         return StringReader(this.file.getOrThrow())
     }
 
-    public func getStringWriter(): StringWriter<File> {
+     func getStringWriter(): StringWriter<File> {
         safeOpenFile()
         this.file.getOrThrow().seek(SeekPosition.End(0))
         return StringWriter(this.file.getOrThrow())
     }
 
-    public func getFile(): File {
+     func getFile(): File {
         safeOpenFile()
         this.file.getOrThrow().seek(SeekPosition.End(0))
         return this.file.getOrThrow()
     }
 
-    public func getFileNoSeek(): File {
+     func getFileNoSeek(): File {
         safeOpenFile()
         return this.file.getOrThrow()
     }
 
-    public func toByteArrayStream(): ByteArrayStream {
+     func toByteArrayStream(): ByteArrayStream {
         let outStream: ByteArrayStream = ByteArrayStream()
         synchronized (mtx) {
             safeOpenFile()
@@ -179,20 +179,20 @@ public class DropletFile <: DropletAny<DropletFile> {
         return outStream
     }
 
-    public func length(): Int64 {
+     func length(): Int64 {
         return FileInfo(this.filePath).length
     }
 
-    public func isDirectory(): Bool {
+     func isDirectory(): Bool {
         let r = Directory.exists(this.filePath) && this.filePath.isDirectory()
         return r
     }
 
-    public func isFile(): Bool {
+     func isFile(): Bool {
         return File.exists(this.filePath) && this.filePath.isFile()
     }
 
-    public func exists(): Bool {
+     func exists(): Bool {
         if(Directory.exists(this.filePath)) {
             return true
         } else if(File.exists(this.filePath)) {
@@ -201,7 +201,7 @@ public class DropletFile <: DropletAny<DropletFile> {
         return false
     }
 
-    public func delete(): Bool {
+     func delete(): Bool {
         if(isFile()) {
             if(match(this.file) {
                 case Some(x) => true
@@ -228,7 +228,7 @@ public class DropletFile <: DropletAny<DropletFile> {
         return false
     }
 
-    public func renameTo(to: DropletFile): Bool {
+     func renameTo(to: DropletFile): Bool {
         if(!isFile()) {
             return false
         }
@@ -241,7 +241,7 @@ public class DropletFile <: DropletAny<DropletFile> {
         return true
     }
 
-    public func mkdirs(): Bool {
+     func mkdirs(): Bool {
         if(isFile()) {
             return false
         }

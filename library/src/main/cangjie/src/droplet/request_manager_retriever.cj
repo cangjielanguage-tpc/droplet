@@ -11,12 +11,12 @@ public class RequestManagerRetriever {
 
     private var lifecycleRequestManagerRetriever: LifecycleRequestManagerRetriever;
 
-    public init() {
+    init() {
         this.factory = DefaultRequestManagerFactory()
         lifecycleRequestManagerRetriever = LifecycleRequestManagerRetriever(this.factory);
     }
 
-    public func get(context: AbilityContext, key: String) {
+    func get(context: AbilityContext, key: String) {
         var droplet: Droplet = Droplet.get(context);
         return lifecycleRequestManagerRetriever.getOrCreate(
             context,
@@ -25,7 +25,7 @@ public class RequestManagerRetriever {
             true);
     }
 
-    public func getDeviceLifecycle(key: String): DeviceLifecycle {
+    func getDeviceLifecycle(key: String): DeviceLifecycle {
         return lifecycleRequestManagerRetriever.getDeviceLifecycle(key)
     }
 }

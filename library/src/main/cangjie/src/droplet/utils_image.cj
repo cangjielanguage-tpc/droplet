@@ -22,7 +22,7 @@ public class ImageUtils {
     /**
      * 根据buf最前面的字符序列判断图片类型
      */
-    static public func getImageType(data:Array<UInt8>): Int64 {
+    static  func getImageType(data:Array<UInt8>): Int64 {
 		if (data[0]==0x42 && data[1]==0x4D){  // "BM"
 			return ImageFormatBMP
         }else if(data[0] == 0xFF && data[1] == 0xD8 ){  //"FFD8"

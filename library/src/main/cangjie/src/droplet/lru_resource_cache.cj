@@ -8,11 +8,11 @@ public class LruResourceCache <: LruCache<AnyKey, AnyDropletResource> & MemoryCa
 
   private var listener: Option<ResourceRemovedListener> = None;
 
-  public init() {
+  init() {
     super(100);
   }
 
-  public init(size: Int64) {
+  init(size: Int64) {
     super(size);
   }
 

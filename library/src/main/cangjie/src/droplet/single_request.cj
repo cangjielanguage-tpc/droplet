@@ -100,7 +100,7 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
     private var height: Int64 = 0;
     private var isCallingCallbacks: Bool = false;
 
-    public func isEquivalentTo(o: SingleRequest<R>): Bool {
+    func isEquivalentTo(o: SingleRequest<R>): Bool {
         if (!(o is AnySingleRequest)) {
             return false;
         }
@@ -460,16 +460,16 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
         }
     }
 
-    public func getErrorDrawable(): Option<CJResourceDrawable> {
+    func getErrorDrawable(): Option<CJResourceDrawable> {
         return requestOptions.getErrorPlaceholderDrawable();
     }
 
-    public func getPlaceholderDrawable(): Option<CJResourceDrawable> {
+    func getPlaceholderDrawable(): Option<CJResourceDrawable> {
         return requestOptions.getPlaceholderDrawable();
     }
 
 
-    public func setErrorPlaceholder(): Unit {
+    func setErrorPlaceholder(): Unit {
         if (!canNotifyStatusChanged()) {
             return;
         }
@@ -763,7 +763,6 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
             }
 
             if (!anyListenerHandledUpdatingTarget) {
-                // TODO transition  animationFactory.build(dataSource, isFirstResource);
                 let t: Option<DrawableTransition> = None
                 target.onResourceReady(result, t);
             }
@@ -778,7 +777,7 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
         onLoadFailed(e, 0);
     }
 
-    public func getLock(): ReentrantMutex {
+    public override func getLock(): ReentrantMutex {
         stateVerifier.throwIfRecycled();
         return requestLock;
     }

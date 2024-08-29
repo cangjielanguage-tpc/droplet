@@ -6,7 +6,7 @@ package droplet.droplet
 
 
 public class EngineResourceFactory {
-    public func build<R>(
+     func build<R>(
         resource: DropletResource<R>,
         isMemoryCacheable: Bool,
         key: AnyKey, 
@@ -16,7 +16,7 @@ public class EngineResourceFactory {
           resource, isMemoryCacheable, /*isRecyclable=*/ true, key, listener, resourceTypeClass);
     }
 
-    public func buildAny(
+     func buildAny(
         resource: AnyDropletResource,
         isMemoryCacheable: Bool,
         key: AnyKey, 
@@ -81,7 +81,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         mtx = ReentrantMutex()
     }
 
-    public func initEngine(key: AnyKey,
+     func initEngine(key: AnyKey,
                             isCacheable: Bool,
                             onlyRetrieveFromCache: Bool): EngineJob {
         synchronized(mtx) {
@@ -93,11 +93,11 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         
     }
 
-    public func getMtx():ReentrantMutex{
+     func getMtx():ReentrantMutex{
         return mtx
     }
 
-    public func start(job: DecodeJob): Unit {
+     func start(job: DecodeJob): Unit {
         synchronized(mtx) {
             this.decodeJob = job
             reschedule(job)
@@ -108,7 +108,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         excutor.execute(job)
     }
 
-    public func callCallbackOnResourceReady(cb: ResourceCallback): Unit {
+     func callCallbackOnResourceReady(cb: ResourceCallback): Unit {
             cb.onResourceReady(engineResource.getOrThrow() as AnyDropletResource, dataSource.getOrThrow(), isLoadedFromAlternateCacheKey);
     }
 
@@ -136,7 +136,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         notifyCallbacksOfException();
     }
 
-    public func notifyCallbacksOfResult(): Unit {
+     func notifyCallbacksOfResult(): Unit {
         let copy: ArrayList<ResourceCallbackAndExecutor>
         let localKey: AnyKey;
         let localResource: AnyEngineResource;
@@ -181,7 +181,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         decrementPendingCallbacks();
     }
 
-    public func notifyCallbacksOfException(): Unit {
+     func notifyCallbacksOfException(): Unit {
         let copy: ArrayList<ResourceCallbackAndExecutor>;
         let localKey: AnyKey;
         synchronized (mtx) {
@@ -213,7 +213,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         decrementPendingCallbacks();
     }
 
-    public func addCallback(cb: ResourceCallback, callbackExecutor: DropletExecutor<Option<InputStream>>) {
+     func addCallback(cb: ResourceCallback, callbackExecutor: DropletExecutor<Option<InputStream>>) {
         synchronized(mtx) {
             stateVerifier.throwIfRecycled();
             cbs.append(ResourceCallbackAndExecutor(cb, callbackExecutor))
@@ -233,7 +233,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         }
     }
 
-    public func removeCallback(cb: ResourceCallback): Unit {
+     func removeCallback(cb: ResourceCallback): Unit {
         synchronized(mtx) {
             stateVerifier.throwIfRecycled();
             try {
@@ -257,7 +257,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         }
     }
 
-    public func cancel(): Unit {
+     func cancel(): Unit {
         if (isDone()) {
             return;
         }
@@ -279,7 +279,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         
     }
 
-    public func callCallbackOnLoadFailed(cb: ResourceCallback): Unit {
+     func callCallbackOnLoadFailed(cb: ResourceCallback): Unit {
         // This is overly broad, some Droplet code is actually called here, but it's much
         // simpler to encapsulate here than to do so at the actual call point in the Request
         // implementation.
@@ -290,7 +290,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         }
     }
 
-    public func incrementPendingCallbacks(count: Int64): Unit {
+     func incrementPendingCallbacks(count: Int64): Unit {
         synchronized(mtx) {
             if (pendingCallbacks.fetchAdd(count) == 0 && match(engineResource) {
                 case Some(x) => true
@@ -301,7 +301,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         }
     }
 
-    public func decrementPendingCallbacks(): Unit {
+     func decrementPendingCallbacks(): Unit {
         var toRelease: Option<AnyEngineResource> = None;
         synchronized (mtx) {
             stateVerifier.throwIfRecycled();
@@ -345,17 +345,17 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         
     }
 
-    public func getCancelled(): Bool {
+     func getCancelled(): Bool {
         synchronized(mtx) {
             return isCancelled;
         }
     }
 
-    public func isDone(): Bool {
+     func isDone(): Bool {
         return hasLoadFailed || hasResource || isCancelled;
     }
 
-    public func equals(other: EngineJob): Bool {
+     func equals(other: EngineJob): Bool {
         this.pendingCallbacks.load() == other.pendingCallbacks.load() && 
         this.key == other.key && 
         this.isCacheable == other.isCacheable && 
@@ -452,7 +452,7 @@ public class CallResourceReady <: DropletThread<Option<InputStream>> {
       this.executor = executor;
     }
 
-    public func equals(o: Any): Bool {
+     func equals(o: Any): Bool {
       if (o is ResourceCallbackAndExecutor) {
         let other: ResourceCallbackAndExecutor = (o as ResourceCallbackAndExecutor).getOrThrow();
         return cb == other.cb;

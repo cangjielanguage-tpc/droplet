@@ -37,39 +37,41 @@ public class DeviceLifecycle <: Hashable & Equatable<DeviceLifecycle> {
     this.key = key
   }
   
-  public func getCurrentState(): Int64 {
+   func getCurrentState(): Int64 {
     return this.state.getCurrentState()
   }
 
-  public func isAtLeast(s: Int64): Bool {
+   func isAtLeast(s: Int64): Bool {
     return this.state.isAtLeast(s)
   }
 
-  public func setCurrentState(s: Int64): Unit {
+   func setCurrentState(s: Int64): Unit {
     this.state.setCurrentState(s)
   }
 
-  public func addObserver(o: LifecycleObserver): Unit {
+   func addObserver(o: LifecycleObserver): Unit {
     this.observer.put(o)
   }
 
-  public func removeObserver(o: LifecycleObserver): Unit {
+   func removeObserver(o: LifecycleObserver): Unit {
     this.observer.remove(o)
   }
 
-  public func onAppear(): Unit {
+   func onAppear(): Unit {
     setCurrentState(LifecycleState.STATE_STARTED)
     for(o in this.observer) {
       o.onStart()
     }
   }
 
-  public func onDisAppear(): Unit {
+   func onDisAppear(): Unit {
     setCurrentState(LifecycleState.STATE_DESTROYED)
-    for(o in this.observer) {
+    let cloneObserve = this.observer.clone()
+    for(o in cloneObserve) {
       o.onStop()
       o.onDestroy()
     }
+    setCurrentState(LifecycleState.STATE_INITIALIZED)
   }
   
   public operator func ==(right: DeviceLifecycle): Bool {
@@ -93,23 +95,23 @@ public class LifecycleState {
 
   public var state: Int64;
 
-  public init() {
+   init() {
     this.state = STATE_INITIALIZED
   }
 
-  public init(s: Int64) {
+   init(s: Int64) {
     this.state = s
   }
 
-  public func getCurrentState(): Int64 {
+   func getCurrentState(): Int64 {
     return this.state
   }
 
-  public func isAtLeast(s: Int64): Bool {
+   func isAtLeast(s: Int64): Bool {
     return (this.state - s) >= 0;
   }
 
-  public func setCurrentState(s: Int64): Unit {
+   func setCurrentState(s: Int64): Unit {
     this.state = s
   }
 
@@ -157,6 +159,7 @@ public class LifecycleLifecycle <: Lifecycle & LifecycleObserver {
     for (lifecycleListener in Utils.getSnapshot(lifecycleListeners)) {
       lifecycleListener.onDestroy();
     }
+    deviceLifecycle.removeObserver(this)
   }
 
   public operator func ==(right: LifecycleObserver): Bool {

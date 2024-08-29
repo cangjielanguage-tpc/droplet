@@ -6,7 +6,7 @@ package droplet.droplet
 
 
 public class DropletExecutor<T> {
-    public func execute(gt: DropletThread<T>): Future<T> {
+     func execute(gt: DropletThread<T>): Future<T> {
         return gt.run()
     }
 }

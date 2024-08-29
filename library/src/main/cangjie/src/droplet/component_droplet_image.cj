@@ -148,14 +148,6 @@ public class DropletImageComponent {
     @State
     var pixelMap: PixelMap = createPixelMap(color, opts)
 
-    // 生命周期：组件首次显示在屏幕上时调用
-    public func onAppear(key: String): Unit {
-        Droplet.get(globalContext.getOrThrow()).onAppear(key)
-    }
-    //生命周期：组件从屏幕上消失时调用
-    public func onDisappear(key: String): Unit {
-        Droplet.get(globalContext.getOrThrow()).onDisAppear(key)
-    }
 
     func onOptionChanged() {
         updateImg(oldWidth, oldHeight)
@@ -165,78 +157,66 @@ public class DropletImageComponent {
         if (option.loadSrc != "" && width > 0 && height > 0) {
             beginFn()
 
-            var dropletManager = Option<RequestManager>.None
+            var requestManager = Option<RequestManager>.None
             if (let Some(v) <- option.useDefaultRequestOption) {
-                dropletManager = Droplet.withContext(globalContext.getOrThrow(), option.label).useDefaultRequestOptions(
+                requestManager = Droplet.withContext(globalContext.getOrThrow(), option.label).useDefaultRequestOptions(
                     v)
             } else {
-                dropletManager = Droplet.withContext(globalContext.getOrThrow(), option.label)
+                requestManager = Droplet.withContext(globalContext.getOrThrow(), option.label)
             }
-            var droplet = dropletManager.getOrThrow().load(option.loadSrc)
+            var builder = requestManager.getOrThrow().load(option.loadSrc)
             //设置三级缓存策略
             if (let Some(v) <- option.strategy) {
-                droplet = droplet.setDiskCacheStrategy(v)
+                builder = builder.setDiskCacheStrategy(v)
             }
 
             if (let Some(v) <- option.onlyRetrieveFromCache) {
-                droplet = droplet.onlyRetrieveFromCachecj(v, droplet)
+                builder = builder.onlyRetrieveFromCachecj(v, builder)
             }
 
             if (let Some(v) <- option.isSkipMemory) {
-                droplet = droplet.skipMemoryCache(v, droplet)
-            }
-
-            if (let Some(v) <- option.transitionOption) {
-                droplet = droplet.transition(v, droplet)
+                builder = builder.skipMemoryCache(v, builder)
             }
 
             if (let Some(v) <- option.thumbnail) {
-                droplet = droplet.thumbnail(v)
+                builder = builder.thumbnail(v)
             }
 
             if (let Some(v) <- option.thumbnaildrawable) {
-                droplet = droplet.thumbnail(v)
+                builder = builder.thumbnail(v)
             }
 
             if (let Some(v) <- option.overrideWH) {
-                droplet = droplet.setOverride(v[0], v[1])
+                builder = builder.setOverride(v[0], v[1])
             }
 
             if (let Some(v) <- option.transformCate) {
-                droplet = droplet.transform(v)
+                builder = builder.transform(v)
             }
 
             if (let Some(v) <- option.transformListCate) {
                 if (v.size > 1) {
-                    droplet = droplet.transforms(v)
+                    builder = builder.transforms(v)
                 } else if (v.size == 1) {
-                    droplet = droplet.transform(v[0])
+                    builder = builder.transform(v[0])
                 }
             }
 
             if (let Some(v) <- option.dontTransform) {
                 if (v) {
-                    droplet = droplet.dontTransform(droplet)
+                    builder = builder.dontTransform(builder)
                 }
-            }
-            //设置占位符
-            if (let Some(v) <- option.placeholder) {
-                droplet = droplet.placeholder(v)
-            }
-            //设置错误占位符
-            if (let Some(v) <- option.errholder) {
-                droplet = droplet.error(v)
             }
 
             if (let Some(v) <- option.applyRequestOption) {
-                droplet = droplet.apply(v)
+                builder = builder.apply(v)
             }
 
             if (let Some(v) <- option.signature) {
-                droplet = droplet.setSignature(StringKey(v))
+                builder = builder.setSignature(StringKey(v))
             }
 
-            droplet.listener(
+            builder.listener(
                 {
                     drawable: Drawable, model: Model, target: Target<Drawable>, datasource: DataSource, 
                     isFirstResource: Bool =>
@@ -344,8 +324,8 @@ public class DropletImageComponent {
                         )
                     }
                 } else {
-                    Image(pixelMap).width(100.percent).objectFit(ImageFit.ScaleDown).opacity(opacityValue).rotate(
-                        rotateValue).scale(scaleValue).translateX(TranslateValue)
+                    Image(pixelMap).objectFit(ImageFit.ScaleDown).opacity(opacityValue).rotate(
+                        rotateValue).scale(scaleValue).translateX(TranslateValue).fitOriginalSize(true)
                 }
             }
         }

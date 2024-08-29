@@ -29,57 +29,57 @@ public class Manager {
         this.pixelMapResourceDecoders.append(PixelMapResourceDecoder())
     }
 
-    public func getStringModelLoaders(): ArrayList<ModelLoader> {
+     func getStringModelLoaders(): ArrayList<ModelLoader> {
         synchronized (mtx) {
             return stringModelLoaders
         }
     }
 
-    public func getFileModelLoaders(): ArrayList<ModelLoader> {
+     func getFileModelLoaders(): ArrayList<ModelLoader> {
         synchronized (mtx) {
             return fileModelLoaders
         }
     }
 
-    public func setStringModelLoader(modelLoader: ModelLoader): Unit {
+     func setStringModelLoader(modelLoader: ModelLoader): Unit {
         synchronized (mtx) {
             this.stringModelLoaders.clear()
             this.stringModelLoaders.append(modelLoader)
         }
     }
 
-    public func setFileModelLoader(modelLoader: ModelLoader): Unit {
+     func setFileModelLoader(modelLoader: ModelLoader): Unit {
         synchronized (mtx) {
             this.fileModelLoaders.clear()
             this.fileModelLoaders.append(modelLoader)
         }
     }
 
-    public func addDrawableResourceDecoder(decoder: ResourceDecoder<Array<UInt8>, Drawable>): Unit {
+     func addDrawableResourceDecoder(decoder: ResourceDecoder<Array<UInt8>, Drawable>): Unit {
         synchronized (mtx) {
             this.drawableResourceDecoders.append(decoder)
         }
     }
 
-    public func getDrawableResourceParser(): ResourceDecoder<Array<UInt8>, Drawable> {
+     func getDrawableResourceParser(): ResourceDecoder<Array<UInt8>, Drawable> {
         synchronized (mtx) {
             return drawableResourceParser
         }
     }
 
-    public func getDrawableResourceDecoders(): ArrayList<ResourceDecoder<Array<UInt8>, Drawable>> {
+     func getDrawableResourceDecoders(): ArrayList<ResourceDecoder<Array<UInt8>, Drawable>> {
         synchronized (mtx) {
             return this.drawableResourceDecoders
         }
     }
 
-    public func addPixelMapResourceDecoder(decoder: ResourceDecoder<Array<UInt8>, PixelMap>): Unit {
+     func addPixelMapResourceDecoder(decoder: ResourceDecoder<Array<UInt8>, PixelMap>): Unit {
         synchronized (mtx) {
             this.pixelMapResourceDecoders.append(decoder)
         }
     }
 
-    public func getPixelMapResourceDecoders(): ArrayList<ResourceDecoder<Array<UInt8>, PixelMap>> {
+     func getPixelMapResourceDecoders(): ArrayList<ResourceDecoder<Array<UInt8>, PixelMap>> {
         synchronized (mtx) {
             return this.pixelMapResourceDecoders
         }

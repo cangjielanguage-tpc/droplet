@@ -87,7 +87,7 @@ class LZWEncoder {
 
     // Add a character to the end of the current packet, and if it is 254
     // characters, flush the packet to disk.
-    public func char_out(c:UInt8, outs:File) {
+     func char_out(c:UInt8, outs:File) {
         accum[Int64(a_count)] = c;
         a_count++
         if (a_count >= 254){
@@ -98,7 +98,7 @@ class LZWEncoder {
     // Clear out the hash table
 
     // table clear for block compress
-    public func cl_block(outs:File) {
+     func cl_block(outs:File) {
         cl_hash(hsize);
         free_ent = ClearCode + 2;
         clear_flg = true;
@@ -107,13 +107,13 @@ class LZWEncoder {
     }
 
     // reset code table
-    public func cl_hash( hsize:Int32) {
+     func cl_hash( hsize:Int32) {
         for (i in 0..hsize){
             htab[Int64(i)] = -1;
         }
     }
 
-    public func compress( init_bits:Int32,  outs:File){
+     func compress( init_bits:Int32,  outs:File){
         var fcode:Int32;
         var i:Int32 = 0 /* = 0 */;
         var c:Int32;
@@ -197,7 +197,7 @@ class LZWEncoder {
         output(EOFCode, outs);
     }
     // ----------------------------------------------------------------------------
-    public func encode(os:File) {
+     func encode(os:File) {
         os.write(Array<UInt8>(1, item: UInt8(initCodeSize)))
         remaining = imgW * imgH; // reset navigation variables
         curPixel = 0;
@@ -206,7 +206,7 @@ class LZWEncoder {
     }
 
     // Flush the packet to disk, and reset the accumulator
-    public func flush_char(outs:File) {
+     func flush_char(outs:File) {
         if (a_count > 0) {
             outs.write(Array<UInt8>(1, item:UInt8(a_count)))
             outs.write(accum.slice(0, Int64(a_count)));
@@ -214,7 +214,7 @@ class LZWEncoder {
         }
     }
 
-    public func MAXCODE(n_bits:Int32):Int32 {
+     func MAXCODE(n_bits:Int32):Int32 {
         return (1 << n_bits) - 1;
     }
 
@@ -233,7 +233,7 @@ class LZWEncoder {
         return Int32(pix & UInt8(0xff));
     }
 
-    public func output(codecj:Int32, outscj:File) {
+     func output(codecj:Int32, outscj:File) {
         cur_accum &= masks[Int64(cur_bits)];
 
         if (cur_bits > 0){

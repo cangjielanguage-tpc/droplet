@@ -62,11 +62,11 @@ public class ResourceCacheGenerator <: DataFetcherGenerator {
   public func cancel(): Unit {
   }
 
-  public func onDataReady(data: Any): Unit {
+   func onDataReady(data: Any): Unit {
       cb.onDataFetcherReady(sourceKey.getOrThrow(), Some(data), DataSource.RESOURCE_DISK_CACHE);
     }
 
-  public func onLoadFailed(e: DropletException): Unit {
+   func onLoadFailed(e: DropletException): Unit {
     cb.onDataFetcherFailed();
 
   }

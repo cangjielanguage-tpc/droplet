@@ -17,7 +17,7 @@ public class ActiveResources <: LruCache<AnyKey, AnyDropletResource> {
     super(size);
   }
 
-  public func moveMemory(memoryCache: MemoryCache): Unit {
+   func moveMemory(memoryCache: MemoryCache): Unit {
     var iter: Iterator<CustomMapItem<AnyKey, MemoryEntry<AnyDropletResource>>> = this.cache.getIterator()
     while (true) {
       match (iter.next()) {
@@ -28,7 +28,7 @@ public class ActiveResources <: LruCache<AnyKey, AnyDropletResource> {
     this.cache.clear()
   }
 
-  public func setActiveResourceRemovedListener(listener: ActiveResourceRemovedListener): Unit {
+   func setActiveResourceRemovedListener(listener: ActiveResourceRemovedListener): Unit {
     this.listener = listener;
   }
 
@@ -45,7 +45,7 @@ public class ActiveResources <: LruCache<AnyKey, AnyDropletResource> {
     return Int64(item.getSize());
   }
 
-  public func trimMemory(level: Int64): Unit {
+   func trimMemory(level: Int64): Unit {
     // Name	                Value	Description
     // MEMORY_LEVEL_MODERATE	0	  Moderate memory usage.
     // MEMORY_LEVEL_LOW	      1	  Low memory usage.

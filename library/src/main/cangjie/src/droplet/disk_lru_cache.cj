@@ -50,7 +50,7 @@ public class DiskLruCache {
         this.maxSize = maxSize;
     }
 
-    public func getMtx():ReentrantMutex{
+     func getMtx():ReentrantMutex{
         return mtx
     }
 
@@ -63,7 +63,7 @@ public class DiskLruCache {
     * @param maxSize the maximum number of bytes this cache should use to store
     * @throws IOException if reading or writing the cache directory fails
     */
-    public static func openStatic(directory: DropletFile, appVersion: Int64, valueCount: Int64, maxSize: Int64): DiskLruCache {
+     static func openStatic(directory: DropletFile, appVersion: Int64, valueCount: Int64, maxSize: Int64): DiskLruCache {
         if (maxSize <= 0) {
             throw Exception("droplet error: maxSize <= 0");
         }
@@ -300,7 +300,7 @@ public class DiskLruCache {
     * exist is not currently readable. If a value is returned, it is moved to
     * the head of the LRU queue.
     */
-    public func get(key: String): Option<Value> {
+     func get(key: String): Option<Value> {
         synchronized(mtx) {
             checkNotClosed();
             for(r in lruEntries.getIterator()) {
@@ -342,11 +342,11 @@ public class DiskLruCache {
     * Returns an editor for the entry named {@code key}, or null if another
     * edit is in progress.
     */
-    public func edit(key: String): Option<Editor> {
+     func edit(key: String): Option<Editor> {
         return edit(key, ANY_SEQUENCE_NUMBER);
     }
 
-    public func edit(key: String, expectedSequenceNumber: Int64): Option<Editor> {
+     func edit(key: String, expectedSequenceNumber: Int64): Option<Editor> {
         synchronized(mtx) {
             checkNotClosed();
             var entry: Option<DiskEntry> = lruEntries.get(key);
@@ -383,7 +383,7 @@ public class DiskLruCache {
     }
 
     /** Returns the directory where this cache stores its data. */
-    public func getDirectory(): DropletFile {
+     func getDirectory(): DropletFile {
         return directory;
     }
 
@@ -391,7 +391,7 @@ public class DiskLruCache {
     * Returns the maximum number of bytes that this cache should use to store
     * its data.
     */
-    public func getMaxSize(): Int64 {
+     func getMaxSize(): Int64 {
         synchronized(mtx) {
             return maxSize;
         }
@@ -401,7 +401,7 @@ public class DiskLruCache {
     * Changes the maximum number of bytes the cache can store and queues a job
     * to trim the existing store, if necessary.
     */
-    public func setMaxSize(maxSize: Int64): Unit {
+     func setMaxSize(maxSize: Int64): Unit {
         synchronized(mtx) {
             this.maxSize = maxSize;
             // 开线程
@@ -414,13 +414,13 @@ public class DiskLruCache {
     * this cache. This may be greater than the max size if a background
     * deletion is pending.
     */
-    public func getSize(): Int64 {
+     func getSize(): Int64 {
         synchronized(mtx) {
             return size;
         }
     }
 
-    public func completeEdit(editor: Editor, success: Bool): Unit {
+     func completeEdit(editor: Editor, success: Bool): Unit {
         synchronized(mtx) {
             var entry: DiskEntry = editor.entry;
             if (entry.currentEditor.getOrThrow() != editor) {
@@ -493,7 +493,7 @@ public class DiskLruCache {
         }
     }
 
-    public func executorServiceSubmit(): Unit {
+     func executorServiceSubmit(): Unit {
         spawn {
             synchronized (mtx) {
                 if (match(journalWriter) {
@@ -525,7 +525,7 @@ public class DiskLruCache {
     *
     * @return true if an entry was removed.
     */
-    public func remove(key: String): Bool {
+     func remove(key: String): Bool {
         synchronized(mtx) {
             checkNotClosed();
             var entry: Option<DiskEntry> = lruEntries.get(key);
@@ -570,7 +570,7 @@ public class DiskLruCache {
     }
 
     /** Returns true if this cache has been closed. */
-    public func isClosed(): Bool {
+     func isClosed(): Bool {
         synchronized(mtx) {
             return match(journalWriter) {
                 case Some(x) => false
@@ -590,7 +590,7 @@ public class DiskLruCache {
     }
 
     /** Force buffered operations to the filesystem. */
-    public func flush(): Unit {
+     func flush(): Unit {
         synchronized(mtx) {
             checkNotClosed();
             trimToSize();
@@ -599,7 +599,7 @@ public class DiskLruCache {
     }
 
     /** Closes this cache. Stored values will remain on the filesystem. */
-    public func close(): Unit{
+     func close(): Unit{
         synchronized(mtx) {
             if (match(journalWriter) {
                 case Some(x) => false
@@ -639,7 +639,7 @@ public class DiskLruCache {
     * all files in the cache directory including files that weren't created by
     * the cache.
     */
-    public func delete(): Unit {
+     func delete(): Unit {
         close();
         directory.delete()
     }
@@ -662,7 +662,7 @@ public class Value {
     private let files: Array<DropletFile>;
     private let parent: DiskLruCache;
 
-    public init(key: String, sequenceNumber: Int64, files: Array<DropletFile>, lengths: Array<Int64>, parent: DiskLruCache) {
+     init(key: String, sequenceNumber: Int64, files: Array<DropletFile>, lengths: Array<Int64>, parent: DiskLruCache) {
       this.key = key;
       this.sequenceNumber = sequenceNumber;
       this.files = files;
@@ -675,22 +675,22 @@ public class Value {
      * entry has changed since this snapshot was created or if another edit
      * is in progress.
      */
-    public func edit(): Option<Editor> {
+     func edit(): Option<Editor> {
       return parent.edit(key, sequenceNumber);
     }
 
-    public func getFile(index: Int64): DropletFile {
+     func getFile(index: Int64): DropletFile {
         return files[index];
     }
 
     /** Returns the string value for {@code index}. */
-    public func getString(index: Int64): String {
+     func getString(index: Int64): String {
         var stringReader: StringReader<File> = files[index].getStringReader()
         return stringReader.readToEnd()
     }
 
     /** Returns the byte length of the value for {@code index}. */
-    public func getLength(index: Int64): Int64 {
+     func getLength(index: Int64): Int64 {
       return lengths[index];
     }
 }
@@ -700,7 +700,7 @@ public class Editor <: DropletAny<Editor> {
     public let written: Option<Array<Bool>>;
     public var committed: Bool = false;
 
-    public init(entry: DiskEntry, valueCount: Int64) {
+     init(entry: DiskEntry, valueCount: Int64) {
         this.entry = entry;
         if(!entry.readable) {
             this.written = Some(Array<Bool>(valueCount, item: false))
@@ -713,7 +713,7 @@ public class Editor <: DropletAny<Editor> {
     * Returns an unbuffered input stream to read the last committed value,
     * or null if no value has been committed.
     */
-    public func newInputStream(index: Int64): Option<StringReader<File>> {
+     func newInputStream(index: Int64): Option<StringReader<File>> {
           synchronized(entry.parent.getMtx()) {
             if (entry.currentEditor != this) {
                 throw Exception("droplet error: getString error");
@@ -730,7 +730,7 @@ public class Editor <: DropletAny<Editor> {
     * Returns the last committed value as a string, or null if no value
     * has been committed.
     */
-    public func getString(index: Int64): Option<String> {
+     func getString(index: Int64): Option<String> {
         synchronized(entry.parent.getMtx()) {
             if (entry.currentEditor != this) {
                 throw Exception("droplet error: getString error");
@@ -751,7 +751,7 @@ public class Editor <: DropletAny<Editor> {
         }
     }
 
-    public func getFile(index: Int64): DropletFile {
+     func getFile(index: Int64): DropletFile {
         synchronized (entry.parent.getMtx()) {
             if (entry.currentEditor != this) {
                 throw Exception();
@@ -766,7 +766,7 @@ public class Editor <: DropletAny<Editor> {
     }
 
     /** Sets the value at {@code index} to {@code value}. */
-    public func set(index: Int64, value: String): Unit {
+     func set(index: Int64, value: String): Unit {
         var writer: StringWriter<File> = getFile(index).getStringWriter()
         writer.write(value);
         writer.flush()
@@ -776,7 +776,7 @@ public class Editor <: DropletAny<Editor> {
     * Commits this edit so it is visible to readers.  This releases the
     * edit lock so another edit may be started on the same key.
     */
-    public func commit(): Unit {
+     func commit(): Unit {
         // The object using this Editor must catch and handle any errors
         // during the write. If there is an error and they call commit
         // anyway, we will assume whatever they managed to write was valid.
@@ -789,11 +789,11 @@ public class Editor <: DropletAny<Editor> {
     * Aborts this edit. This releases the edit lock so another edit may be
     * started on the same key.
     */
-    public func abort(): Unit {
+     func abort(): Unit {
         this.entry.parent.completeEdit(this, false);
     }
 
-    public func abortUnlessCommitted(): Unit {
+     func abortUnlessCommitted(): Unit {
         if (!committed) {
             try {
                 abort();
@@ -850,7 +850,7 @@ public class DiskEntry <: DropletAny<DiskEntry> {
     /** The sequence number of the most recently committed edit to this entry. */
     public var sequenceNumber: Int64 = 0;
 
-    public init(key: String, parent: DiskLruCache) {
+     init(key: String, parent: DiskLruCache) {
         this.key = key;
         this.parent = parent;
         this.lengths = Array<Int64>(this.parent.valueCount, item: 0);
@@ -872,7 +872,7 @@ public class DiskEntry <: DropletAny<DiskEntry> {
         }
     }
 
-    public func getLengths(): String {
+     func getLengths(): String {
         var result: StringBuilder = StringBuilder();
         
         for (size in lengths) {
@@ -883,7 +883,7 @@ public class DiskEntry <: DropletAny<DiskEntry> {
     }
 
     /** Set lengths using decimal numbers like "10123". */
-    public func setLengths(strings: Array<String>): Unit {
+     func setLengths(strings: Array<String>): Unit {
         if (strings.size != this.parent.valueCount) {
             throw Exception("droplet error: error !!!!!!!")
         }
@@ -899,11 +899,11 @@ public class DiskEntry <: DropletAny<DiskEntry> {
         }
     }
 
-    public func getCleanFile(i: Int64): DropletFile {
+     func getCleanFile(i: Int64): DropletFile {
         return cleanFiles[i];
     }
 
-    public func getDirtyFile(i: Int64): DropletFile {
+     func getDirtyFile(i: Int64): DropletFile {
         return dirtyFiles[i];
     }
 

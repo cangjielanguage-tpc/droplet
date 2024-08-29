@@ -16,7 +16,7 @@ public class GifFrameResourceDecoder {
 
 
 
-   public func decode(source: GifDecoder): PixelMap {
+    func decode(source: GifDecoder): PixelMap {
     let (ret, firstFrame) = source.getNextFrame();
     return firstFrame
   }

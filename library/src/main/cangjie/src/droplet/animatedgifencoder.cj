@@ -120,10 +120,10 @@ public class AnimatedGifEncoder {
             started = false
         }
     }
-    public func isOpened():Bool{
+    func isOpened():Bool{
         return started && outFile.canWrite()
     }
-    public func writeHeadMark(){
+    func writeHeadMark(){
         try {
             writeString("GIF89a"); // header
         } catch (e:IOException) {
@@ -138,26 +138,26 @@ public class AnimatedGifEncoder {
      * @param ms
      *          int delay time in milliseconds
      */
-    public func setDelay( ms:Int32) {
+    func setDelay( ms:Int32) {
         delay = Int32(round(Float64(ms) / 10.0))
     }
 
 
-    public func setDispose(code:Int32) {
+    func setDispose(code:Int32) {
         if (code >= 0) {
             dispose = code;
         }
     }
 
 
-    public func setRepeat(iter:Int32) {
+    func setRepeat(iter:Int32) {
         if (iter >= 0) {
             repeat = iter;
         }
     }
 
 
-    public func setTransparent(color:UInt32) {
+    func setTransparent(color:UInt32) {
         transparent = color;
     }
 
@@ -172,7 +172,7 @@ public class AnimatedGifEncoder {
      *          BufferedImage containing frame to write.
      * @return true if successful.
      */
-    public func addFrame(im:Bitmap):Bool {
+    func addFrame(im:Bitmap):Bool {
         return addFrame(im, 0, 0);
     }
 
@@ -194,7 +194,7 @@ public class AnimatedGifEncoder {
      *          the Logical Screen.
      * @return true if successful.
      */
-    public func addFrame(  im:Bitmap,  x:Int32,  y:Int32):Bool {
+    func addFrame(  im:Bitmap,  x:Int32,  y:Int32):Bool {
         if ((im.width==0) || !started) {
             return false;
         }
@@ -237,7 +237,7 @@ public class AnimatedGifEncoder {
      * Flushes any pending data and closes output file. If writing to an
      * OutputStream, the stream is not closed.
      */
-    public func finish():Bool {
+     func finish():Bool {
         if (!started){
             return false;
         }
@@ -271,14 +271,14 @@ public class AnimatedGifEncoder {
      * @param fps
      *          float frame rate (frames per second)
      */
-    public func setFrameRate(fps:Float32) {
+     func setFrameRate(fps:Float32) {
         if (abs(fps - 0.0)>0.001) {
             delay = Int32(round(Float32(100.0) / fps))
         }
     }
 
 
-    public func setQuality(quality:Int32) {
+     func setQuality(quality:Int32) {
         if (quality < 1){
             sample = 1;
         }else{
@@ -295,7 +295,7 @@ public class AnimatedGifEncoder {
      * @param h
      *          int frame width.
      */
-    public func setSize(w:Int32, h:Int32) {
+     func setSize(w:Int32, h:Int32) {
         if (started) {
             return;
         }

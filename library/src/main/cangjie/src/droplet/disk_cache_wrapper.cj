@@ -32,7 +32,7 @@ public class DiskLruCacheWrapper <: DiskCache {
    * @return The new disk cache with the given arguments, or the current cache if one already exists
    * @deprecated Use {@link #create(File, long)} to create a new cache with the specified arguments.
    */
-  public static func getStatic(directory: DropletFile, maxSize: Int64): DiskCache {
+   static func getStatic(directory: DropletFile, maxSize: Int64): DiskCache {
     // TODO calling twice with different arguments makes it return the cache for the same
     // directory, it's public!
 
@@ -54,14 +54,14 @@ public class DiskLruCacheWrapper <: DiskCache {
    * @param maxSize The max size for the disk cache
    * @return The new disk cache with the given arguments
    */
-  public static func create(directory: DropletFile, maxSize: Int64): DiskCache {
+   static func create(directory: DropletFile, maxSize: Int64): DiskCache {
     return DiskLruCacheWrapper(directory, maxSize);
   }
 
   /**
    * @deprecated Do not extend this class.
    */
-  public init(directory: DropletFile, maxSize: Int64) {
+  init(directory: DropletFile, maxSize: Int64) {
     this.directory = directory;
     this.maxSize = maxSize;
     this.safeKeyGenerator = SafeKeyGenerator();

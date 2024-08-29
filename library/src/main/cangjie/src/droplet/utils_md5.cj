@@ -175,7 +175,7 @@ public class MD5 <: ToString {
         m_fill[0]=0x80;
         MD5Init();
     }  
-    public func MD5Init(){
+     func MD5Init(){
         MD5.InitDigest(m_digest);
         m_len0 = 0
         m_len1 = 0;
@@ -185,7 +185,7 @@ public class MD5 <: ToString {
         return MD5Update(data, data.size)
     }
     @OverflowWrapping
-    public func MD5Update(data: Array<UInt8>, len: Int64) {
+     func MD5Update(data: Array<UInt8>, len: Int64) {
         m_len1+=UInt64(len)
         var count_pre:Int64 = 64 - m_len0;
         var processed:Int64 = 0;
@@ -215,7 +215,7 @@ public class MD5 <: ToString {
         }
     }
     @OverflowWrapping
-    public func MD5Final() {
+     func MD5Final() {
         var fill_len = 64-m_len0;
         m_fill.copyTo(this.m_data, 0, m_len0, fill_len);
         if(m_len0>56){
@@ -241,11 +241,11 @@ public class MD5 <: ToString {
         }
         return str
     }
-    public func toUInt8Array(): Array<UInt8> {
+     func toUInt8Array(): Array<UInt8> {
         return ToUInt8(m_digest);
     }
     
-    public func getStringValue(): String {
+     func getStringValue(): String {
         MD5Final()
         var str = toString()
         MD5Init()

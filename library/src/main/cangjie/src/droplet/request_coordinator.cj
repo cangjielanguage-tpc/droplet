@@ -109,7 +109,7 @@ public class ErrorRequestCoordinator <: RequestCoordinator & LoadRequest {
     this.parent = parent;
   }
 
-  public func setRequests(primary: LoadRequest, error: LoadRequest): Unit {
+   func setRequests(primary: LoadRequest, error: LoadRequest): Unit {
     this.primary = primary;
     this.error = error;
   }

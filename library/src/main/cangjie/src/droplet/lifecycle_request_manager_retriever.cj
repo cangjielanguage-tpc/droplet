@@ -18,7 +18,7 @@ public class LifecycleRequestManagerRetriever {
         this.factory = factory
     }
 
-    public func getDeviceLifecycle(key: String): DeviceLifecycle {
+     func getDeviceLifecycle(key: String): DeviceLifecycle {
         let deviceLifecycle: Option<DeviceLifecycle> = deviceLifecycleMap.get(key)
         if(match(deviceLifecycle) {
             case Some(x) => false
@@ -31,7 +31,7 @@ public class LifecycleRequestManagerRetriever {
         return deviceLifecycle.getOrThrow()
     }
 
-    public func getOrCreate(
+     func getOrCreate(
         context: AbilityContext,
         droplet: Droplet,
         key: String,
@@ -55,7 +55,7 @@ public class LifecycleRequestManagerRetriever {
             
             lifecycleToRequestManager.put(managerKey, result.getOrThrow());
             
-            dropletLifecycle.addListener(DefaultLifecycleListener(lifecycleToRequestManager, managerKey));
+            dropletLifecycle.addListener(DefaultLifecycleListener(lifecycleToRequestManager, managerKey,deviceLifecycleMap,key));
                 
             // This is a bit of hack, we're going to start the RequestManager, but not the
             // corresponding Lifecycle. It's safe to start the RequestManager, but starting the
@@ -75,9 +75,15 @@ public class DefaultLifecycleListener <: LifecycleListener {
 
     public var requestManagerKey: String
 
-    public init(lifecycleToRequestManager: HashMap<String, RequestManager>, requestManagerKey: String) {
+    public var deviceLifecycleMap: HashMap<String, DeviceLifecycle>;
+
+    public var key: String
+
+    public init(lifecycleToRequestManager: HashMap<String, RequestManager>, requestManagerKey: String,deviceLifecycleMap:HashMap<String, DeviceLifecycle>,key:String) {
         this.lifecycleToRequestManager = lifecycleToRequestManager
         this.requestManagerKey = requestManagerKey
+        this.deviceLifecycleMap = deviceLifecycleMap
+        this.key = key
     }
 
     public override func onStart(): Unit {
@@ -88,6 +94,7 @@ public class DefaultLifecycleListener <: LifecycleListener {
 
     public override func onDestroy(): Unit {
         this.lifecycleToRequestManager.remove(requestManagerKey);
+        this.deviceLifecycleMap.remove(key)
     }
 
     public override func hashCode(): Int64 {

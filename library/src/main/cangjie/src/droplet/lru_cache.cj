@@ -18,7 +18,7 @@ public open class LruCache<T, Y> where T <: DropletAny<T>, Y <: DropletAny<Y> {
    * @param size The maximum size of the cache, the units must match the units used in {@link
    *     #getSize(Object)}.
    */
-  public init(size: Int64) {
+  init(size: Int64) {
     this.initialMaxSize = size;
     this.maxSize = size;
   }
@@ -30,7 +30,7 @@ public open class LruCache<T, Y> where T <: DropletAny<T>, Y <: DropletAny<Y> {
    *
    * @param multiplier The multiplier to apply.
    */
-  public func setSizeMultiplier(multiplier: Float32): Unit {
+   public func setSizeMultiplier(multiplier: Float32): Unit {
     synchronized(mtx) {
         if (multiplier < 0.0) {
             throw IllegalArgumentException("Multiplier must be >= 0");
@@ -87,7 +87,7 @@ public open class LruCache<T, Y> where T <: DropletAny<T>, Y <: DropletAny<Y> {
    *
    * @param key The key to check.
    */
-  public func contains(key: T): Bool {
+   func contains(key: T): Bool {
     synchronized(mtx) {
         return cache.containsKey(key);
     }
@@ -98,7 +98,7 @@ public open class LruCache<T, Y> where T <: DropletAny<T>, Y <: DropletAny<Y> {
    *
    * @param key The key to check.
    */
-  public func get(key: T): Option<Y> {
+   func get(key: T): Option<Y> {
     synchronized(mtx) {
         var entry: Option<MemoryEntry<Y>> = cache.get(key);
         if(match(entry) {
@@ -137,7 +137,7 @@ public open class LruCache<T, Y> where T <: DropletAny<T>, Y <: DropletAny<Y> {
    * @param key The key to add the item at.
    * @param item The item to add.
    */
-  public func put(key: T, item: Y): Option<Y> {
+   public func put(key: T, item: Y): Option<Y> {
     synchronized(mtx) {
         let itemSize: Int64 = getSize(item);
         if (itemSize >= maxSize) {

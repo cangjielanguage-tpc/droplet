@@ -21,7 +21,7 @@ public class ResourceTypeClass <: DropletAny<ResourceTypeClass> {
     // 1 ARRAY  2 PIXELMAP
     public var resourceType: Int64 = NONE
 
-    public init(resourceType: Int64) {
+    init(resourceType: Int64) {
         this.resourceType = resourceType
     }
 

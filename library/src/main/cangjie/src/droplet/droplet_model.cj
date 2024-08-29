@@ -17,27 +17,27 @@ public abstract class Model <: DropletAny<Model> {
     public var decoder: Option<GifDecoder> = None
     public var modelType: ModelType = ModelType.NONE
 
-    public init(arr: Array<UInt8>) {
+    init(arr: Array<UInt8>) {
         this.arr = arr
         this.modelType = ModelType.ARRAY
     }
 
-    public init(str: String) {
+    init(str: String) {
         this.str = str
         this.modelType = ModelType.STRING
     }
 
-    public init(file: FSPath) {
+    init(file: FSPath) {
         this.file = DropletFile(file)
         this.modelType = ModelType.FILE
     }
 
-    public init(file: File) {
+    init(file: File) {
         this.file = DropletFile(file)
         this.modelType = ModelType.FILE
     }
 
-    public init(decoder: GifDecoder) {
+    init(decoder: GifDecoder) {
         this.decoder = Some(decoder)
         this.modelType = ModelType.GIFDECODER
     }
@@ -78,7 +78,7 @@ public abstract class Model <: DropletAny<Model> {
         return true
     }
 
-    public func getDataSource(): DataSource {
+    func getDataSource(): DataSource {
         match(modelType) {
             case ModelType.ARRAY => DataSource.LOCAL
             case ModelType.STRING => 
@@ -98,19 +98,19 @@ public abstract class Model <: DropletAny<Model> {
 }
 
 public class LoadModel <: Model {
-    public init(arr: Array<UInt8>) {
+    init(arr: Array<UInt8>) {
         super(arr)
     }
 
-    public init(str: String) {
+    init(str: String) {
         super(str)
     }
 
-    public init(file: FSPath) {
+    init(file: FSPath) {
         super(file)
     }
 
-    public init(file: File) {
+    init(file: File) {
         super(file)
     }
 }

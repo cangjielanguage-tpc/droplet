@@ -10,7 +10,7 @@ public class SafeKeyGenerator {
     private let mtx = ReentrantMutex()
     private let mtxLoadIdToSafeHash = ReentrantMutex()
 
-    public func getSafeKey(key: AnyKey): String {
+     func getSafeKey(key: AnyKey): String {
         var safeKey: Option<DropletString> = None;
         synchronized (mtxLoadIdToSafeHash) {
           safeKey = loadIdToSafeHash.get(key);
@@ -45,7 +45,7 @@ public class WriteLock <: Equatable<WriteLock> {
   private let lock = ReentrantMutex();
   public var interestedThreads: Int64 = 0;
 
-  public func getMtx():ReentrantMutex{
+   func getMtx():ReentrantMutex{
         return lock
   }
 
@@ -64,7 +64,7 @@ public class WriteLockPool {
   private let pool: ArrayDeque<WriteLock> = ArrayDeque<WriteLock>();
   private let mtx = ReentrantMutex()
 
-  public func obtain(): WriteLock {
+   func obtain(): WriteLock {
     var result: Option<WriteLock>;
     synchronized (mtx) {
       result = pool.poll();
@@ -78,7 +78,7 @@ public class WriteLockPool {
     return result.getOrThrow();
   }
 
-  public func offer(writeLock: WriteLock): Unit {
+   func offer(writeLock: WriteLock): Unit {
     synchronized (mtx) {
       if (pool.size() < MAX_POOL_SIZE) {
         pool.offer(writeLock);

@@ -16,7 +16,7 @@ public class MemorySizeCalculator {
     }
 
     /** Returns the recommended memory cache size for the device it is run on in bytes. */
-    public func getMemoryCacheSize() {
+     func getMemoryCacheSize() {
         return memoryCacheSize;
     }
 

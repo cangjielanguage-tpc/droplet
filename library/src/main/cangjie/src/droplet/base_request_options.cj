@@ -5,6 +5,7 @@
 package droplet.droplet
 
 public interface AnyRequestOptions {
+
     func getFields(): Int64
 
     func getTransformationAllowed(): Bool
@@ -36,8 +37,6 @@ public interface AnyRequestOptions {
     func getOptions(): DropletOptions
 
     func getDiskCacheStrategy(): DiskCacheStrategy
-
-    func getTransitionOption(): Option<TransitionOption>
 
     func getTransformations(): CachedHashCodeArrayMap<TransformationKey, AnyKey>
 
@@ -131,10 +130,6 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return onlyRetrieveFromCache
     }
 
-    public func getTransitionOption(): Option<TransitionOption> {
-        return transitionOption
-    }
-
     public func getSignature(): AnyKey {
         return signature
     }
@@ -163,7 +158,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return transformations;
     }
 
-    public func set<V>(option: DropletOption<V>, value: V, t: T): T where V <: AnyDropletOptionValue {
+    func set<V>(option: DropletOption<V>, value: V, t: T): T where V <: AnyDropletOptionValue {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.set(option, value, t2);
@@ -176,7 +171,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         setOptions(option, value, (this as T).getOrThrow())
     }
 
-    public func setOptions(option: String, value: String, t: T): T {
+    func setOptions(option: String, value: String, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.setOptions(option, value, t2);
@@ -185,11 +180,11 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return selfOrThrowIfLocked();
     }
 
-    public func setSizeMultiplier(sizeMultiplier: Float32): T {
+    func setSizeMultiplier(sizeMultiplier: Float32): T {
         setSizeMultiplier(sizeMultiplier, (this as T).getOrThrow())
     }
 
-    public func setSizeMultiplier(sizeMultiplier: Float32, t: T): T {
+    func setSizeMultiplier(sizeMultiplier: Float32, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.setSizeMultiplier(sizeMultiplier, t2);
@@ -208,7 +203,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         dontTransform((this as T).getOrThrow())
     }
 
-    public func dontTransform(t: T): T {
+    func dontTransform(t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.dontTransform(t2);
@@ -280,7 +275,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return self();
     }
 
-    public func self(): T {
+    func self(): T {
         return (this as T).getOrThrow()
     }
 
@@ -297,7 +292,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
     }
 
     // 仓颉没有克隆方法 需要传入一个空对象来赋值
-    public func clone(t: T): T {
+    func clone(t: T): T {
 
         // TODO 克隆对象
         t.fields = this.fields
@@ -322,7 +317,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return t
     }
 
-    public func autoClone(): T {
+    func autoClone(): T {
         if (isLocked && !isAutoCloneEnabled) {
             throw IllegalStateException("You cannot auto lock an already locked options object" + ", try clone() first");
         }
@@ -330,13 +325,13 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return lock();
     }
 
-    public func lock(): T {
+    func lock(): T {
         isLocked = true
         // This is the only place we should not check locked.
         return self();
     }
 
-    public func apply(v: AnyRequestOptions, t: T): T {
+    func apply(v: AnyRequestOptions, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.apply(v, t2)
@@ -408,7 +403,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         skipMemoryCache(skip, (this as T).getOrThrow())
     }
 
-    public func skipMemoryCache(skip: Bool, t: T): T {
+    func skipMemoryCache(skip: Bool, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.skipMemoryCache<T>(true, t2);
@@ -424,7 +419,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return onlyRetrieveFromCachecj(flag, (this as T).getOrThrow())
     }
 
-    public func onlyRetrieveFromCachecj(flag: Bool, t: T): T {
+    func onlyRetrieveFromCachecj(flag: Bool, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.onlyRetrieveFromCachecj<T>(true, t2);
@@ -435,24 +430,12 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return t.selfOrThrowIfLocked();
     }
 
-    public func transition(transitionOption: TransitionOption): T {
-        return transition(transitionOption, (this as T).getOrThrow())
-    }
-
-    public func transition(transitionOption: TransitionOption, t: T): T {
-        if (getIsAutoCloneEnabled()) {
-            var t2 = clone(t)
-            return t2.transition(transitionOption, t2);
-        }
-        t.transitionOption = transitionOption
-        return t.selfOrThrowIfLocked();
-    }
 
     public func setDiskCacheStrategy(strategy: DiskCacheStrategy): T {
         return setDiskCacheStrategy(strategy, (this as T).getOrThrow())
     }
 
-    public func setDiskCacheStrategy(strategy: DiskCacheStrategy, t: T): T {
+    func setDiskCacheStrategy(strategy: DiskCacheStrategy, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.setDiskCacheStrategy(strategy, t2);
@@ -468,7 +451,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return setOverride(width, height, (this as T).getOrThrow())
     }
 
-    public func setOverride(width: Int64, height: Int64, t: T): T {
+    func setOverride(width: Int64, height: Int64, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.setOverride(width, height, t2);
@@ -481,7 +464,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return t.selfOrThrowIfLocked();
     }
 
-    public func setSignature(signature: AnyKey, t: T): T {
+    func setSignature(signature: AnyKey, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.setSignature(signature, t2);
@@ -495,53 +478,53 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return setSignature(signature, (this as T).getOrThrow())
     }
 
-    public func optionalCenterInside(): T {
+    func optionalCenterInside(): T {
         return optionalCenterInside((this as T).getOrThrow())
     }
 
     /**
      * 转换失败时直接返回原图
      */
-    public func optionalCenterInside(t: T): T {
+    func optionalCenterInside(t: T): T {
         return optionalScaleOnlyTransform(DownsampleStrategy.CENTER_INSIDE, CenterInside(), t);
     }
 
-    public func centerInside(): T {
+    func centerInside(): T {
         return centerInside((this as T).getOrThrow())
     }
 
     /**
      * 转换失败时报错
      */
-    public func centerInside(t: T): T {
+    func centerInside(t: T): T {
         return scaleOnlyTransform(DownsampleStrategy.CENTER_INSIDE, CenterInside(), t);
     }
 
-    public func optionalCircleCrop(t: T): T {
+    func optionalCircleCrop(t: T): T {
         return optionalTransform(DownsampleStrategy.CENTER_OUTSIDE, CircleCrop(), t);
     }
 
-    public func circleCrop(): T {
+    func circleCrop(): T {
         return circleCrop((this as T).getOrThrow())
     }
 
-    public func circleCrop(t: T): T {
+    func circleCrop(t: T): T {
         return transform(DownsampleStrategy.CENTER_INSIDE, CircleCrop(), t);
     }
 
-    public func fitCenter(): T {
+    func fitCenter(): T {
         return fitCenter((this as T).getOrThrow())
     }
 
-    public func fitCenter(t: T): T {
+    func fitCenter(t: T): T {
         return scaleOnlyTransform(DownsampleStrategy.FIT_CENTER, FitCenter(), t);
     }
 
-    public func optionalFitCenter(): T {
+    func optionalFitCenter(): T {
         return optionalFitCenter((this as T).getOrThrow())
     }
 
-    public func optionalFitCenter(t: T): T {
+    func optionalFitCenter(t: T): T {
         return optionalScaleOnlyTransform(DownsampleStrategy.FIT_CENTER, FitCenter(), t);
     }
 
@@ -565,7 +548,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return (result as T).getOrThrow();
     }
 
-    public func optionalTransform(downsampleStrategy: DownsampleStrategy, transformation: Transformation<PixelMap>, t: T): T {
+    func optionalTransform(downsampleStrategy: DownsampleStrategy, transformation: Transformation<PixelMap>, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.optionalTransform(downsampleStrategy, transformation, t2);
@@ -575,15 +558,13 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return t.transform(transformation, /*isRequired=*/ false, t);
     }
 
-    // 目前只支持PixelMap
     // TODO 支持其他类型
-    public func optionalTransform(resourceClass: TransformationKey, transformation: Transformation<PixelMap>, t: T): T {
+    func optionalTransform(resourceClass: TransformationKey, transformation: Transformation<PixelMap>, t: T): T {
         return transform(resourceClass, transformation, /*isRequired=*/ false, t);
     }
 
-    // 目前只支持PixelMap
     // TODO 支持其他类型
-    public func transform(downsampleStrategy: DownsampleStrategy, transformation: Transformation<PixelMap>, t: T): T {
+    func transform(downsampleStrategy: DownsampleStrategy, transformation: Transformation<PixelMap>, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.transform(downsampleStrategy, transformation, t2);
@@ -593,7 +574,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return t.transform(transformation, t);
     }
 
-    public func downsample(strategy: DownsampleStrategy): T {
+    func downsample(strategy: DownsampleStrategy): T {
         var s2 = (this as T).getOrThrow()
 
         return set<DownsampleStrategy>(DownsampleStrategy.OPTION, strategy, s2);
@@ -607,11 +588,11 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return transform(transformation, true, (this as T).getOrThrow());
     }
 
-    public func transform(transformation: Transformation<PixelMap>, t: T): T {
+    func transform(transformation: Transformation<PixelMap>, t: T): T {
         return transform(transformation, true, t);
     }
 
-    public func transform(transformation: Transformation<PixelMap>, isRequired: Bool, t: T): T {
+    func transform(transformation: Transformation<PixelMap>, isRequired: Bool, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2 = clone(t)
             return t2.transform(transformation, isRequired, t2);
@@ -630,7 +611,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return selfOrThrowIfLocked();
     }
 
-    public func transform<Y>(resourceClass: TransformationKey, transformation: Transformation<Y>, isRequired: Bool, t: T): T {
+    func transform<Y>(resourceClass: TransformationKey, transformation: Transformation<Y>, isRequired: Bool, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2: T = clone(t)
             return t2.transform(resourceClass, transformation, isRequired, t2);
@@ -654,7 +635,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return priority;
     }
 
-    public func decode(resourceTypeClass: ResourceTypeClass, t: T): T {
+    func decode(resourceTypeClass: ResourceTypeClass, t: T): T {
         if (getIsAutoCloneEnabled()) {
             var t2: T = clone(t)
             return t2.decode(resourceTypeClass, t2);
@@ -665,13 +646,13 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         return t.selfOrThrowIfLocked();
     }
 
-    public func placeholder(res: CJResource): T {
+    func placeholder(res: CJResource): T {
         this.placeholderDrawable = Some(CJResourceDrawable(res))
         fields |= PLACEHOLDER
         return self();
     }
 
-    public func error(res: CJResource): T {
+    func error(res: CJResource): T {
         this.errorPlaceholder = Some(CJResourceDrawable(res))
         fields |= ERROR_PLACEHOLDER
         return self();

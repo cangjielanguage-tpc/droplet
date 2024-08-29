@@ -9,12 +9,12 @@ public class DrawableTransformation <: Transformation<PixelMapDrawable> {
   private let wrapped: Transformation<PixelMap>;
   private let isRequired: Bool;
 
-  public init(wrapped: Transformation<PixelMap>, isRequired: Bool) {
+  init(wrapped: Transformation<PixelMap>, isRequired: Bool) {
     this.wrapped = wrapped;
     this.isRequired = isRequired;
   }
 
-  public func asPixelMapDrawable(): Transformation<PixelMapDrawable> {
+   func asPixelMapDrawable(): Transformation<PixelMapDrawable> {
     return ((this as AnyTransformation).getOrThrow() as Transformation<PixelMapDrawable>).getOrThrow();
   }
 

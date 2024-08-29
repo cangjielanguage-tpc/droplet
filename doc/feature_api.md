@@ -123,22 +123,6 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
      * @返回值 T 泛型数据类型
      */
     public func setDiskCacheStrategy(strategy: DiskCacheStrategy): T
-
-    /**
-     * 设置占位图，只支持静态图片资源
-     * 
-     * @参数 res - CJResource数据类型，静态图片资源
-     * @返回值 T 泛型数据类型
-     */
-    public func placeholder(res: CJResource): T
-
-    /**
-     * 设置错误图，只支持静态图片资源
-     * 
-     * @参数 res - CJResource数据类型，静态图片资源
-     * @返回值 T 泛型数据类型
-     */
-    public func error(res: CJResource): T
     
     /**
      * 禁用内存缓存。
@@ -210,15 +194,6 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
      */   
      public func dontTransform(): T
         
-        
-     /**
-     * 设置过渡动画
-     *
-     * @参数 transitionOption - TransitionOption过渡动画选项
-     * @返回值  T 泛型数据类型
-     */   
-     public func transition(transitionOption:TransitionOption):T
-        
      /**
      * 是否设置DiskCacheStrategy
      * 
@@ -237,7 +212,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
      /**
      * 设置签名，这个签名会影响缓存的key,签名不同，缓存的key必不同
      * 
-     * @参数 signature: AnyKey 设置的签名，有个StringKey的实现类   
+     * @参数 signature: AnyKey 设置的签名，StringKey实现了AnyKey接口   
      * @返回值  T 泛型数据类型
      */       
     public func setSignature(signature: AnyKey): T
@@ -246,17 +221,10 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
     /**
      * 获取设置的签名
      * 
-     * @返回值  AnyKey 设置的签名,有个StringKey的实现类
+     * @返回值  AnyKey 设置的签名,StringKey实现了AnyKey接口
      */           
     public func getSignature(): AnyKey
             
-            
-    /**
-     * 获取设置得过渡动画配置
-     * 
-     * @返回值  Option<TransitionOption> 过渡动画配置
-     */            
-    public func getTransitionOption():Option<TransitionOption>
             
     /**
      * 设置dropletoption
@@ -324,15 +292,6 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
      * @返回值 FutureTarget<TranscodeType> - FutureTarget<TranscodeType>数据类型
      */
     public func downloadOnly(): FutureTarget<InputStream>
-    
-    /**
-     * 指定宽高下载图片不显示
-     *
-     * @参数 width  Int64，图片宽
-     * @参数 height  Int64，图片高
-     * @返回值 FutureTarget<TranscodeType> - FutureTarget<TranscodeType>数据类型
-     */
-    public func downloadOnly(width: Int64, height: Int64): FutureTarget<InputStream> {
     
     /**
      * 缩略图为原图缩放,参数是缩小的倍数 值在0-1之间,根据缩略图和原图的加载速度差异不保证必现
@@ -546,6 +505,34 @@ public class TransitionOption {
         this.duration = duration
     }     
 }
+```    
+    
+#### 1.8 StringKey    
+```cangjie 
+
+public class StringKey <: AnyKey {
+
+    /**
+    * 构造函数
+    * @参数 str - String 字符串
+    */
+    public init(str: String) {
+        this.str = str
+    }
+}
+
+```
+
+#### 1.9 TransitionType
+```cangjie
+ 
+public enum TransitionType {
+    /**
+    四种过渡动画类型 透明度 缩放 旋转 平移
+    **/
+    Opacity | Scale | Rotate | Translate
+}
+
 ```
 
 ### 2 图片变换接口
@@ -669,17 +656,18 @@ class MyView {
         placeholder: Option<CJResource>.Some(@r(app.media.loading)),             // 占位图使用本地资源icon_loading（可选）自己定义
         errholder: Option<CJResource>.Some(@r(app.media.img)),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
         strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
-        label: Option<String>.Some("page"),                                       // 生命周期标签 （可选）
+        label: Option<String>.Some("page"),                                       // 生命周期标签 （可选） 同一个页面不同组件建议用相同的标签,或者都不加,
+                                                                                  //这样每个页面的组件会用相同的requestManager管理生命周期  
         signature:Option<String>.Some("1111") //不同的signature可保证缓存key的唯一    （可选）   
         transformCate:Option<PixelMapTransformation>.Some(RoundedCorners(50)), //transform动画 （可选）
         transitionOption:Option<TransitionOption>.Some(transitionOption)  //过渡动画 （可选）
     )
 
     public func onAppear(): Unit {
-        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(option.label)
+        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(option.label) //如果不加label,可不调用，如果加了建议在这里调用
     }
     public func onDisappear(): Unit {
-        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(option.label)
+        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(option.label) //onAppear和onDisAppear一起使用，要么都不调用
     }
 
     func build() {

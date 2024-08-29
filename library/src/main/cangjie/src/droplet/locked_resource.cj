@@ -28,7 +28,7 @@ public class LockedResource<Z> <: DropletResource<Z> {
     toWrap = None;
   }
 
-  public func unlock(): Unit {
+   func unlock(): Unit {
     synchronized(mtx) {
         stateVerifier.throwIfRecycled();
 
@@ -66,7 +66,7 @@ public class LockedResource<Z> <: DropletResource<Z> {
     }
   }
 
-  public func getVerifier(): StateVerifier {
+   func getVerifier(): StateVerifier {
     return stateVerifier;
   }
 

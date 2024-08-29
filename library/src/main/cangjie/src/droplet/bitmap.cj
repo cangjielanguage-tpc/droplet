@@ -60,13 +60,13 @@ public class CommonBitmap {
     dataTocdata()
   }
 
-  public func read(path: FSPath) {
+   func read(path: FSPath) {
     var file = File(path, OpenOption.Open(true, false))
     file.read(data)
     file.close()
   }
   
-  public func write(path: FSPath) {
+   func write(path: FSPath) {
     var file: File = File(path, OpenOption.CreateOrTruncate(false))
     file.write(data)
     file.close()
@@ -78,7 +78,7 @@ public class CommonBitmap {
     cdata = unsafe { CPointer<UInt8>(ptr) }
   }
 
-  public func dataTocdata() {
+   func dataTocdata() {
     unsafe {
         let cp = acquireArrayRawData(data)
         memcpy_s(cdata,UIntNative(data.size),cp.pointer,UIntNative(data.size))
@@ -86,7 +86,7 @@ public class CommonBitmap {
     }
   }
 
-  public func dataTocdataCV() {
+   func dataTocdataCV() {
     unsafe { 
       var h = Int64(height)
       var w = Int64(width)
@@ -116,12 +116,12 @@ public class CommonBitmap {
     unsafe { free(ptr) }
   }
 
-  public func at(y: Int32, x: Int32, ch: Int32): UInt8 {
+   func at(y: Int32, x: Int32, ch: Int32): UInt8 {
     let idx = Int64(y * width * channel + x * channel + ch)
     return data[idx]
   }
 
-  public func set(y: Int32, x: Int32, ch: Int32, value: UInt8) {
+   func set(y: Int32, x: Int32, ch: Int32, value: UInt8) {
     let idx = Int64(y * width * channel + x * channel + ch)
     data[idx] = value
   }
