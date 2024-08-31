@@ -64,7 +64,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
 
     public var thumbSizeMultiplier: Float32 = 0.0;
 
-    public init(droplet: Droplet, requestManager: RequestManager, transcodeTypeClass: TransformationKey,
+    init(droplet: Droplet, requestManager: RequestManager, transcodeTypeClass: TransformationKey,
         context: AbilityContext) {
         this.droplet = droplet
         this.requestManager = requestManager
@@ -84,7 +84,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         DOWNLOAD_ONLY_OPTIONS = Some(o)
     }
 
-    public init(transcodeTypeClass: TransformationKey, other: AnyRequestBuilder) {
+    init(transcodeTypeClass: TransformationKey, other: AnyRequestBuilder) {
         this(other.getDroplet(), other.getRequestManager(), transcodeTypeClass, other.getContext());
         model = other.getModel()
         isModelSet = other.getModelSet()
@@ -111,7 +111,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return loadGeneric(model)
     }
 
-    public func load(model: Array<UInt8>): RequestBuilder<TranscodeType> {
+    func load(model: Array<UInt8>): RequestBuilder<TranscodeType> {
         return loadGeneric(LoadModel(model))
     }
 
@@ -119,11 +119,11 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return loadGeneric(LoadModel(model))
     }
 
-    public func load(model: File): RequestBuilder<TranscodeType> {
+    func load(model: File): RequestBuilder<TranscodeType> {
         return loadGeneric(LoadModel(model))
     }
 
-    public func load(model: String): RequestBuilder<TranscodeType> {
+    func load(model: String): RequestBuilder<TranscodeType> {
         return loadGeneric(LoadModel(model))
     }
 
@@ -132,7 +132,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
             RequestBuilder<TranscodeType>(this.droplet, this.requestManager, this.transcodeTypeClass, this.context))
     }
 
-    public func cloneBuilder(): RequestBuilder<TranscodeType> {
+    func cloneBuilder(): RequestBuilder<TranscodeType> {
         var r: RequestBuilder<TranscodeType> = this.clone()
         r.model = this.model
         r.isModelSet = this.isModelSet
@@ -146,7 +146,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return r
     }
 
-    public func loadGeneric(model: Model): RequestBuilder<TranscodeType> {
+    func loadGeneric(model: Model): RequestBuilder<TranscodeType> {
         if (getIsAutoCloneEnabled()) {
             return cloneBuilder().loadGeneric(model);
         }
@@ -163,7 +163,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return !this.equals(that)
     }
 
-    public func equals(o: Any): Bool {
+   public func equals(o: Any): Bool {
         if (o is AnyRequestBuilder && o is AnyRequestOptions) {
             var that: AnyRequestBuilder = (o as AnyRequestBuilder).getOrThrow();
             var thatSuper: AnyRequestOptions = (o as AnyRequestOptions).getOrThrow();
@@ -232,9 +232,6 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return getDownloadOnlyRequest().submit(Downsampler.SIZE_ORIGINAL, Downsampler.SIZE_ORIGINAL);
     }
 
-    public func downloadOnly(width: Int64, height: Int64): FutureTarget<InputStream> {
-        return getDownloadOnlyRequest().submit(width, height);
-    }
 
     public func submit(width: Int64, height: Int64): FutureTarget<TranscodeType> {
         let target: RequestFutureTarget<TranscodeType> = RequestFutureTarget<TranscodeType>(width, height);
@@ -245,7 +242,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return submit(Downsampler.SIZE_ORIGINAL, Downsampler.SIZE_ORIGINAL);
     }
 
-    public func getDownloadOnlyRequest(): RequestBuilder<InputStream> {
+    func getDownloadOnlyRequest(): RequestBuilder<InputStream> {
         var r = RequestBuilder<InputStream>(TransformationKey(TransformationKey.TRANSFORMATION_INPUTSTREAM), this)
         r = r.apply(DOWNLOAD_ONLY_OPTIONS.getOrThrow())
         return r
@@ -270,7 +267,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return selfOrThrowIfLocked();
     }
 
-    public func error(src: String): RequestBuilder<TranscodeType> {
+    func error(src: String): RequestBuilder<TranscodeType> {
         return error(LoadModel(src))
     }
 
@@ -288,7 +285,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
             Option<RequestBuilder<TranscodeType>>.None);
     }
 
-    public func into(width: Int64, height: Int64): Target<TranscodeType> {
+    func into(width: Int64, height: Int64): Target<TranscodeType> {
         let target: Target<TranscodeType> = (StringDrawableTarget(width, height) as Target<TranscodeType>).getOrThrow()
         return into<Target<TranscodeType>>(target);
     }
@@ -303,15 +300,15 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return into<Target<TranscodeType>>(target);
     }
 
-    public func into<Y>(target: Y): Y where Y <: Target<TranscodeType> {
+    func into<Y>(target: Y): Y where Y <: Target<TranscodeType> {
         return into(target, /*targetListener=*/ NoRequestListener<TranscodeType>());
     }
 
-    public func into<Y>(target: Y, targetListener: RequestListener<TranscodeType>): Y where Y <: Target<TranscodeType> {
+    func into<Y>(target: Y, targetListener: RequestListener<TranscodeType>): Y where Y <: Target<TranscodeType> {
         return into(target, targetListener, /*options=*/ this);
     }
 
-    public func into<Y, Y2>(target: Y, targetListener: RequestListener<TranscodeType>, options: Y2): Y where Y <: Target<TranscodeType>,
+    func into<Y, Y2>(target: Y, targetListener: RequestListener<TranscodeType>, options: Y2): Y where Y <: Target<TranscodeType>,
         Y2 <: BaseRequestOptions<Y2> & Cloneable<Y2> {
         if (!isModelSet) {
             throw IllegalArgumentException("You must call #load() before calling #into()");

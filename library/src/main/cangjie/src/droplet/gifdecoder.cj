@@ -5,46 +5,6 @@
 package droplet.droplet
 
 
- public interface BitmapProvider {
-    /**
-     * Returns an {@link Bitmap} with exactly the given dimensions and config.
-     *
-     * @param width  The width in pixels of the desired {@link android.graphics.Bitmap}.
-     * @param height The height in pixels of the desired {@link android.graphics.Bitmap}.
-     * @param config The {@link android.graphics.Bitmap.Config} of the desired {@link
-     *               android.graphics.Bitmap}.
-     */
-    func obtain(width:Int32,  height:Int32, config:Bitmap_Config):Bitmap
-
-    /**
-     * Releases the given Bitmap back to the pool.
-     */
-    func release(bitmap:Bitmap):Unit
-
-    /**
-     * Returns a byte array used for decoding and generating the frame bitmap.
-     *
-     * @param size the size of the byte array to obtain
-     */
-    func obtainByteArray(size:Int32):Array<UInt8>
-
-    /**
-     * Releases the given byte array back to the pool.
-     */
-    func release( bytes1:Array<UInt8>):Unit
-
-    /**
-     * Returns an int array used for decoding/generating the frame bitmaps.
-     */
-    func obtainIntArray( size:Int32):Array<UInt32>
-
-    /**
-     * Release the given array back to the pool.
-     */
-    func release(array:Array<UInt32>):Unit
-  }
-
-
 /**
  * Shared interface for GIF decoders.
  */

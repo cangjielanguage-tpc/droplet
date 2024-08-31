@@ -50,7 +50,7 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
         this.drawFunc.append(drawFunc)
     }
 
-    public func getSize(): Int32 {
+     func getSize(): Int32 {
         return Int32(frameLoader.getSize())
     }
 
@@ -66,7 +66,7 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
         }
     }
 
-    public func getCurrentFrame(): PixelMap {
+     func getCurrentFrame(): PixelMap {
         return frameLoader.getCurrentFrame();
     }
 
@@ -74,13 +74,13 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
         return this.getCurrentFrame()
     }
 
-    public func drawCurrentFrame(f: (PixelMap) -> Unit): Unit {
+     func drawCurrentFrame(f: (PixelMap) -> Unit): Unit {
         // draw pixelMap
         let pixelMap: PixelMap = frameLoader.getCurrentFrame();
         f(pixelMap)
     }
 
-    public func getFrameIndex(): Int64 {
+     func getFrameIndex(): Int64 {
         return frameLoader.getCurrentIndex();
     }
 

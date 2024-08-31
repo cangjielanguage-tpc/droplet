@@ -7,19 +7,19 @@ package droplet.droplet
 public class TargetTracker <: LifecycleListener {
     public let targets: HashSet<AnyTarget> = HashSet<AnyTarget>()
 
-    public func track(target: AnyTarget): Unit {
+    func track(target: AnyTarget): Unit {
         targets.put(target);
     }
 
-    public func untrack(target: AnyTarget): Unit {
+    func untrack(target: AnyTarget): Unit {
         targets.remove(target);
     }
 
-    public func getAll(): ArrayList<AnyTarget> {
+    func getAll(): ArrayList<AnyTarget> {
         return Utils.getSnapshot<AnyTarget>(targets);
     }
 
-    public func clear(): Unit {
+    func clear(): Unit {
         targets.clear();
     }
 

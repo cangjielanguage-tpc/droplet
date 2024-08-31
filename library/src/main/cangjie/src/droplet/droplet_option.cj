@@ -40,11 +40,11 @@ public class DropletOption<T> <: AnyDropletOptionKey & Equatable<DropletOption<T
         return EMPTY_UPDATER
     }
 
-    public func update(value: T, md5: MD5) {
+     func update(value: T, md5: MD5) {
         cacheKeyUpdater.update(key, value, md5);
     }
 
-    public func getDefaultValue(): Option<T> {
+     func getDefaultValue(): Option<T> {
         return defaultValue;
     }
 

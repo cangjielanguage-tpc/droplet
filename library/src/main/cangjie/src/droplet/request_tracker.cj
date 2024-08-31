@@ -18,7 +18,7 @@ public class RequestTracker {
   private var isPaused: Bool = false;
 
   /** Starts tracking the given request. */
-  public func runRequest(request: LoadRequest): Unit {
+   func runRequest(request: LoadRequest): Unit {
     requests.put(request);
     if (!isPaused) {
       request.begin();
@@ -36,7 +36,7 @@ public class RequestTracker {
    * Stops tracking the given request, clears, and recycles it, and returns {@code true} if the
    * request was removed or invalid or {@code false} if the request was not found.
    */
-  public func clearAndRemove(requestcj: LoadRequest): Bool {
+   func clearAndRemove(requestcj: LoadRequest): Bool {
     var isOwnedByUs: Bool = requests.remove(requestcj);
     // Avoid short circuiting.
     isOwnedByUs = pendingRequests.remove(requestcj) || isOwnedByUs;
@@ -46,12 +46,12 @@ public class RequestTracker {
     return isOwnedByUs;
   }
 
-  public func getPaused(): Bool {
+   func getPaused(): Bool {
     return isPaused;
   }
 
   /** Stops any in progress requests. */
-  public func pauseRequests(): Unit {
+   func pauseRequests(): Unit {
     isPaused = true;
     for (request in Utils.getSnapshot<LoadRequest>(requests)) {
       if (request.isRunning()) {
@@ -65,7 +65,7 @@ public class RequestTracker {
   }
 
   /** Stops any in progress requests and releases bitmaps associated with completed requests. */
-  public func pauseAllRequests(): Unit {
+   func pauseAllRequests(): Unit {
     isPaused = true;
     for (request in Utils.getSnapshot<LoadRequest>(requests)) {
       // TODO(judds): Failed requests return false from isComplete(). They're still restarted in
@@ -78,7 +78,7 @@ public class RequestTracker {
   }
 
   /** Starts any not yet completed or failed requests. */
-  public func resumeRequests(): Unit {
+   func resumeRequests(): Unit {
     isPaused = false;
     for (request in Utils.getSnapshot<LoadRequest>(requests)) {
       // We don't need to check for cleared here. Any explicit clear by a user will remove the
@@ -96,7 +96,7 @@ public class RequestTracker {
    *
    * <p>After this call requests cannot be restarted.
    */
-  public func clearRequests(): Unit {
+   func clearRequests(): Unit {
     for (request in Utils.getSnapshot<LoadRequest>(requests)) {
       // It's unsafe to recycle the Request here because we don't know who might else have a
       // reference to it.
@@ -106,7 +106,7 @@ public class RequestTracker {
   }
 
   /** Restarts failed requests and cancels and restarts in progress requests. */
-  public func restartRequests(): Unit {
+   func restartRequests(): Unit {
     for (request_cj in Utils.getSnapshot<LoadRequest>(requests)) {
       if (!request_cj.isComplete() && !request_cj.isCleared()) {
         request_cj.clear();

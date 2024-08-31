@@ -100,7 +100,7 @@ public class Droplet <: ActiveResourceRemovedListener {
 
     public var arrayPool: ArrayPool
 
-    public init(requestManagerRetriever: RequestManagerRetriever, defaultRequestOptionsFactory: RequestOptionsFactory, memoryCache: MemoryCache, activeResources: ActiveResources, context: AbilityContext, engine: Engine, arrayPool: ArrayPool) {
+    init(requestManagerRetriever: RequestManagerRetriever, defaultRequestOptionsFactory: RequestOptionsFactory, memoryCache: MemoryCache, activeResources: ActiveResources, context: AbilityContext, engine: Engine, arrayPool: ArrayPool) {
         this.requestManagerRetriever = requestManagerRetriever
         this.dropletContext = DropletContext(defaultRequestOptionsFactory, context, arrayPool)
         this.memoryCache = memoryCache
@@ -111,23 +111,23 @@ public class Droplet <: ActiveResourceRemovedListener {
         globalcontext = context
     }
 
-    public func getEngine(): Engine {
+    func getEngine(): Engine {
         return engine;
     }
 
-    public func getDropletContext(): DropletContext {
+    func getDropletContext(): DropletContext {
         return this.dropletContext
     }
 
-    public func getArrayPool(): ArrayPool {
+    func getArrayPool(): ArrayPool {
         return arrayPool;
     }
 
-    public func setStringModelLoader(modelLoader: ModelLoader): Unit {
+    func setStringModelLoader(modelLoader: ModelLoader): Unit {
         this.dropletContext.getManager().setStringModelLoader(modelLoader)
     }
 
-    public func setFileModelLoaders(modelLoader: ModelLoader): Unit {
+    func setFileModelLoaders(modelLoader: ModelLoader): Unit {
         this.dropletContext.getManager().setFileModelLoader(modelLoader)
     }
 
@@ -148,7 +148,7 @@ public class Droplet <: ActiveResourceRemovedListener {
         return droplet.getOrThrow()
     }
 
-    public static func checkAndInitializeDroplet(context: AbilityContext) {
+    static func checkAndInitializeDroplet(context: AbilityContext) {
         if(isInitializing) {
             throw IllegalStateException("You cannot call Droplet.get() in registerComponents(), use the provided Droplet instance instead")
         }
@@ -164,11 +164,11 @@ public class Droplet <: ActiveResourceRemovedListener {
         Droplet.droplet = Some(dropletLocal)
     }
 
-    public func getRequestManagerRetriever() {
+    func getRequestManagerRetriever() {
         return this.requestManagerRetriever
     }
 
-    public static func getRetriever(context: AbilityContext): RequestManagerRetriever {
+    static func getRetriever(context: AbilityContext): RequestManagerRetriever {
         return Droplet.get(context).getRequestManagerRetriever()
     }
 
@@ -183,7 +183,7 @@ public class Droplet <: ActiveResourceRemovedListener {
         return getRetriever(context).get(context, label)
     }
 
-    public func removeFromManagers(target: AnyTarget): Bool {
+    func removeFromManagers(target: AnyTarget): Bool {
         synchronized (mtxManagers) {
             for (requestManager in managers) {
                 if (requestManager.untrack(target)) {
@@ -199,7 +199,7 @@ public class Droplet <: ActiveResourceRemovedListener {
         memoryCache.clearMemory();
     }
 
-    public func trimMemory(level: Int64): Unit {
+    func trimMemory(level: Int64): Unit {
         // Name	                Value	Description
         // MEMORY_LEVEL_MODERATE	0	Moderate memory usage.
         // MEMORY_LEVEL_LOW	        1	Low memory usage.
@@ -242,7 +242,7 @@ public class Droplet <: ActiveResourceRemovedListener {
     }
 
 
-    public func registerRequestManager(requestManager: RequestManager): Unit {
+    func registerRequestManager(requestManager: RequestManager): Unit {
         synchronized (mtxManagers) {
             if (!managers.contains(requestManager)) {
                 managers.put(requestManager);
@@ -250,7 +250,7 @@ public class Droplet <: ActiveResourceRemovedListener {
         }
     }
 
-    public func unregisterRequestManager(requestManager: RequestManager): Unit {
+    func unregisterRequestManager(requestManager: RequestManager): Unit {
         synchronized (mtxManagers) {
             if (!managers.contains(requestManager)) {
                 throw IllegalStateException("Cannot unregister not yet registered manager");

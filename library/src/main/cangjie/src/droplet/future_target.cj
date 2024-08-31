@@ -34,7 +34,7 @@ public class RequestFutureTarget<R> <: FutureTarget<R> & RequestListener<R> {
     mon = Monitor()
   }
 
-  public func start(): Unit {
+   func start(): Unit {
       this.future = Some(spawn {
           mon.lock()
           while (flag) {

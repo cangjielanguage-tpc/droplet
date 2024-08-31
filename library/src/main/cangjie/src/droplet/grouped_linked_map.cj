@@ -24,7 +24,7 @@ public class LinkedEntry<K, V> <: Equatable<LinkedEntry<K, V>> where K <: Equata
       
     }
 
-    public func removeLast(): Option<V> {
+     func removeLast(): Option<V> {
       let valueSize: Int64 = size();
       return if(valueSize > 0) {
         this.values.remove(valueSize - 1)
@@ -33,11 +33,11 @@ public class LinkedEntry<K, V> <: Equatable<LinkedEntry<K, V>> where K <: Equata
       };
     }
 
-    public func size(): Int64 {
+     func size(): Int64 {
       return this.values.size
     }
 
-    public func add(value: V): Unit {
+     func add(value: V): Unit {
       this.values.append(value);
     }
 
@@ -48,7 +48,7 @@ public class LinkedEntry<K, V> <: Equatable<LinkedEntry<K, V>> where K <: Equata
       return !equals(right)
     } 
 
-    public func equals(right: LinkedEntry<K, V>): Bool {
+     func equals(right: LinkedEntry<K, V>): Bool {
         if(match(this.key) {
             case Some(x) => true
             case _ => false
@@ -70,7 +70,7 @@ public class LinkedEntry<K, V> <: Equatable<LinkedEntry<K, V>> where K <: Equata
         }
     }
 
-    public func toString(): String {
+     func toString(): String {
         return if(match(this.key) {
             case Some(x) => true
             case _ => false
@@ -82,7 +82,7 @@ public class GroupedLinkedMap<K, V> where K <: Poolable & Hashable & Equatable<K
   private let head: LinkedEntry<K, V> = LinkedEntry<K, V>();
   private let keyToEntry: HashMap<K, LinkedEntry<K, V>>  = HashMap<K, LinkedEntry<K, V>>();
 
-  public func put(key: K, value: V): Unit {
+   func put(key: K, value: V): Unit {
     var entry: Option<LinkedEntry<K, V>> = keyToEntry.get(key);
 
     if(match(entry) {
@@ -99,7 +99,7 @@ public class GroupedLinkedMap<K, V> where K <: Poolable & Hashable & Equatable<K
     entry.getOrThrow().add(value);
   }
 
-  public func get(key: K): Option<V> {
+   func get(key: K): Option<V> {
     var entry: Option<LinkedEntry<K, V>> = keyToEntry.get(key);
     if (match(entry) {
         case Some(x) => false
@@ -118,7 +118,7 @@ public class GroupedLinkedMap<K, V> where K <: Poolable & Hashable & Equatable<K
     return en.removeLast();
   }
 
-  public func removeLast(): Option<V> {
+   func removeLast(): Option<V> {
     var last: LinkedEntry<K, V> = head.prev.getOrThrow();
 
     while (!last.equals(head)) {
@@ -147,7 +147,7 @@ public class GroupedLinkedMap<K, V> where K <: Poolable & Hashable & Equatable<K
     return None;
   }
 
-  public func toString(): String {
+   func toString(): String {
     var sb: StringBuilder = StringBuilder("GroupedLinkedMap( ");
     var current: LinkedEntry<K, V> = head.next.getOrThrow();
     var hadAtLeastOneItem: Bool  = false;

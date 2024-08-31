@@ -35,11 +35,11 @@ public open class AnyEngineResource <: AnyDropletResource {
     this.resourceTypeClass = resourceTypeClass;
   }
 
-  public func getResource(): AnyDropletResource {
+   func getResource(): AnyDropletResource {
     return resource;
   }
 
-  public func getMemoryCacheable(): Bool {
+   func getMemoryCacheable(): Bool {
     return isMemoryCacheable;
   }
 
@@ -79,7 +79,7 @@ public open class AnyEngineResource <: AnyDropletResource {
    * necessary. Generally external users should never call this method, the framework will take care
    * of this for you.
    */
-   public func acquire(): Unit {
+    func acquire(): Unit {
     synchronized(mtx) {
         if (isRecycled) {
             throw IllegalStateException("Cannot acquire a recycled resource");
@@ -97,7 +97,7 @@ public open class AnyEngineResource <: AnyDropletResource {
    * will take care of this for you.
    */
   // listener is effectively final.
-  public func release(): Unit {
+   func release(): Unit {
     var release: Bool = false;
     synchronized (mtx) {
       if (acquired <= 0) {

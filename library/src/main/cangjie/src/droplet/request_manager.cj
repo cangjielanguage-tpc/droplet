@@ -28,7 +28,7 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
     private let requestTracker: RequestTracker
     private let targetTracker: TargetTracker = TargetTracker();
 
-    public init(droplet: Droplet, lifecycle: Lifecycle, context: AbilityContext, key: String) {
+    init(droplet: Droplet, lifecycle: Lifecycle, context: AbilityContext, key: String) {
         this.context = context
         this.droplet = droplet
         this.lifecycle = lifecycle
@@ -40,7 +40,7 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
         droplet.registerRequestManager(this);
     }
 
-    public func compare(key: String): Bool {
+    func compare(key: String): Bool {
         return this.requestManagerKey == Utils.getRequestManagerKey(key)
     }
 
@@ -69,11 +69,11 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
         }
     }
 
-    public func decodeAs<ResourceType>(transcodeTypeClass: TransformationKey): RequestBuilder<ResourceType> {
+    func decodeAs<ResourceType>(transcodeTypeClass: TransformationKey): RequestBuilder<ResourceType> {
         return RequestBuilder<ResourceType>(droplet, this, transcodeTypeClass, this.context);
     }
 
-    public func decodeAsPixelMap() {
+    func decodeAsPixelMap() {
         return decodeAs<PixelMap>(TransformationKey(TransformationKey.TRANSFORMATION_PIXELMAP)).apply(
             DECODE_TYPE_BITMAP);
     }
@@ -98,11 +98,11 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
         return decodeAs<Drawable>(TransformationKey(TransformationKey.TRANSFORMATION_DRAWABLE)).load(model)
     }
 
-    public func getDefaultRequestListeners(): ArrayList<RequestListener<Any>> {
+    func getDefaultRequestListeners(): ArrayList<RequestListener<Any>> {
         return defaultRequestListeners;
     }
 
-    public func clear(t: AnyTarget): Unit {
+    func clear(t: AnyTarget): Unit {
         untrackOrDelegate(t);
     }
 
@@ -120,14 +120,14 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
         }
     }
 
-    public func track(t: AnyTarget, request: LoadRequest) {
+    func track(t: AnyTarget, request: LoadRequest) {
         synchronized(mtx) {
             targetTracker.track(t);
             requestTracker.runRequest(request);
         }
     }
 
-    public func untrack(t: AnyTarget): Bool {
+    func untrack(t: AnyTarget): Bool {
         synchronized(mtx) {
             var request: Option<LoadRequest> = t.getRequest();
             // If the Target doesn't have a request, it's already been cleared.
@@ -149,14 +149,14 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
         }
     }
 
-    public override func onStart(): Unit {
+   public override func onStart(): Unit {
         synchronized(mtx) {
             resumeRequests();
             targetTracker.onStart();
         }
     }
 
-    public func resumeRequests(): Unit {
+    func resumeRequests(): Unit {
         synchronized(mtx) {
             requestTracker.resumeRequests();
         }
@@ -169,13 +169,13 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
         }
     }
 
-    public func pauseRequests(): Unit {
+    func pauseRequests(): Unit {
         synchronized(mtx) {
             requestTracker.pauseRequests();
         }
     }
 
-    public func pauseAllRequests(): Unit {
+    func pauseAllRequests(): Unit {
         synchronized(mtx) {
             requestTracker.pauseAllRequests();
         }
@@ -199,7 +199,7 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
         }
     }
 
-    public func onTrimMemory(level: Int64): Unit {
+    func onTrimMemory(level: Int64): Unit {
         if (level == 0) {
             // 暂停请求
             pauseAllRequests();
@@ -210,7 +210,7 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
         return requestManagerKey.hashCode()
     }
 
-    public operator func ==(that: LifecycleListener): Bool {
+   public operator func ==(that: LifecycleListener): Bool {
         if (that is RequestManager) {
             return this.requestManagerKey == (that as RequestManager).getOrThrow().requestManagerKey
         }

@@ -32,26 +32,26 @@ public class DropletOptions <: AnyKey {
     public let values: CustomMap<AnyDropletOptionKey, AnyDropletOptionValue> = CachedHashCodeArrayMap<AnyDropletOptionKey, AnyDropletOptionValue>(
         );
 
-    public func putAll(other: DropletOptions) {
+     func putAll(other: DropletOptions) {
         values.putAll((other.values as CustomMap<AnyDropletOptionKey, AnyDropletOptionValue>).getOrThrow());
     }
 
-    public func set<V>(option: DropletOption<V>, value: V): DropletOptions where V <: AnyDropletOptionValue {
+     func set<V>(option: DropletOption<V>, value: V): DropletOptions where V <: AnyDropletOptionValue {
         values.put((option as AnyDropletOptionKey).getOrThrow(), (value as AnyDropletOptionValue).getOrThrow());
         return this;
     }
 
-    public func get<V>(option: DropletOption<V>): V where V <: AnyDropletOptionValue {
+     func get<V>(option: DropletOption<V>): V where V <: AnyDropletOptionValue {
         (values.get(option).getOrDefault({=> option.getDefaultValue().getOrThrow()}) as V).getOrThrow()
     }
 
-    public func setOptions<V>(option: String, value: String): DropletOptions where V <: AnyDropletOptionValue {
+     func setOptions<V>(option: String, value: String): DropletOptions where V <: AnyDropletOptionValue {
         values.put((DropletOption<V>.memory(option) as AnyDropletOptionKey).getOrThrow(),
             (DropletString(value) as AnyDropletOptionValue).getOrThrow());
         return this;
     }
 
-    public func getOptions(option: String): String {
+     func getOptions(option: String): String {
         let o = DropletOption<DropletString>.memory(option);
         let r: DropletString = (values.get(o).getOrDefault({
             => o.getDefaultValue().getOrThrow()
@@ -59,7 +59,7 @@ public class DropletOptions <: AnyKey {
         return r.str
     }
 
-    public func equals(o: AnyKey): Bool {
+     func equals(o: AnyKey): Bool {
         if (o is DropletOptions) {
             var other: DropletOptions = (o as DropletOptions).getOrThrow();
             return values == other.values;

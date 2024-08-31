@@ -9,7 +9,7 @@ public class MultiTransformation <: Transformation<PixelMap> {
 
     public var transformations: ArrayList<PixelMapTransformation> = ArrayList<PixelMapTransformation>();
 
-    public init(transformationList: ArrayList<PixelMapTransformation>) {
+    init(transformationList: ArrayList<PixelMapTransformation>) {
         if (transformationList.size > 0) {
             this.transformations = transformationList
         }

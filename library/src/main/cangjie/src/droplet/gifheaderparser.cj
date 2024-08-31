@@ -117,7 +117,7 @@ public class GifHeaderParser {
   private var header:GifHeader=GifHeader();
   private var blockSize:Int32 = 0;
 
-  public func setData(data:ByteBuffer):GifHeaderParser {
+   func setData(data:ByteBuffer):GifHeaderParser {
     reset();
     rawData = data.asReadOnlyBuffer();
     rawData.setPosition(0);
@@ -125,7 +125,7 @@ public class GifHeaderParser {
     return this;
   }
 
-  public func setData(data:Array<UInt8>):GifHeaderParser {
+   func setData(data:Array<UInt8>):GifHeaderParser {
     if (data.size > 0) {
       setData(ByteBuffer.wrap(data));
     } else {
@@ -135,7 +135,7 @@ public class GifHeaderParser {
     return this;
   }
 
-  public func clear() {
+   func clear() {
     rawData = ByteBuffer();
     header = GifHeader();
   }
@@ -149,7 +149,7 @@ public class GifHeaderParser {
     blockSize = 0;
   }
 
-  public func parseHeader():GifHeader{
+   func parseHeader():GifHeader{
     if (rawData.isEmpty()) {
       throw Exception("You must call setData() before parseHeader()");
     }
@@ -171,7 +171,7 @@ public class GifHeaderParser {
    * Determines if the GIF is animated by trying to read in the first 2 frames
    * This method re-parses the data even if the header has already been read.
    */
-  public func isAnimated():Bool {
+   func isAnimated():Bool {
     readHeader();
     if (!err()) {
       readContents(2 /* maxFrames */);

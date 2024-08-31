@@ -36,7 +36,7 @@ public class DropletContext {
 
     }
 
-    public func getDefaultRequestOptions(): RequestOptions {
+     func getDefaultRequestOptions(): RequestOptions {
         synchronized (mtx) {
             if (match(defaultRequestOptions) {
                     case Some(x) => false
@@ -48,11 +48,11 @@ public class DropletContext {
         }
     }
 
-    public func getManager(): Manager {
+     func getManager(): Manager {
         return this.manager
     }
 
-    public func getArrayPool(): ArrayPool {
+     func getArrayPool(): ArrayPool {
         return arrayPool;
     }
 

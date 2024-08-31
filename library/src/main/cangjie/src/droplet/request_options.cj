@@ -25,7 +25,7 @@ public class RequestOptions <: BaseRequestOptions<RequestOptions> {
     public RequestOptions() {
     }
 
-    public func skipMemoryCacheOf(skipMemoryCache: Bool): RequestOptions {
+    func skipMemoryCacheOf(skipMemoryCache: Bool): RequestOptions {
         if (skipMemoryCache) {
             return skipMemoryCacheTrueOptions.getOrDefault({=> 
                 let ro = RequestOptions()

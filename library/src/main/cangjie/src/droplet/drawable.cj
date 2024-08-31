@@ -59,7 +59,7 @@ public class CJResourceDrawable <: Drawable {
     private let cjResource: CJResource
     private var drawFunc: ArrayList<(CJResource,Bool) -> Unit> = ArrayList<(CJResource,Bool) -> Unit>()
 
-    public func getCJResource(): CJResource {
+     func getCJResource(): CJResource {
         return cjResource
     }
 
@@ -88,7 +88,7 @@ public class CJResourceDrawable <: Drawable {
     public override func setDrawFunc(drawFunc: (PixelMap) -> Unit): Unit {
     }
 
-    public func setDrawFuncCJResource(drawFunc: (CJResource,Bool) -> Unit): Unit {
+     func setDrawFuncCJResource(drawFunc: (CJResource,Bool) -> Unit): Unit {
         this.drawFunc.append(drawFunc)
     }
 }

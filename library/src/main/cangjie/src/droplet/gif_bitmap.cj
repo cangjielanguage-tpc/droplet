@@ -63,10 +63,10 @@ public class Bitmap {
     allocCdata()
     dataTocdata()
   }
-  public func getWidth():Int32{
+   func getWidth():Int32{
     return width
   }
-  public func getHeight():Int32{
+   func getHeight():Int32{
     return height
   }
   public static func createBitmap(width:Int32, height:Int32, config:Bitmap_Config):Bitmap{
@@ -76,25 +76,25 @@ public class Bitmap {
       throw Exception("Only support Bitmap_Config.ARGB_8888!")
     }
   }
-  public func read(path: FSPath) {
+   func read(path: FSPath) {
     var file = File(path, OpenOption.Open(true, false))
     file.read(data)
     file.close()
   }
   
-  public func write(path: FSPath) {
+   func write(path: FSPath) {
     var file: File = File(path, OpenOption.CreateOrTruncate(false))
     file.write(data)
     file.close()
   }
 
-  public func allocCdata() {
+   func allocCdata() {
 
     ptr = unsafe { malloc(UIntNative(len)) }
     cdata = unsafe { CPointer<UInt8>(ptr) }
   }
 
-  public func dataTocdata() {
+   func dataTocdata() {
     unsafe { 
       for (i in 0..len) {
         cdata.write(i, data[i])
@@ -102,27 +102,27 @@ public class Bitmap {
     }
   }
 
-  public func cdataToData() {
+   func cdataToData() {
     for (i in 0..len) {
       data[i] = unsafe { cdata.read(i) }
     }
   }
 
-  public func release() {
+   func release() {
     unsafe { free(ptr) }
   }
 
-  public func at(y: Int32, x: Int32, ch: Int32): UInt8 {
+   func at(y: Int32, x: Int32, ch: Int32): UInt8 {
     let idx = Int64(y * width * channel + x * channel + ch)
     return data[idx]
   }
 
-  public func set(y: Int32, x: Int32, ch: Int32, value: UInt8) {
+   func set(y: Int32, x: Int32, ch: Int32, value: UInt8) {
     let idx = Int64(y * width * channel + x * channel + ch)
     data[idx] = value
   }
 
-  public func dataTodata32() {
+   func dataTodata32() {
     //channel should be 3.
     data32 = Array<UInt32>(Int64(width * height), item: 0)
     for (y in 0..height) {
@@ -135,7 +135,7 @@ public class Bitmap {
       }
     }
   }
-  public func data32Todata() {
+   func data32Todata() {
     //channel should be 3.
     data = Array<UInt8>(Int64(width * height * channel), item: 0)
     for (y in 0..height) {
@@ -148,10 +148,10 @@ public class Bitmap {
       }
     }
   }
-  public func getPixel (x:Int32, y:Int32):UInt32{
+   func getPixel (x:Int32, y:Int32):UInt32{
     return data32[Int64(this.width * y + x)]
   }
-    public func getPixels (pixels:Array<UInt32>, offset:Int32,stride:Int32, width:Int32, height:Int32):Unit
+     func getPixels (pixels:Array<UInt32>, offset:Int32,stride:Int32, width:Int32, height:Int32):Unit
    {
     var outpos:Int64 = Int64(offset) 
     var times:Int32 = 0
@@ -168,7 +168,7 @@ public class Bitmap {
     }
   }
 
-  public func setPixels (pixels:Array<UInt32>, offset:Int32, stride:Int32, width:Int32, height:Int32):Unit{
+   func setPixels (pixels:Array<UInt32>, offset:Int32, stride:Int32, width:Int32, height:Int32):Unit{
     var outpos:Int64 = Int64(offset)
     var times:Int32 = 0
     for(yid in 0..height){
@@ -184,15 +184,15 @@ public class Bitmap {
     }
     data32Todata()
   }
-  public func getData32():Array<UInt32>{
+   func getData32():Array<UInt32>{
     return data32
   }
-  public func getData():Array<UInt8>{
+   func getData():Array<UInt8>{
     return data
   }
 
   private var hasApha=false
-  public func setHasAlpha(val:Bool) {
+   func setHasAlpha(val:Bool) {
     hasApha =val
   }
   public var Config =  Bitmap_Config.RGB_888
@@ -201,7 +201,7 @@ public class Bitmap {
     |RGB_888
     |ARGB_8888
     |RGB_565
-    public func GetTypeNum(result: Bitmap_Config): Int64 {
+     func GetTypeNum(result: Bitmap_Config): Int64 {
         match (result) {
             case RGB_888 => return 0
             case ARGB_8888 => return 1

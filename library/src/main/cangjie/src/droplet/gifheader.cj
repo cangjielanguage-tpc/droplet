@@ -47,67 +47,67 @@ public class GifHeader {
   var bgColor:UInt32 = 0
   var loopCount:Int32 = NETSCAPE_LOOP_COUNT_DOES_NOT_EXIST
 
-  public func getHeight(): Int32 {
+   func getHeight(): Int32 {
     return height;
   }
 
-  public func getWidth():Int32 {
+   func getWidth():Int32 {
     return width;
   }
-  public func setHeight(val:Int32)  {
+   func setHeight(val:Int32)  {
     height = val
   }
 
-  public func setWidth(val:Int32) {
+   func setWidth(val:Int32) {
     width = val
   }
-  public func getNumFrames():Int32 {
+   func getNumFrames():Int32 {
     return frameCount;
   }
 
   /**
    * Global status code of GIF data parsing.
    */
-  public func getStatus():Int32 {
+   func getStatus():Int32 {
     return status;
   }
-  public func getGctFlag():Bool{
+   func getGctFlag():Bool{
     return gctFlag
   }
 
-  public func getGctSize():Int32{
+   func getGctSize():Int32{
     return gctSize
   }
   /** Background color index into the Global/Local color table. */
-  public func getBgIndex():Int32{
+   func getBgIndex():Int32{
     return bgIndex
   }
   /**
    * Pixel aspect ratio.
    * Factor used to compute an approximation of the aspect ratio of the pixel in the original image.
    */
-  public func getPixelAspect():Int32{
+   func getPixelAspect():Int32{
     return pixelAspect
   }
-  public func getBgColor():UInt32{
+   func getBgColor():UInt32{
     return bgColor
   }
-  public func getLoopCount():Int32{
+   func getLoopCount():Int32{
     return loopCount
   }
-  public func setLoopCount(val:Int32){
+   func setLoopCount(val:Int32){
     loopCount = val
   }
-  public func getFrameCount():Int32{
+   func getFrameCount():Int32{
     return frameCount
   }
-  public func setFrameCount(val:Int32){
+   func setFrameCount(val:Int32){
     frameCount = val
   }
-  public func getCurrentFrame():GifFrame {
+   func getCurrentFrame():GifFrame {
     return currentFrame
   }
-  public func getFrames(): ArrayList<GifFrame>{
+   func getFrames(): ArrayList<GifFrame>{
     return frames
   }
 

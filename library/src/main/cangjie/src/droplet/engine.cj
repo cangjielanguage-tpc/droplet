@@ -50,15 +50,15 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         }
     }
 
-    public func setActiveResourceRemovedListener() {
+     func setActiveResourceRemovedListener() {
         this.activeResources.setActiveResourceRemovedListener(this);
     }
 
-    public func setResourceRemovedListener() {
+     func setResourceRemovedListener() {
         this.cache.setResourceRemovedListener(this);
     }
 
-    public func load(
+     func load(
         dropletContext: DropletContext,
         signature: AnyKey,
         model: Model,
@@ -251,7 +251,7 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         return result;
     }
 
-    public func release(resource: AnyDropletResource): Unit {
+     func release(resource: AnyDropletResource): Unit {
         if (resource is AnyEngineResource) {
             (resource as AnyEngineResource).getOrThrow().release();
         } else {
@@ -286,10 +286,10 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         }
     }
 
-    public func clearDiskCache(): Unit {
+     func clearDiskCache(): Unit {
     }
 
-    public func shutdown(): Unit {
+     func shutdown(): Unit {
     }
 }
 
@@ -472,7 +472,7 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
         return Option<InputStream>.None;
     }
 
-    public func cancel(): Unit {
+     func cancel(): Unit {
         isCancelled = true
         let local: Option<DataFetcherGenerator> = currentGenerator;
         if (match (local) {
@@ -483,7 +483,7 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
         }
     }
 
-    public func release(isRemovedFromQueue: Bool): Unit {
+     func release(isRemovedFromQueue: Bool): Unit {
         if (releaseManager.release(isRemovedFromQueue)) {
             releaseInternal();
         }
@@ -879,7 +879,7 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
         }
     }
 
-    public func onResourceDecoded<Z>(dataSource: DataSource, decoded: DropletResource<Z>): DropletResource<Z> {
+     func onResourceDecoded<Z>(dataSource: DataSource, decoded: DropletResource<Z>): DropletResource<Z> {
         let transformationKey: TransformationKey = decodeHelper.getTransformationKey()
         let appliedTransformation: Option<AnyTransformation> = decodeHelper.getTransformation(transformationKey)
         var transformed: DropletResource<Z> = decoded;
@@ -970,28 +970,28 @@ public class ReleaseManager {
     private var isFailed: Bool = false
     private let mtx = ReentrantMutex()
 
-    public func release(isRemovedFromQueue: Bool): Bool {
+     func release(isRemovedFromQueue: Bool): Bool {
         synchronized(mtx) {
             isReleased = true
             return isComplete(isRemovedFromQueue);
         }
     }
 
-    public func onEncodeComplete(): Bool {
+     func onEncodeComplete(): Bool {
         synchronized(mtx) {
             isEncodeComplete = true
             return isComplete(false /*isRemovedFromQueue*/ );
         }
     }
 
-    public func onFailed(): Bool {
+     func onFailed(): Bool {
         synchronized(mtx) {
             isFailed = true
             return isComplete(false /*isRemovedFromQueue*/ );
         }
     }
 
-    public func reset(): Unit {
+     func reset(): Unit {
         synchronized(mtx) {
             isEncodeComplete = false
             isReleased = false
@@ -1029,7 +1029,7 @@ public class LazyDiskCacheProvider <: DiskCacheProvider {
         this.factory = factory
     }
 
-    public func clearDiskCacheIfCreated(): Unit {
+     func clearDiskCacheIfCreated(): Unit {
         synchronized(mtx) {
             if (match (diskCache) {
                 case Some(x) => false
@@ -1080,7 +1080,7 @@ public class LoadStatus {
 
 
     // 取消解码 取消回调
-    public func cancel(): Unit {
+     func cancel(): Unit {
         // Acquire the Engine lock so that a new request can't get access to a particular EngineJob
         // just after the EngineJob has been cancelled. Without this lock, we'd allow new requests
         // to find the cancelling EngineJob in our Jobs data structure. With this lock, the EngineJob

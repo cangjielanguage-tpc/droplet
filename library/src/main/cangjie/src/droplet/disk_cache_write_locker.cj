@@ -9,7 +9,7 @@ public class DiskCacheWriteLocker {
   private let writeLockPool: WriteLockPool = WriteLockPool();
   private let mtx = ReentrantMutex();
 
-  public func acquire(safeKey: String) {
+   func acquire(safeKey: String) {
     var writeLock: Option<WriteLock>;
     synchronized (mtx) {
       writeLock = locks.get(safeKey);
@@ -26,7 +26,7 @@ public class DiskCacheWriteLocker {
 
   }
 
-  public func release(safeKey: String): Unit {
+   func release(safeKey: String): Unit {
     var writeLock: Option<WriteLock>;
     synchronized (mtx) {
       writeLock = locks.get(safeKey);

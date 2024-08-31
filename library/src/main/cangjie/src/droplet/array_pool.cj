@@ -62,7 +62,7 @@ public class Key <: Poolable & Equatable<Key> & Hashable & ToString {
     public var size: Int64 = 0;
     public var arrType: Int64 = 0
 
-    public init(pool: KeyPool) {
+    init(pool: KeyPool) {
       this.pool = pool;
     }
 
@@ -73,7 +73,7 @@ public class Key <: Poolable & Equatable<Key> & Hashable & ToString {
       !this.equals(right)
     } 
 
-    public func initKey(length: Int64, arrType: Int64): Unit {
+     func initKey(length: Int64, arrType: Int64): Unit {
       this.size = length;
       this.arrType = arrType
     }
@@ -104,7 +104,7 @@ public class Key <: Poolable & Equatable<Key> & Hashable & ToString {
 
 public class KeyPool <: BaseKeyPool<Key> {
 
-    public func get(size: Int64, arrType: Int64): Key {
+     func get(size: Int64, arrType: Int64): Key {
       let result: Key = get();
       result.initKey(size, arrType);
       return result;
@@ -175,7 +175,6 @@ public class LruArrayPool <: ArrayPool {
     private func evictToSizeUInt8Arr(size: Int64): Unit {
         while (currentSize > size) {
             var evicted: Option<Array<UInt8>> = uint8GroupedMap.removeLast();
-            // Preconditions.checkNotNull(evicted);
             if(match(evicted) {
                 case Some(x) => false
                 case _ => true
@@ -226,7 +225,7 @@ public class LruArrayPool <: ArrayPool {
         return byteSize <= maxSize / SINGLE_ARRAY_MAX_SIZE_DIVISOR;
     }
 
-    public func get(size: Int64): Array<UInt8> {
+   public func get(size: Int64): Array<UInt8> {
         synchronized(mtx) {
             let keys = getSizesForAdapter(ARR_TYPE_U8).keys()
             var possibleSize: Option<Int64> = None
@@ -251,7 +250,7 @@ public class LruArrayPool <: ArrayPool {
         }
     }
 
-    public func getExact(size: Int64): Array<UInt8> {
+   public func getExact(size: Int64): Array<UInt8> {
         synchronized(mtx) {
             let key: Key = keyPool.get(size, ARR_TYPE_U8);
             return getForKey(key, ARR_TYPE_U8);
@@ -289,13 +288,13 @@ public class LruArrayPool <: ArrayPool {
     }
 
     /** Clears all arrays from the pool. */
-    public func clearMemory(): Unit {
+   public  func clearMemory(): Unit {
         synchronized(mtx) {
             evictToSize(0);
         }
     }
 
-    public func getMaxSize(): Int64 {
+     func getMaxSize(): Int64 {
         return maxSize
     }
 
@@ -335,7 +334,7 @@ public class LruArrayPool <: ArrayPool {
         }
     }
 
-    public func getCurrentSize(): Int64 {
+     func getCurrentSize(): Int64 {
         var cSize: Int64 = 0;
         var sizes: HashMap<Int64, Int64> = getSizesForAdapter(ARR_TYPE_U8);
 

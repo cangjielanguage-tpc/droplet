@@ -54,25 +54,25 @@ public class GifFrameLoader {
         this.mHeight = height
     }
 
-    public func getSize(): Int32 {
+     func getSize(): Int32 {
         //TODO gif
         return this.gifDecoder.getFrameCount() * Int32(this.frameList[0].getPixelBytesNumber())
     }
 
-    public func getFrameCount(): Int64 {
+     func getFrameCount(): Int64 {
         //TODO gif
         return Int64(this.gifDecoder.getFrameCount())
     }
 
-    public func getCurrentIndex(): Int64 {
+     func getCurrentIndex(): Int64 {
         return currentFrameIndex
     }
 
-    public func getCurrentFrame(): PixelMap {
+     func getCurrentFrame(): PixelMap {
         return frameList[currentFrameIndex]
     }
 
-    public func subscribe(frameCallback: FrameCallback): Unit {
+     func subscribe(frameCallback: FrameCallback): Unit {
         if (isCleared) {
             throw IllegalStateException("Cannot subscribe to a cleared frame loader");
         }
@@ -106,14 +106,14 @@ public class GifFrameLoader {
         isRunning = false;
     }
 
-    public func clear(): Unit {
+     func clear(): Unit {
         callbacks.clear();
         stop();
         gifDecoder.clear();
         isCleared = true;
     }
 
-    public func getLoopCount(): Int64 {
+     func getLoopCount(): Int64 {
         return Int64(gifDecoder.getTotalIterationCount());
     }
 
@@ -191,7 +191,7 @@ public class GifFrameLoader {
             })
         }
     }
-    public func onFrameReady(): Unit {
+     func onFrameReady(): Unit {
         for (i in 0 .. callbacks.size) {
             let cb: FrameCallback = callbacks[i];
             cb.onFrameReady();

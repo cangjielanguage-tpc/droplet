@@ -68,10 +68,10 @@ public class GifFrame {
    */
   var lct:Array<UInt32> = Array<UInt32>()
 
-  public func getDelay():Int32{
+   func getDelay():Int32{
     return delay
   }
-  public func getLct():Array<UInt32>{
+   func getLct():Array<UInt32>{
     return lct
   }
 }

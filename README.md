@@ -5,13 +5,13 @@
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.0.1-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.53.4-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v0.53.8-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/project-open-brightgreen" style="display: inline-block;" />
 </p>
 
 ## 介绍
 
-droplet是一个图像加载缓存库，致力于更高效、更轻便、更简单得加载图片。在图片列表滚动时候实现平滑滚动得效果。
+droplet是一个图像加载缓存库，致力于更高效、更轻便、更简单地加载图片。在图片列表滚动的时候实现平滑滚动的效果。
 
 
 ### 特性
@@ -51,8 +51,9 @@ droplet是一个图像加载缓存库，致力于更高效、更轻便、更简�
 ├── doc                                       #文档目录
 │   ├── assets                                #文档资源目录
 │   └── feature_api.md                        #API接口文档
-├── library                                 #源码目录 
-└── entry                                     #测试用例目录
+├── library                                   #源码目录 
+├── entry                                     #示例目录
+└── hvigor                                    #构建工具目录
 ```
 
 ### 接口说明
@@ -101,6 +102,7 @@ droplet是一个图像加载缓存库，致力于更高效、更轻便、更简�
 
 #### 1. 把droplet作为三方库依赖引入
 当前仓颉语言三方库还不支持中心仓库，可以把依赖库克隆到本地引入，具体步骤如下：
+
 a. 目标工程把依赖库作为git submodule引入
 
 ```shell
@@ -153,17 +155,18 @@ class MyView {
         placeholder: Option<CJResource>.Some(@r(app.media.loading)),             // 占位图使用本地资源icon_loading（可选）自己定义
         errholder: Option<CJResource>.Some(@r(app.media.img)),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
         strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
-        label: Option<String>.Some("page"),                                       // 生命周期标签 （可选）
+        label: Option<String>.Some("page"),                                       // 生命周期标签 （可选） 同一个页面不同组件建议用相同的标签,或者都不加,
+                                                                                  //  这样每个页面的组件会用相同的requestManager管理生命周期
         signature:Option<String>.Some("1111"), //不同的signature可保证缓存key的唯一    （可选）   
         transformCate:Option<PixelMapTransformation>.Some(RoundedCorners(50)), //transform效果 （可选）
         transitionOption:Option<TransitionOption>.Some(transitionOption)  //过渡动画 （可选）
     )
 
     public func onAppear(): Unit {
-        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(option.label)
+        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(option.label)  //如果不加label,可不调用，如果加了建议在这里调用
     }
     public func onDisappear(): Unit {
-        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(option.label)
+        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(option.label) //onAppear和onDisAppear一起使用，要么都不调用
     }
 
     func build() {
@@ -189,7 +192,12 @@ load成功
 
 ## 约束与限制
 
-当前基于 OpenHarmony Cangjie Mobile B100 版本实现的
+当前基于 HarmonyOS NEXT Developer Beta5 版本实现的
+
+IDE : DevEco Studio NEXT Developer Beta5(5.0.3.700)
+
+Plugins (SDK) : DevEco Studio NEXT Developer Beta5-Cangjie Plugin(5.0.3.700)
+
 
 ## 开源协议
 

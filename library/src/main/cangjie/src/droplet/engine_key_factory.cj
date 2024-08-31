@@ -6,7 +6,7 @@ package droplet.droplet
 
 public class EngineKeyFactory {
 
-  public func buildKey(
+   func buildKey(
       model: Model,
       signature: AnyKey,
       width: Int64,

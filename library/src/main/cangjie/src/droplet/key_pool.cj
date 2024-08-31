@@ -16,7 +16,7 @@ public class Queue<T> {
     this.size = size
   }
 
-  public func poll(): Option<T> {
+   func poll(): Option<T> {
     
     if(list.size == 0) {
       return None
@@ -26,11 +26,11 @@ public class Queue<T> {
 
   }
 
-  public func getSize(): Int64 {
+   func getSize(): Int64 {
     return list.size
   }
 
-  public func offer(key: T): Bool {
+   func offer(key: T): Bool {
 
     if(list.size > this.size) {
       return false
@@ -46,7 +46,7 @@ public abstract class BaseKeyPool<T> where T <: Poolable {
   private static let MAX_SIZE: Int64 = 20;
   private let keyPool: Queue<T> = Queue<T>(MAX_SIZE);
 
-  public func get(): T {
+   func get(): T {
     var result: Option<T> = keyPool.poll();
     if (match(result) {
       case Some(x) => false
@@ -57,7 +57,7 @@ public abstract class BaseKeyPool<T> where T <: Poolable {
     return result.getOrThrow();
   }
 
-  public func offer(key: T): Unit {
+   func offer(key: T): Unit {
     if (keyPool.getSize() < MAX_SIZE) {
       keyPool.offer(key);
     }

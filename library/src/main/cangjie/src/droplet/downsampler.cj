@@ -97,7 +97,7 @@ public class Downsampler {
    * Identical to {@link #decode(InputStream, int, int, Options)}, except that it accepts a {@link
    * ByteBuffer} in place of an {@link InputStream}.
    */
-  public func decode(buffer: Array<UInt8>, requestedWidth: Int64, requestedHeight: Int64, options: DropletOptions): Option<DropletResource<PixelMapDrawable>> {
+   func decode(buffer: Array<UInt8>, requestedWidth: Int64, requestedHeight: Int64, options: DropletOptions): Option<DropletResource<PixelMapDrawable>> {
     return decode(
         ByteArrayReader(buffer),
         requestedWidth,
@@ -106,7 +106,7 @@ public class Downsampler {
         );
   }
 
-  public func decodeDrawable(buffer: Array<UInt8>, requestedWidth: Int64, requestedHeight: Int64, options: DropletOptions): Option<PixelMapDrawable> {
+   func decodeDrawable(buffer: Array<UInt8>, requestedWidth: Int64, requestedHeight: Int64, options: DropletOptions): Option<PixelMapDrawable> {
     return decodeDrawable(
         ByteArrayReader(buffer),
         requestedWidth,
@@ -115,7 +115,7 @@ public class Downsampler {
         );
   }
 
-  public func decodePixelMap(buffer: Array<UInt8>, requestedWidth: Int64, requestedHeight: Int64, options: DropletOptions): Option<PixelMap> {
+   func decodePixelMap(buffer: Array<UInt8>, requestedWidth: Int64, requestedHeight: Int64, options: DropletOptions): Option<PixelMap> {
     return decodePixelMap(
         ByteArrayReader(buffer),
         requestedWidth,

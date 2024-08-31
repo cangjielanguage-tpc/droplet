@@ -105,7 +105,7 @@ public class SourceGenerator <: DataFetcherGenerator & FetcherReadyCallback {
         return true;
     }
 
-    public func onDataReadyInternal(data: Option<Any>, dataSource: DataSource, sourceKey: Option<AnyKey>): Unit {
+     func onDataReadyInternal(data: Option<Any>, dataSource: DataSource, sourceKey: Option<AnyKey>): Unit {
         let diskCacheStrategy: DiskCacheStrategy = helper.getDiskCacheStrategy();
         if (match (data) {
             case Some(x) => true
@@ -188,7 +188,6 @@ public class SourceGenerator <: DataFetcherGenerator & FetcherReadyCallback {
     public func onDataFetcherReady(sourceKey: AnyKey, data: Option<Any>, dataSource: DataSource): Unit {
         // This data fetcher will be loading from a File and provide the wrong data source, so override
         // with the data source of the original fetcher
-        // cb.onDataFetcherReady(sourceKey, data, fetcher, loadData.fetcher.getDataSource(), sourceKey);
         cb.onDataFetcherReady(sourceKey, data, dataSource);
     }
 

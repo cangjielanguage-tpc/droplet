@@ -55,31 +55,31 @@ public class DecodeHelper {
         this.dataSource = model.getDataSource()
   }
 
-  public func isGif(data: Array<UInt8>): Bool {
+   func isGif(data: Array<UInt8>): Bool {
     return ImageUtils.getImageType(data) == ImageUtils.ImageFormatGIF
   }
 
-  public func getDrawableResourceParser(): ResourceDecoder<Array<UInt8>, Drawable> {
+   func getDrawableResourceParser(): ResourceDecoder<Array<UInt8>, Drawable> {
     return dropletContext.getManager().getDrawableResourceParser()
   }
 
-  public func getDrawableResourceDecoders(): ArrayList<ResourceDecoder<Array<UInt8>, Drawable>> {
+   func getDrawableResourceDecoders(): ArrayList<ResourceDecoder<Array<UInt8>, Drawable>> {
     return dropletContext.getManager().getDrawableResourceDecoders()
   }
 
-  public func getPixelMapResourceDecoders(): ArrayList<ResourceDecoder<Array<UInt8>, PixelMap>> {
+   func getPixelMapResourceDecoders(): ArrayList<ResourceDecoder<Array<UInt8>, PixelMap>> {
     return dropletContext.getManager().getPixelMapResourceDecoders()
   }
 
-  public func getDataSource(): DataSource {
+   func getDataSource(): DataSource {
     return this.dataSource
   }
 
-  public func getModel(): Model {
+   func getModel(): Model {
     return model
   }
 
-  public func getModelLoaders(): Option<ArrayList<ModelLoader>> {
+   func getModelLoaders(): Option<ArrayList<ModelLoader>> {
     match(model.modelType) {
       case ModelType.STRING => Some(dropletContext.getManager().getStringModelLoaders())
       case ModelType.FILE => Some(dropletContext.getManager().getFileModelLoaders())
@@ -92,52 +92,52 @@ public class DecodeHelper {
 
   }
 
-  public func getDiskCache(): DiskCache {
+   func getDiskCache(): DiskCache {
     return diskCacheProvider.getDiskCache();
   }
 
-  public func getDiskCacheStrategy(): DiskCacheStrategy {
+   func getDiskCacheStrategy(): DiskCacheStrategy {
     return diskCacheStrategy;
   }
 
-  public func getOptions(): DropletOptions {
+   func getOptions(): DropletOptions {
     return options;
   }
 
-  public func getSignature(): AnyKey {
+   func getSignature(): AnyKey {
     return signature;
   }
 
-  public func getWidth(): Int64 {
+   func getWidth(): Int64 {
     return width;
   }
 
-  public func getHeight(): Int64 {
+   func getHeight(): Int64 {
     return height;
   }
 
-  public func getArrayPool(): ArrayPool {
+   func getArrayPool(): ArrayPool {
       return dropletContext.getArrayPool();
   }
 
     // getTranscodeClass
-  public func getTransformationKey(): TransformationKey {
+   func getTransformationKey(): TransformationKey {
     return transformationKey;
   }
 
-  public func getResourceTypeClass(): ResourceTypeClass {
+   func getResourceTypeClass(): ResourceTypeClass {
     return resourceTypeClass
   }
 
-  public func getScaleOnlyOrNoTransform(): Bool {
+   func getScaleOnlyOrNoTransform(): Bool {
     return isScaleOnlyOrNoTransform;
   }
 
-  public func getTransformation(): Option<AnyTransformation> {
+   func getTransformation(): Option<AnyTransformation> {
     return getTransformation(this.transformationKey)
   }
 
-  public func getTransformation(transformationKey: TransformationKey): Option<AnyTransformation> {
+   func getTransformation(transformationKey: TransformationKey): Option<AnyTransformation> {
     var result: Option<AnyKey> = transformations.get(transformationKey);
 
     if (match(result) {
@@ -167,7 +167,7 @@ public class DecodeHelper {
     throw DropletException("Missing transformation for  xxxtransforms.   error  !!!")
   }
 
-  public func isResourceEncoderAvailable(resource: AnyDropletResource): Bool {
+   func isResourceEncoderAvailable(resource: AnyDropletResource): Bool {
     // Gif格式不支持缓存变换后的数据 不需要判断gif
     if(resource is DropletResource<PixelMap> || resource is DropletResource<PixelMapDrawable>) {
       return true
@@ -181,7 +181,7 @@ public class DecodeHelper {
 public class InputStreamEncoder <: Encoder<InputStream> {
   private let byteArrayPool: ArrayPool;
 
-  public init(byteArrayPool: ArrayPool) {
+   init(byteArrayPool: ArrayPool) {
     this.byteArrayPool = byteArrayPool;
   }
 

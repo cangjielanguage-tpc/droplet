@@ -28,19 +28,19 @@ public class CustomMapItem<K, V> <: Hashable & ToString where K <: Hashable & To
 public open class CustomMap<K, V> <: ToString & Equatable<CustomMap<K, V>> where K <: Hashable & ToString & Equatable<K>, V <: ToString & Equatable<V> {
     public var list: ArrayList<CustomMapItem<K, V>> = ArrayList<CustomMapItem<K, V>>()
 
-    public func size(): Int64 {
+     func size(): Int64 {
         return list.size
     }
 
-    public func isEmpty(): Bool {
+     func isEmpty(): Bool {
         return list.isEmpty()
     }
 
-    public func getIterator(): Iterator<CustomMapItem<K, V>> {
+     func getIterator(): Iterator<CustomMapItem<K, V>> {
         return list.iterator()
     }
 
-    public open func put(k: K, v: V): Option<V> {
+   public open func put(k: K, v: V): Option<V> {
         var old: Option<V> = None
         for(i in 0 .. list.size) {
             let l: CustomMapItem<K, V> = list[i]
@@ -95,7 +95,7 @@ public open class CustomMap<K, V> <: ToString & Equatable<CustomMap<K, V>> where
         return list[index].k;
     }
 
-    public func containsKey(k: K): Bool {
+     func containsKey(k: K): Bool {
         for(i in 0 .. list.size) {
             let o: CustomMapItem<K, V> = list[i]
             if(o.k == k) {
@@ -105,7 +105,7 @@ public open class CustomMap<K, V> <: ToString & Equatable<CustomMap<K, V>> where
         return false
     }
 
-    public func get(k: K): Option<V> {
+     func get(k: K): Option<V> {
         for(i in 0 .. list.size) {
             let o: CustomMapItem<K, V> = list[i]
             if(o.k == k) {

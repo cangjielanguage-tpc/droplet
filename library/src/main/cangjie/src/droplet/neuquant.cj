@@ -123,7 +123,6 @@ class NeuQuant {
 
     protected var samplefac:Int32; /* sampling factor 1..30 */
 
-    // typedef int pixel[4]; /* BGRc */
     protected var network:Array<Array<Int32>>; /* the network itself - [netsize][4] */
 
     protected var netindex:Array<Int32> = Array<Int32>(256,item:0);
@@ -164,7 +163,7 @@ class NeuQuant {
         }
     }
 
-    public func colorMap():Array<UInt8> {
+     func colorMap():Array<UInt8> {
         var map:Array<UInt8> = Array<UInt8>(Int64(3 * netsize),item:0)
         var index:Array<Int32> = Array<Int32>(Int64(netsize),item:0)
         for ( i in 0..netsize){
@@ -188,7 +187,7 @@ class NeuQuant {
      * unbias)
      * -------------------------------------------------------------------------------
      */
-    public func inxbuild() {
+     func inxbuild() {
 
         var j:Int32; var smallpos:Int32; var smallval:Int32; var previouscol:Int32; var startpos:Int32
         var p:Array<Int32>; var q:Array<Int32>;
@@ -245,7 +244,7 @@ class NeuQuant {
     /*
      * Main Learning Loop ------------------
      */
-    public func learn():Unit {
+     func learn():Unit {
 
         var i:Int32
         var j:Int32
@@ -352,7 +351,7 @@ class NeuQuant {
      * index
      * ----------------------------------------------------------------------------
      */
-    public func map(b:Int32, g:Int32, r:Int32):Int32 {
+     func map(b:Int32, g:Int32, r:Int32):Int32 {
 
         var i:Int32
         var j:Int32
@@ -429,7 +428,7 @@ class NeuQuant {
         return (best);
     }
 
-    public func process():Array<UInt8> {
+     func process():Array<UInt8> {
         // 300ms
         learn();
         unbiasnet();
@@ -442,7 +441,7 @@ class NeuQuant {
      * for sort
      * -----------------------------------------------------------------------------------
      */
-    public func unbiasnet():Unit {
+     func unbiasnet():Unit {
 
         for (i in 0..Int64(netsize)) {
             network[i][0] >>= netbiasshift;

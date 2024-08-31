@@ -8,7 +8,7 @@ public enum ByteOrder <: Hashable & Equatable<ByteOrder>{
     | LITTLE_ENDIAN
     | BIG_ENDIAN
 
- public func GetTypeNum(result: ByteOrder): Int64 {
+  func GetTypeNum(result: ByteOrder): Int64 {
         match (result) {
             case LITTLE_ENDIAN => return 0
             case BIG_ENDIAN => return 1
