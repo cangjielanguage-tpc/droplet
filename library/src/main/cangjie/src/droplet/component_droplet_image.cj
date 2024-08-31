@@ -208,6 +208,10 @@ public class DropletImageComponent {
                 }
             }
 
+            if (let Some(v) <- option.errholder) {
+                builder = builder.error(v)
+            }
+
             if (let Some(v) <- option.applyRequestOption) {
                 builder = builder.apply(v)
             }
