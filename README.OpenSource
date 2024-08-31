@@ -1,11 +1,11 @@
 [
     {
-        "Name": " xxx",
-        "License": " Apache License ",
-        "License File": " LICENSE ",
-        "Version Number": " v2.0 ",
-        "Owner": "xxx"
-        "Upstream URL": "https://github.com/xxx",
-        "Description": " xxx."
+        "Name": "glide'",
+        "License": "ohther",
+        "License File": "https://gitcode.com/Cangjie-TPC/droplet/blob/develop/LICENSE",
+        "Version Number": "v4.14.2",
+        "Owner": "bumptech"
+        "Upstream URL": "https://github.com/bumptech/glide",
+        "Description": "An image loading and caching library for Android focused on smooth scrolling"
     }
 ]
