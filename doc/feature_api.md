@@ -40,30 +40,34 @@ public class Droplet {
      * 根据页面标记，获取绑定的图片请求管理器实例对象，每个页面有一个单独的图片请求管理器。
      * 
      * @参数 context - AbilityContext数据类型，上下文
-     * @参数 label - String数据类型，标签，用于绑定生命周期
+     * @参数 label - String数据类型，标签，用于绑定生命周期,同一个页面的不同组件保持label相同
      * @返回值 RequestManager 图片请求管理器
      */
     public static func withContext(context: AbilityContext, label: String): RequestManager
 
     /**
      * 页面生命周期事件绑定函数，需在页面显示回调函数中调用。
+     * onAppear和onDisAppear一起使用或一起不使用
      */
     public func onAppear(): Unit
 
     /**
      * 页面生命周期事件绑定函数，需在页面显示回调函数中调用。
-     * 
+     * onAppear和onDisAppear一起使用或一起不使用，key和组件的label保持一致     
+     *
      * @参数 key - String数据类型
      */
     public func onAppear(key: String): Unit
 
     /**
      * 页面生命周期事件绑定函数，需在页面隐藏回调函数中调用
+     * onAppear和onDisAppear一起使用或一起不使用
      */
     public func onDisAppear(): Unit
 
     /**
      * 页面生命周期事件绑定函数，需在页面隐藏回调函数中调用
+     * onAppear和onDisAppear一起使用或一起不使用,key和组件的label保持一致      
      * 
      * @参数 key - String数据类型
      */
@@ -658,22 +662,25 @@ class MyView {
         strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
         label: Option<String>.Some("page"),                                       // 生命周期标签 （可选） 同一个页面不同组件建议用相同的标签,或者都不加,
                                                                                   //这样每个页面的组件会用相同的requestManager管理生命周期  
-        signature:Option<String>.Some("1111") //不同的signature可保证缓存key的唯一    （可选）   
+        signature:Option<String>.Some("1111"),                                  //不同的signature可保证缓存key的唯一    （可选）   
         transformCate:Option<PixelMapTransformation>.Some(RoundedCorners(50)), //transform动画 （可选）
         transitionOption:Option<TransitionOption>.Some(transitionOption)  //过渡动画 （可选）
     )
 
-    public func onAppear(): Unit {
-        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(option.label) //如果不加label,可不调用，如果加了建议在这里调用
+    protected open func aboutToAppear(){
+        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(option.label) //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致,
+                                                                              //组件没设置label,就调用空参的onAppear                                                    
     }
-    public func onDisappear(): Unit {
-        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(option.label) //onAppear和onDisAppear一起使用，要么都不调用
+    
+    protected open func aboutToDisappear(){
+        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(option.label) //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致
+                                                                                 //组件没设置label,就调用空参的onDisAppear
     }
 
     func build() {
         Column(30) {
             Column() {
-                DropletImageComponent(globalContext:globalAbilityContext,option: option, beginFn: {=> text = "begin";AppLog.error("droplet hhs begin")}, endFn: {=> textTmp = "end";AppLog.error("droplet hhs end")})
+                DropletImageComponent(globalContext:globalAbilityContext,option: option, beginFn: {=> text = "begin";AppLog.error("droplet begin")}, endFn: {=> textTmp = "end";AppLog.error("droplet  end")})
             }.width(100.percent)
         }
     }
