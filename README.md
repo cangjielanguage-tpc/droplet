@@ -5,7 +5,7 @@
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.0.1-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.53.8-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v0.53.12-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/project-open-brightgreen" style="display: inline-block;" />
 </p>
 
@@ -68,34 +68,11 @@ droplet是一个图像加载缓存库，致力于更高效、更轻便、更简�
 描述具体的编译过程：
 
 ```shell
-    第一步.由于该库的transform依赖C的代码，因此首先要用library/cpp下的C代码编译成so
-      编译方法，新建一个仓颉UI项目，然后在entry/src/main/下面建一个文件夹，这个文件夹是和cangjie文件夹平级的，给他取一个名字比如cjdropletOpenGl,然后把刚才的
-      C代码，放入这个文件夹，
-      然后看新建项目的entry下面的build-profile.json5,在buildOption层级下加上这个
-      "externalNativeOptions": {
-       "path":"./src/main/cjdropletOpenGl/CMakeLists.txt",
-       "arguments": "",
-       "cppFlags": "",
-       "abiFilters": [
-         "arm64-v8a",
-         "armeabi-v7a"
-       ]
-      }
-      这个代码和cangjieOptions平级，其中的path路径就是刚新建的目录的下面的CMakeLists.txt
-      注意，还有一个细节在entry/src/main/下面要建一个cpp名字的文件夹，没有的话可能编译so会失败
-      接下来点击deveco的build菜单下的Build Haps/Apps 里的Build Haps 
-      构建结束后，最后，会在entry/build/default/intermediates/cmake/default/obj/里面找到arm64-v8a这个文件夹，里面有libc++_shared.so libglwrapper.so两个文件
-      其中的libglwrapper.so就是我们需要的so，注意libglwrapper这个名字跟你CMakeLists.txt里面的定义有关
+    1.先通过命令把代码下载下来,
+      git clone -b 具体分支名 https://gitcode.com/Cangjie-TPC/droplet.git
+          
+    2.选择library模块,点击Build菜单,然后点击 Make Module 'library' 等待编译完成,项目则编译成功
     
-    第二步
-     在得到第一步的so之后，我们把这个so放入我们项目下的library/libs里面即可
-     然后在library/src/main/cangjie/cjpm.toml里面添加   
-     [ffi.c]
-        glwrapper = {path = "../../../libs/"}   
-    其中glwrapper是so的名字，如果你修改了c代码改了名字，要在这里同步修改，后面那个路径就是根据cjpm.toml的相对路径
-    
-    最后
-       点击Build菜单下的Rebuild Project就能把项目编译成功 
 ```
 
 ### 功能示例
@@ -110,6 +87,7 @@ a. 目标工程把依赖库作为git submodule引入
 >mkdir third-party
 >cd  third-party
 >git submodule add "https://gitcode.com/Cangjie-TPC/droplet.git"
+ 然后按照上述办法把droplet编译通过即可
 ```
 
 b. 打开 .\entry\src\main\cangjie\cjpm.toml，添加依赖
@@ -195,11 +173,9 @@ load成功
 
 ## 约束与限制
 
-当前基于 HarmonyOS NEXT Developer Beta5 版本实现的
+IDE : DevEco Studio NEXT Beta1(5.0.3.810)
 
-IDE : DevEco Studio NEXT Developer Beta5(5.0.3.700)
-
-Plugins (SDK) : DevEco Studio NEXT Developer Beta5-Cangjie Plugin(5.0.3.700)
+Plugins (SDK) : DevEco Studio NEXT Beta1-Cangjie Plugin(5.0.3.810)
 
 
 ## 开源协议

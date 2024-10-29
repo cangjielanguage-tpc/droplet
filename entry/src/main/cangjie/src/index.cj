@@ -22,7 +22,10 @@ class MyView {
         Row {
             Scroll(this.scroller){
                 Column {
-                    Button("helloworld").onClick {Router.push(url: "TestJpg")}
+                    Button("TestJpg").onClick {Router.push(url:  "TestJpg")}
+                    Button("TestPng").onClick {Router.push(url:  "TestPng")}
+                    Button("TestWebp").onClick {Router.push(url: "TestWebp")}
+                    Button("TestBmp").onClick {Router.push(url:  "TestBmp")}
                 }.width(100.percent)
             }
         }.height(100.percent)
