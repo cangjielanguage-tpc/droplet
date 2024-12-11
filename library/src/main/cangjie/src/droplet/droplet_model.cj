@@ -7,13 +7,14 @@ package droplet.droplet
 
 
 public enum ModelType {
-    ARRAY | STRING | FILE | GIFDECODER | NONE
+    ARRAY | STRING | FILE | GIFDECODER | NONE | CJRESOURCE
 }
 
 public abstract class Model <: DropletAny<Model> {
     public var arr: Array<UInt8> = Array<UInt8>()
     public var str: String = ""
     public var file: DropletFile = DropletFile("")
+    public var res: CJResource = CJResource(0,0,"")
     public var decoder: Option<GifDecoder> = None
     public var modelType: ModelType = ModelType.NONE
 
@@ -37,6 +38,11 @@ public abstract class Model <: DropletAny<Model> {
         this.modelType = ModelType.FILE
     }
 
+    init(res: CJResource) {
+        this.res = res
+        this.modelType = ModelType.CJRESOURCE
+    }
+
     init(decoder: GifDecoder) {
         this.decoder = Some(decoder)
         this.modelType = ModelType.GIFDECODER
@@ -48,6 +54,7 @@ public abstract class Model <: DropletAny<Model> {
             case ModelType.STRING => "modeltype: ${this.str}"
             case ModelType.FILE => "modeltype: ${this.file}"
             case ModelType.GIFDECODER => "modeltype: ${this.file}"
+            case ModelType.CJRESOURCE => "modeltype: res ${this.res.id}"
             case ModelType.NONE => "modeltype: NONE"
         }
     }
@@ -57,6 +64,7 @@ public abstract class Model <: DropletAny<Model> {
             case ModelType.ARRAY => Utils.hashCode<UInt8>(this.arr)
             case ModelType.STRING => this.str.hashCode()
             case ModelType.FILE => this.file.hashCode()
+            case ModelType.CJRESOURCE => this.res.id
             case ModelType.GIFDECODER => 0i64
             case ModelType.NONE => 0i64
         }
@@ -65,7 +73,7 @@ public abstract class Model <: DropletAny<Model> {
     public operator func ==(that: Model): Bool {
         if(that is LoadModel) {
             var t = (that as LoadModel).getOrThrow()
-            return this.arr == t.arr && this.str == t.str && this.file == t.file
+            return this.arr == t.arr && this.str == t.str && this.file == t.file && this.res.id == t.res.id
         }
         return false
     }
@@ -73,7 +81,7 @@ public abstract class Model <: DropletAny<Model> {
     public operator func !=(that: Model): Bool {
         if(that is LoadModel) {
             var t = (that as LoadModel).getOrThrow()
-            return !(this.arr == t.arr && this.str == t.str && this.file == t.file)
+            return !(this.arr == t.arr && this.str == t.str && this.file == t.file && this.res.id == t.res.id)
         }
         return true
     }
@@ -90,6 +98,7 @@ public abstract class Model <: DropletAny<Model> {
                     DataSource.LOCAL
                 }
             case ModelType.FILE => DataSource.LOCAL
+            case ModelType.CJRESOURCE => DataSource.LOCAL
             case ModelType.GIFDECODER => DataSource.LOCAL
             case ModelType.NONE => DataSource.NONE
         }
@@ -112,5 +121,9 @@ public class LoadModel <: Model {
 
     init(file: File) {
         super(file)
+    }
+
+    init(res: CJResource) {
+        super(res)
     }
 }

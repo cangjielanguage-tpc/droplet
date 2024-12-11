@@ -5,7 +5,7 @@
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.0.1-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.53.8-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v0.53.13-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/project-open-brightgreen" style="display: inline-block;" />
 </p>
 
@@ -68,59 +68,43 @@ droplet是一个图像加载缓存库，致力于更高效、更轻便、更简�
 描述具体的编译过程：
 
 ```shell
-    第一步.由于该库的transform依赖C的代码，因此首先要用library/cpp下的C代码编译成so
-      编译方法，新建一个仓颉UI项目，然后在entry/src/main/下面建一个文件夹，这个文件夹是和cangjie文件夹平级的，给他取一个名字比如cjdropletOpenGl,然后把刚才的
-      C代码，放入这个文件夹，
-      然后看新建项目的entry下面的build-profile.json5,在buildOption层级下加上这个
-      "externalNativeOptions": {
-       "path":"./src/main/cjdropletOpenGl/CMakeLists.txt",
-       "arguments": "",
-       "cppFlags": "",
-       "abiFilters": [
-         "arm64-v8a",
-         "armeabi-v7a"
-       ]
-      }
-      这个代码和cangjieOptions平级，其中的path路径就是刚新建的目录的下面的CMakeLists.txt
-      注意，还有一个细节在entry/src/main/下面要建一个cpp名字的文件夹，没有的话可能编译so会失败
-      接下来点击deveco的build菜单下的Build Haps/Apps 里的Build Haps 
-      构建结束后，最后，会在entry/build/default/intermediates/cmake/default/obj/里面找到arm64-v8a这个文件夹，里面有libc++_shared.so libglwrapper.so两个文件
-      其中的libglwrapper.so就是我们需要的so，注意libglwrapper这个名字跟你CMakeLists.txt里面的定义有关
+    1.先通过命令把代码下载下来,
+      git clone -b 具体分支名 https://gitcode.com/Cangjie-TPC/droplet.git
+          
+    2.选择library模块,点击Build菜单,然后点击 Make Module 'library' 等待编译完成,项目则编译成功
     
-    第二步
-     在得到第一步的so之后，我们把这个so放入我们项目下的library/libs里面即可
-     然后在library/src/main/cangjie/cjpm.toml里面添加   
-     [ffi.c]
-        glwrapper = {path = "../../../libs/"}   
-    其中glwrapper是so的名字，如果你修改了c代码改了名字，要在这里同步修改，后面那个路径就是根据cjpm.toml的相对路径
-    
-    最后
-       点击Build菜单下的Rebuild Project就能把项目编译成功 
 ```
 
 ### 功能示例
 
 #### 1. 把droplet作为三方库依赖引入
-当前仓颉语言三方库还不支持中心仓库，可以把依赖库克隆到本地引入，具体步骤如下：
 
-a. 目标工程把依赖库作为git submodule引入
-
-```shell
-> cd $工程根目录
->mkdir third-party
->cd  third-party
->git submodule add "https://gitcode.com/Cangjie-TPC/droplet.git"
+```cj
+用户如何在自己项目里引入droplet，具体步骤如下：
+1. 在自己项目的根目录下,建一个thirdparty目录,然后通过git命令,把自己需要的ijk分支拉下来,比如
+   git clone -b 分支名  https://gitcode.com/Cangjie-TPC/droplet.git
+2. 把 thirdparty文件下的droplet项目用deveco编译通过，方法如上面的编译构建
+3. 在自己项目的根目录的build-profile.json5文件里的modules节点下添加
+    {
+      "name": "library",
+      "srcPath": "./thirdparty/droplet/library"
+    },
+    {
+      "name": "droplet_ffi",
+      "srcPath": "./thirdparty/droplet/droplet_ffi"
+    }
+   把droplet库的两个依赖变为modeule依赖形式.然后同步项目
+4. 在自己项目的enrty里的oh-package.json5里的dependencies里加上 "library": "file:../thirdparty/droplet/library",然后同步项目
+    "dependencies": {
+    "library": "file:../thirdparty/droplet/library"
+  }
+   项目即依赖成功
+   另外注意该项目需要网络权限
 ```
 
-b. 打开 .\entry\src\main\cangjie\cjpm.toml，添加依赖
-
-```toml
-[dependencies]
-  droplet = {path = "../../../../third-party/droplet/library/src/main/cangjie", version = "1.0.0"}
-```
 
 #### 2. 在UI代码中使用Droplet组件（DropletImageComponent）
-功能示例描述: 加载一个网络图片，支持的图片类型为：bmp、jpg、png、wbep。
+功能示例描述: 加载一个网络图片，支持的图片类型为：bmp、jpg、png、wbep、gif。
 
 示例代码如下：
 
@@ -141,41 +125,55 @@ import droplet.droplet.*
 @Component
 class MyView {
 
-	@State var text: String = ""
-
-    @State var textTmp: String = ""
-
-    var transitionOption:TransitionOption = TransitionOption(TransitionType.Opacity,0.0,1.0,1000) //透明度
-
+	@State var label: String = "MyView"
 
     @State
     var option: DropletRequestOption = DropletRequestOption (
-        // 加载一张本地的jpg资源（必选）
-        loadSrc: "/data/storage/el1/bundle/testjpg.jpg",    // (必选) jpg 注意这里是本地路径，必须本地有这张图片，才能加载 或者自己填写网络图片
+        
         placeholder: Option<CJResource>.Some(@r(app.media.loading)),             // 占位图使用本地资源icon_loading（可选）自己定义
         errholder: Option<CJResource>.Some(@r(app.media.img)),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
         strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
-        label: Option<String>.Some("page"),                                       // 生命周期标签 （可选） 同一个页面不同组件保持相同的标签,或者都不加,
                                                                                   //  这样每个页面的组件会用相同的requestManager管理生命周期
         signature:Option<String>.Some("1111"), //不同的signature可保证缓存key的唯一    （可选）   
         transformCate:Option<PixelMapTransformation>.Some(RoundedCorners(50)), //transform效果 （可选）
-        transitionOption:Option<TransitionOption>.Some(transitionOption)  //过渡动画 （可选）
+        transitionOption:Option<TransitionOption>.Some(TransitionOption(TransitionType.Opacity,0.0,1.0,1000))  //过渡动画 （可选）
     )
 
     protected open func aboutToAppear(){
-        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(option.label)  //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致,
+        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(label)  //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致,
                                                                                //组件没设置label,就调用空参的onAppear                      
     }               
     
     protected open func aboutToDisappear(){
-        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(option.label) //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致
+        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(label) //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致
                                                                                  //组件没设置label,就调用空参的onDisAppear
     }
 
     func build() {
         Column(30) {
             Column() {
-                DropletImageComponent(globalContext:globalAbilityContext,option: option, beginFn: {=> text = "begin";AppLog.error("droplet begin")}, endFn: {=> textTmp = "end";AppLog.error("droplet end")})
+                DropletImageComponent(
+                    //网络图片
+                    loadSrc: "http://www....../testjpg.jpg", 
+                    //本地图片
+                    loadSrc: "/data/storage/el1/bundle/testjpg.jpg",   
+                    //加载raw文件图片
+                    loadSrc："raw1.png"  //要加载的raw文件夹下图片名称
+                    //读取res下的资源文件
+                    loadSrcRes: @r(app.media.startIcon), //loadSrc和loadSrcRes二选一 loadSrc优先
+                    //控件宽度 支持百分比和vp 可选
+                    imageViewWidth: Length(50, unitType: LengthType.percent), //建议都设置(有一个为空则宽按屏幕宽度计算，建议指明宽高) 
+                    //控件高度 支持百分比和vp 可选
+                    imageViewHeight: Length(120.0, unitType: LengthType.vp), //建议都设置(有一个为空则宽按屏幕宽度计算,建议指明宽高) 
+                    //图片相对控件对齐方式 默认ImageFit.Scale 可选
+                    imageFit: ImageFit.Contain,
+                    //context对象
+                    globalContext:globalAbilityContext, //(必选)
+                    //可选
+                    option: Option<DropletRequestOption>.Some(option),
+                    // 生命周期标签 （可选） 同一个页面不同组件保持相同的标签,或者都不加,
+                    label: label
+                    )
             }.width(100.percent)
         }
     }
@@ -195,12 +193,9 @@ load成功
 
 ## 约束与限制
 
-当前基于 HarmonyOS NEXT Developer Beta5 版本实现的
+DevEco Studio:  DevEco Studio 5.0.0 Release Build Version 5.0.3.906
 
-IDE : DevEco Studio NEXT Developer Beta5(5.0.3.700)
-
-Plugins (SDK) : DevEco Studio NEXT Developer Beta5-Cangjie Plugin(5.0.3.700)
-
+Cangjie support Plugin: DevEco Studio-Cangjie Plugin Beta2(5.0.3.906)
 
 ## 开源协议
 

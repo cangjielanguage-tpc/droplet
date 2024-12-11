@@ -609,6 +609,7 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
 
     }
 
+
     private func notifyComplete<R>(
         resource: DropletResource<R>,
         dataSource: DataSource,
@@ -666,7 +667,6 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
                 let r: ResourceDecoder<Array<UInt8>, Drawable> = decoders[i]
                 if (r.handles(arrData, decodeHelper.getOptions())) {
                     let d: Drawable = r.decode(arrData, this.width, this.height, decodeHelper.getOptions())
-
                     if (d is GifDrawable) {
                         let dd: GifDrawable = (d as GifDrawable).getOrThrow()
                         result = dd as DATA

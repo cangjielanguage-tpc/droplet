@@ -43,6 +43,7 @@ public class ByteArrayReader <: ImageReader {
         this.info = imageSource.getImageInfo()
     }
 
+
     public func decodePixelMap(targetWidth: Int32, targetHeight: Int32): Option<PixelMap> {
 
 
@@ -60,7 +61,6 @@ public class ByteArrayReader <: ImageReader {
             editable: true,
             sampleSize: 1
         )
-
         let pixelMap: PixelMap = imageSource.createPixelMap(options: decodingOptions)
 
       return Some(pixelMap);
@@ -289,6 +289,7 @@ public class Downsampler {
         sourceHeight,
         targetWidth,
         targetHeight);
+
 
     let downsampled: Option<PixelMap> = imageReader.decodePixelMap(finalWidth, finalHeight)
 

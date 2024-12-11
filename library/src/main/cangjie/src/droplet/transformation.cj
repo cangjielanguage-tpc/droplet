@@ -260,6 +260,8 @@ public class Rotate <: PixelMapTransformation {
     }
 }
 
+
+
 public class CenterCrop <: PixelMapTransformation {
     private static let ID: String = "com.cj.droplet.load.resource.pixelmap.CenterCrop"
     private static let tfId: UInt32 = unsafe { getCentercropIdx() }

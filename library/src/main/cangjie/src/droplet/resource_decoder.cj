@@ -15,6 +15,7 @@ public class PixelMapDrawableResourceParser <: ResourceDecoder<Array<UInt8>, Dra
         return true
     }
 
+
     public func decode(source: Array<UInt8>, width: Int64, height: Int64, options: DropletOptions): Drawable {
         let finalWidth: Int32 = Int32(UInt16(source[0]) << 8 | UInt16(source[1]))
         let finalHeight: Int32 = Int32(UInt16(source[2]) << 8 | UInt16(source[3]))

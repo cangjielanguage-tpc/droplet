@@ -83,6 +83,7 @@ public class DecodeHelper {
     match(model.modelType) {
       case ModelType.STRING => Some(dropletContext.getManager().getStringModelLoaders())
       case ModelType.FILE => Some(dropletContext.getManager().getFileModelLoaders())
+      case ModelType.CJRESOURCE => Some(dropletContext.getManager().getResourceModelLoaders())
       case ModelType.GIFDECODER => None
       case _ => None
     }

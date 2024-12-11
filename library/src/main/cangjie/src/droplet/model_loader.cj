@@ -1,10 +1,8 @@
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
- 
+
 package droplet.droplet
-
-
 
 public interface ModelLoader {
     func loadModel(t: Any, options: DropletOptions): Option<InputStream>
@@ -12,7 +10,7 @@ public interface ModelLoader {
 
 public class FileModelLoader <: ModelLoader {
     public override func loadModel(o: Any, options: DropletOptions): Option<InputStream> {
-        if(o is File) {
+        if (o is File) {
             return (o as File).getOrThrow()
         } else {
             return None
@@ -20,9 +18,32 @@ public class FileModelLoader <: ModelLoader {
     }
 }
 
+public class ResourceModelLoader <: ModelLoader {
+    public override func loadModel(o: Any, options: DropletOptions): Option<InputStream> {
+        if (o is CJResource) {
+            return getImageFromResource((o as CJResource).getOrThrow())
+        } else {
+            return None
+        }
+    }
+
+    private func getImageFromResource(res:CJResource): Option<InputStream> {
+          try {
+            let resourceManager = ResourceManager.getResourceManager(
+                getStageContext(Droplet.globalcontext.getOrThrow()))
+            let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(res.id),120)
+            var byteStream: ByteArrayStream = ByteArrayStream()
+            byteStream.write(arr)
+            return byteStream
+        } catch (e: Exception) {
+            return None
+        }
+    }
+}
+
 public class StringModelLoader <: ModelLoader {
     public override func loadModel(o: Any, options: DropletOptions): Option<InputStream> {
-        if(o is String) {
+        if (o is String) {
             let s: String = (o as String).getOrThrow()
             getImage(s)
         } else {
@@ -32,18 +53,18 @@ public class StringModelLoader <: ModelLoader {
 
     private func getImage(path: String): Option<InputStream> {
         let s: String = path.trimAscii()
-        if(s.startsWith("/")) {
-        return getImageFromFile(s)
-        } else if(s.startsWith("http")) {
-        return getImageFromHttpClient(s)
+        if (s.startsWith("/")) {
+            return getImageFromFile(s)
+        } else if (s.startsWith("http")) {
+            return getImageFromHttpClient(s)
         } else {
-          return getImageFromRawFile(s)
+            return getImageFromRawFile(s)
         }
     }
 
     private func getImageFromFile(path: String): Option<InputStream> {
         let f: File = File(path, Open(true, false))
-        if(f.canRead()) {
+        if (f.canRead()) {
             return Some(f)
         }
         return None
@@ -52,22 +73,22 @@ public class StringModelLoader <: ModelLoader {
     private func getImageFromHttpClient(path: String): Option<InputStream> {
         var tls = TlsClientConfig()
         tls.verifyMode = CertificateVerifyMode.TrustAll
-        var client = ClientBuilder().readTimeout(Duration.minute*1).tlsConfig(tls).build()
+        var client = ClientBuilder().readTimeout(Duration.minute * 1).tlsConfig(tls).build()
         let resp = client.get(path)
         return Some(resp.body)
     }
 
     private func getImageFromRawFile(rawFileName: String): Option<InputStream> {
-          try{
-             let resourceManager = ResourceManager.getResourceManager(getStageContext(Droplet.globalcontext.getOrThrow()))
-             let arr:Array<UInt8> = resourceManager.getRawFileContent(rawFileName)
-             var byteStream:ByteArrayStream = ByteArrayStream()
-             byteStream.write(arr)
-             return byteStream
-          }catch(e:Exception){
+        try {
+            let resourceManager = ResourceManager.getResourceManager(
+                getStageContext(Droplet.globalcontext.getOrThrow()))
+            let arr: Array<UInt8> = resourceManager.getRawFileContent(rawFileName)
+            var byteStream: ByteArrayStream = ByteArrayStream()
+            byteStream.write(arr)
+            return byteStream
+        } catch (e: Exception) {
             return None
-          }
-      }
-
+        }
+    }
 
 }

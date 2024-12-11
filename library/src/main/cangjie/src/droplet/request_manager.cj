@@ -98,6 +98,10 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
         return decodeAs<Drawable>(TransformationKey(TransformationKey.TRANSFORMATION_DRAWABLE)).load(model)
     }
 
+    public func load(model: CJResource): RequestBuilder<Drawable> {
+        return decodeAs<Drawable>(TransformationKey(TransformationKey.TRANSFORMATION_DRAWABLE)).load(model)
+    }
+
     func getDefaultRequestListeners(): ArrayList<RequestListener<Any>> {
         return defaultRequestListeners;
     }
