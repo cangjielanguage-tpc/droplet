@@ -6,10 +6,10 @@ package droplet.droplet
 
 import ohos.state_manage.*
 import ohos.state_macro_manage.*
-protected import ohos.base.*
-protected import ohos.component.*
-protected import ohos.image.Component as ImageComponent
-protected import ohos.image.Image as ImageImage
+internal import ohos.base.*
+internal import ohos.component.*
+internal import ohos.image.Component as ImageComponent
+internal import ohos.image.Image as ImageImage
 internal import ohos.image.PixelMap
 internal import ohos.image.InitializationOptions
 internal import ohos.image.PixelMapFormat
@@ -22,26 +22,27 @@ internal import ohos.image.ImageSource
 internal import ohos.image.SourceOptions
 internal import ohos.image.DecodingOptions
 internal import ohos.image.ImageInfo
-protected import ohos.ability.*
-protected import ohos.concurrency.*
-protected import net.http.*
-protected import std.socket.*
-protected import net.tls.*
-protected import std.io.*
-protected import encoding.url.*
-protected import std.fs.Path as FSPath
-protected import std.fs.*
-protected import std.time.*
-protected import std.os.posix.*
-protected import std.collection.*
-protected import std.math.*
-protected import std.log.*
-protected import encoding.hex.*
-protected import std.sync.*
-protected import ohos.resource_manager.*
-protected import std.format.Formatter
-protected import std.overflow.*
-protected import ohos.animator.*
+internal import ohos.ability.*
+internal import ohos.concurrency.*
+internal import net.http.*
+internal import std.socket.*
+internal import net.tls.*
+internal import std.io.*
+internal import encoding.url.*
+internal import std.fs.Path as FSPath
+internal import std.fs.*
+internal import std.time.*
+internal import std.os.posix.*
+internal import std.collection.*
+internal import std.math.*
+internal import std.log.*
+internal import encoding.hex.*
+internal import std.sync.*
+internal import ohos.resource_manager.*
+internal import std.format.Formatter
+internal import std.overflow.*
+internal import ohos.animator.*
+internal import std.convert.*
 
 /**
  * Created on 2024/3/4
@@ -50,8 +51,8 @@ protected import ohos.animator.*
 public class DropletRequestOption {
 
     // 加载一张本地的jpg资源（必选）
-    @Publish
-    public var loadSrc: String = ""
+    //@Publish
+    //public var loadSrc: String = ""
     // 占位图使用本地资源icon_loading（可选）
     @Publish
     public var placeholder: Option<CJResource> = Option<CJResource>.None
@@ -61,9 +62,6 @@ public class DropletRequestOption {
     // 磁盘缓存策略（可选）
     @Publish
     public var strategy: Option<DiskCacheStrategy> = Option<DiskCacheStrategy>.None
-    //生命周期管理用到的标签名称
-    @Publish
-    public var label: String = ""
     //transform
     @Publish
     public var transformCate: Option<PixelMapTransformation> = Option<PixelMapTransformation>.None
@@ -105,11 +103,30 @@ public class DropletRequestOption {
 
 @Component
 public class DropletImageComponent {
-    @Link
+    @State
     @Watch[onOptionChanged]
-    var option: DropletRequestOption
+    var option: Option<DropletRequestOption> = Option<DropletRequestOption>.None
 
     var globalContext: Option<AbilityContext> = Option<AbilityContext>.None
+
+    @State
+    var loadSrc: String = ""
+
+    @State
+    var loadSrcRes: Option<CJResource> = Option<CJResource>.None
+
+    @State
+    var imageViewWidth: Length = Length(0.0, unitType: LengthType.vp)
+
+    @State
+    var imageViewHeight: Length = Length(0.0, unitType: LengthType.vp)
+
+    @State
+    var imageFit: ImageFit = ImageFit.ScaleDown
+
+    /*生命周期管理用到的标签名称 */
+    @State
+    var label: String = ""
 
     /*加载状态*/
     @State
@@ -131,11 +148,6 @@ public class DropletImageComponent {
     @State
     var TranslateValue: Float64 = 0.0
 
-    @Prop
-    var beginFn: () -> Unit
-    @Prop
-    var endFn: () -> Unit
-
     var flag: Bool = false
 
     var oldWidth: Int64 = 0
@@ -143,89 +155,122 @@ public class DropletImageComponent {
 
     let size: Size = Size(width: 1, height: 1)
     let opts: InitializationOptions = InitializationOptions(size: size)
-
     let color: Array<UInt8> = Array<UInt8>(96, item: 0)
     @State
     var pixelMap: PixelMap = createPixelMap(color, opts)
-
 
     func onOptionChanged() {
         updateImg(oldWidth, oldHeight)
     }
 
     func updateImg(width: Int64, height: Int64) {
-        if (option.loadSrc != "" && width > 0 && height > 0) {
-            beginFn()
-
+        if ((loadSrc != "" && width > 0 && height > 0) || (!loadSrcRes.isNone() && width > 0 && height > 0)) {
             var requestManager = Option<RequestManager>.None
-            if (let Some(v) <- option.useDefaultRequestOption) {
-                requestManager = Droplet.withContext(globalContext.getOrThrow(), option.label).useDefaultRequestOptions(
-                    v)
+
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.useDefaultRequestOption) {
+                    requestManager = Droplet.withContext(globalContext.getOrThrow(), label).useDefaultRequestOptions(v)
+                } else {
+                    requestManager = Droplet.withContext(globalContext.getOrThrow(), label)
+                }
             } else {
-                requestManager = Droplet.withContext(globalContext.getOrThrow(), option.label)
+                requestManager = Droplet.withContext(globalContext.getOrThrow(), label)
             }
-            var builder = requestManager.getOrThrow().load(option.loadSrc)
+
+            var tempBuilder: Option<RequestBuilder<Drawable>> = Option<RequestBuilder<Drawable>>.None
+            if (loadSrc != "") {
+                tempBuilder = requestManager.getOrThrow().load(loadSrc)
+            } else if (!loadSrcRes.isNone()) {
+                tempBuilder = requestManager.getOrThrow().load(loadSrcRes.getOrThrow())
+            } else {
+                throw Exception("loadSrc and loadSrcRes can not both be empty")
+            }
+
+            var builder = tempBuilder.getOrThrow()
+
             //设置三级缓存策略
-            if (let Some(v) <- option.strategy) {
-                builder = builder.setDiskCacheStrategy(v)
-            }
-
-            if (let Some(v) <- option.onlyRetrieveFromCache) {
-                builder = builder.onlyRetrieveFromCachecj(v, builder)
-            }
-
-            if (let Some(v) <- option.isSkipMemory) {
-                builder = builder.skipMemoryCache(v, builder)
-            }
-
-            if (let Some(v) <- option.thumbnail) {
-                builder = builder.thumbnail(v)
-            }
-
-            if (let Some(v) <- option.thumbnaildrawable) {
-                builder = builder.thumbnail(v)
-            }
-
-            if (let Some(v) <- option.overrideWH) {
-                builder = builder.setOverride(v[0], v[1])
-            }
-
-            if (let Some(v) <- option.transformCate) {
-                builder = builder.transform(v)
-            }
-
-            if (let Some(v) <- option.transformListCate) {
-                if (v.size > 1) {
-                    builder = builder.transforms(v)
-                } else if (v.size == 1) {
-                    builder = builder.transform(v[0])
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.strategy) {
+                    builder = builder.setDiskCacheStrategy(v)
                 }
             }
 
-            if (let Some(v) <- option.dontTransform) {
-                if (v) {
-                    builder = builder.dontTransform(builder)
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.onlyRetrieveFromCache) {
+                    builder = builder.onlyRetrieveFromCachecj(v, builder)
                 }
             }
 
-            if (let Some(v) <- option.errholder) {
-                builder = builder.error(v)
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.isSkipMemory) {
+                    builder = builder.skipMemoryCache(v, builder)
+                }
             }
 
-            if (let Some(v) <- option.applyRequestOption) {
-                builder = builder.apply(v)
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.thumbnail) {
+                    builder = builder.thumbnail(v)
+                }
             }
 
-            if (let Some(v) <- option.signature) {
-                builder = builder.setSignature(StringKey(v))
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.thumbnaildrawable) {
+                    builder = builder.thumbnail(v)
+                }
+            }
+
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.overrideWH) {
+                    builder = builder.setOverride(v[0], v[1])
+                }
+            }
+
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.transformCate) {
+                    builder = builder.transform(v)
+                }
+            }
+
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.transformListCate) {
+                    if (v.size > 1) {
+                        builder = builder.transforms(v)
+                    } else if (v.size == 1) {
+                        builder = builder.transform(v[0])
+                    }
+                }
+            }
+
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.dontTransform) {
+                    if (v) {
+                        builder = builder.dontTransform(builder)
+                    }
+                }
+            }
+
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.errholder) {
+                    builder = builder.error(v)
+                }
+            }
+
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.applyRequestOption) {
+                    builder = builder.apply(v)
+                }
+            }
+
+            if (let Some(o) <- option) {
+                if (let Some(v) <- o.signature) {
+                    builder = builder.setSignature(StringKey(v))
+                }
             }
 
             builder.listener(
                 {
                     drawable: Drawable, model: Model, target: Target<Drawable>, datasource: DataSource, 
-                    isFirstResource: Bool =>
-                    endFn()
-                    return false
+                    isFirstResource: Bool => return false
                 },
                 {
                     e: DropletException, model: Model, target: Target<Drawable>, isFirstResource: Bool => return false
@@ -235,39 +280,41 @@ public class DropletImageComponent {
                     p: PixelMap => launch {
                         isLoading = false
                         pixelMap = p
-                        if (let Some(i) <- option.transitionOption) {
-                            //创建动画对象
-                            var backAnimator: ?AnimatorResult = AnimatorResult(
-                                AnimatorOptions(
-                                    duration: i.getDuration(),
-                                    easing: "linear",
-                                    delay: 0,
-                                    fill: AnimatorFill.Forwards,
-                                    direction: AnimatorDirection.Normal,
-                                    iterations: 1,
-                                    begin: i.getBegin(),
-                                    end: i.getEnd()
+                        if (let Some(o) <- option) {
+                            if (let Some(i) <- o.transitionOption) {
+                                //创建动画对象
+                                var backAnimator: ?AnimatorResult = AnimatorResult(
+                                    AnimatorOptions(
+                                        duration: i.getDuration(),
+                                        easing: "linear",
+                                        delay: 0,
+                                        fill: AnimatorFill.Forwards,
+                                        direction: AnimatorDirection.Normal,
+                                        iterations: 1,
+                                        begin: i.getBegin(),
+                                        end: i.getEnd()
+                                    )
                                 )
-                            )
-                            //表明有动画
-                            match (i.getTransType()) {
-                                case Opacity => backAnimator?.onframe = {
-                                    value: Float64 => this.opacityValue = value
+                                //表明有动画
+                                match (i.getTransType()) {
+                                    case Opacity => backAnimator?.onframe = {
+                                        value: Float64 => this.opacityValue = value
+                                    }
+                                    case Rotate => backAnimator?.onframe = {
+                                        value: Float64 => this.rotateValue = (Float32(value))
+                                    }
+                                    case Scale => backAnimator?.onframe = {
+                                        value: Float64 => this.scaleValue = (Float32(value))
+                                    }
+                                    case Translate => backAnimator?.onframe = {
+                                        value: Float64 => this.TranslateValue = value
+                                    }
+                                    case _ => false
                                 }
-                                case Rotate => backAnimator?.onframe = {
-                                    value: Float64 => this.rotateValue = (Float32(value))
-                                }
-                                case Scale => backAnimator?.onframe = {
-                                    value: Float64 => this.scaleValue = (Float32(value))
-                                }
-                                case Translate => backAnimator?.onframe = {
-                                    value: Float64 => this.TranslateValue = value
-                                }
-                                case _ => false
+                                let callBackGet2 = backAnimator?.onframe
+                                let fun2 = callBackGet2.getOrThrow()
+                                backAnimator?.play()
                             }
-                            let callBackGet2 = backAnimator?.onframe
-                            let fun2 = callBackGet2.getOrThrow()
-                            backAnimator?.play()
                         }
                     }
                 },
@@ -285,51 +332,139 @@ public class DropletImageComponent {
     }
 
     func build() {
-        Column(30) {
+        Column() {
             if (isError) {
-                if (let Some(w) <- option.errholder) {
-                    Image(w).width(100.percent).objectFit(ImageFit.ScaleDown)
+                if (let Some(o) <- option) {
+                    if (let Some(w) <- o.errholder) {
+                        if (imageViewWidth.value == 0.0 || imageViewHeight.value == 0.0) {
+                            Image(w).width(100.percent).objectFit(ImageFit.ScaleDown)
+                        } else {
+                            Image(w).width(imageViewWidth).height(imageViewHeight).objectFit(ImageFit.ScaleDown)
+                        }
+                    }
                 }
             } else {
                 //有占位图的时候加载中走这里
                 if (isLoading) {
-                    if (let Some(v) <- option.placeholder) {
-                        Image(v).width(100.percent).objectFit(ImageFit.ScaleDown).onAreaChange(
-                            {
-                                oldArea, newArea =>
-                                let newWidth: Int64 = Int64(newArea.width)
-                                let newHeight: Int64 = Int64(newArea.height)
-                                if (oldWidth != newWidth || oldHeight != newHeight) {
-                                    if (!flag && newWidth > 0 && newHeight > 0) {
-                                        flag = true
-                                        updateImg(newWidth, newHeight)
-                                        oldWidth = newWidth
-                                        oldHeight = newHeight
+                    if (let Some(o) <- option) {
+                        if (let Some(v) <- o.placeholder) {
+                            if (imageViewWidth.value == 0.0 || imageViewHeight.value == 0.0) {
+                                Image(v).width(100.percent).objectFit(ImageFit.ScaleDown).onAreaChange(
+                                    {
+                                        oldArea, newArea =>
+                                        let newWidth: Int64 = Int64(newArea.width)
+                                        let newHeight: Int64 = Int64(newArea.height)
+                                        if (oldWidth != newWidth || oldHeight != newHeight) {
+                                            if (!flag && newWidth > 0 && newHeight > 0) {
+                                                flag = true
+                                                updateImg(newWidth, newHeight)
+                                                oldWidth = newWidth
+                                                oldHeight = newHeight
+                                            }
+                                        }
                                     }
-                                }
+                                )
+                            } else {
+                                Image(v).width(imageViewWidth).height(imageViewHeight).objectFit(ImageFit.ScaleDown).onAreaChange(
+                                    {
+                                        oldArea, newArea =>
+                                        let newWidth: Int64 = Int64(newArea.width)
+                                        let newHeight: Int64 = Int64(newArea.height)
+                                        if (oldWidth != newWidth || oldHeight != newHeight) {
+                                            if (!flag && newWidth > 0 && newHeight > 0) {
+                                                flag = true
+                                                updateImg(newWidth, newHeight)
+                                                oldWidth = newWidth
+                                                oldHeight = newHeight
+                                            }
+                                        }
+                                    }
+                                )
                             }
-                        )
+                        } else {
+                            //没有展位图
+                            //没有占位图的时候加载中走这里
+                            if (imageViewWidth.value == 0.0 || imageViewHeight.value == 0.0) {
+                                Image(pixelMap).width(100.percent).onAreaChange(
+                                    {
+                                        oldArea, newArea =>
+                                        let newWidth: Int64 = Int64(newArea.width)
+                                        let newHeight: Int64 = Int64(newArea.height)
+                                        if (oldWidth != newWidth || oldHeight != newHeight) {
+                                            if (!flag && newWidth > 0 && newHeight > 0) {
+                                                flag = true
+                                                updateImg(newWidth, newHeight)
+                                                oldWidth = newWidth
+                                                oldHeight = newHeight
+                                            }
+                                        }
+                                    }
+                                )
+                            } else {
+                                Image(pixelMap).width(imageViewWidth).height(imageViewHeight).onAreaChange(
+                                    {
+                                        oldArea, newArea =>
+                                        let newWidth: Int64 = Int64(newArea.width)
+                                        let newHeight: Int64 = Int64(newArea.height)
+                                        if (oldWidth != newWidth || oldHeight != newHeight) {
+                                            if (!flag && newWidth > 0 && newHeight > 0) {
+                                                flag = true
+                                                updateImg(newWidth, newHeight)
+                                                oldWidth = newWidth
+                                                oldHeight = newHeight
+                                            }
+                                        }
+                                    }
+                                )
+                            }
+                        }
                     } else {
+                        //没有展位图
                         //没有占位图的时候加载中走这里
-                        Image(pixelMap).width(100.percent).objectFit(ImageFit.ScaleDown).onAreaChange(
-                            {
-                                oldArea, newArea =>
-                                let newWidth: Int64 = Int64(newArea.width)
-                                let newHeight: Int64 = Int64(newArea.height)
-                                if (oldWidth != newWidth || oldHeight != newHeight) {
-                                    if (!flag && newWidth > 0 && newHeight > 0) {
-                                        flag = true
-                                        updateImg(newWidth, newHeight)
-                                        oldWidth = newWidth
-                                        oldHeight = newHeight
+                        if (imageViewWidth.value == 0.0 || imageViewHeight.value == 0.0) {
+                            Image(pixelMap).width(100.percent).onAreaChange(
+                                {
+                                    oldArea, newArea =>
+                                    let newWidth: Int64 = Int64(newArea.width)
+                                    let newHeight: Int64 = Int64(newArea.height)
+                                    if (oldWidth != newWidth || oldHeight != newHeight) {
+                                        if (!flag && newWidth > 0 && newHeight > 0) {
+                                            flag = true
+                                            updateImg(newWidth, newHeight)
+                                            oldWidth = newWidth
+                                            oldHeight = newHeight
+                                        }
                                     }
                                 }
-                            }
-                        )
+                            )
+                        } else {
+                            Image(pixelMap).width(imageViewWidth).height(imageViewHeight).onAreaChange(
+                                {
+                                    oldArea, newArea =>
+                                    let newWidth: Int64 = Int64(newArea.width)
+                                    let newHeight: Int64 = Int64(newArea.height)
+                                    if (oldWidth != newWidth || oldHeight != newHeight) {
+                                        if (!flag && newWidth > 0 && newHeight > 0) {
+                                            flag = true
+                                            updateImg(newWidth, newHeight)
+                                            oldWidth = newWidth
+                                            oldHeight = newHeight
+                                        }
+                                    }
+                                }
+                            )
+                        }
                     }
                 } else {
-                    Image(pixelMap).objectFit(ImageFit.ScaleDown).opacity(opacityValue).rotate(
-                        rotateValue).scale(scaleValue).translateX(TranslateValue).fitOriginalSize(true)
+                    //主图显示
+                    //控件宽高不设置 控件大小和pixelmap大小一样
+                    if (imageViewWidth.value == 0.0 || imageViewHeight.value == 0.0) {
+                        Image(pixelMap).opacity(opacityValue).rotate(rotateValue).scale(scaleValue).translateX(
+                            TranslateValue).width(100.percent).objectFit(imageFit)
+                    } else {
+                        Image(pixelMap).opacity(opacityValue).rotate(rotateValue).scale(scaleValue).translateX(
+                            TranslateValue).width(imageViewWidth).height(imageViewHeight).objectFit(imageFit)
+                    }
                 }
             }
         }

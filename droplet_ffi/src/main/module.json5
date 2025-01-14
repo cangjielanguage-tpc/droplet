@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "droplet_ffi",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

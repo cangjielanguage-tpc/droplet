@@ -10,6 +10,7 @@ public class Manager {
     // modelloaders
     private let stringModelLoaders: ArrayList<ModelLoader> = ArrayList<ModelLoader>()
     private let fileModelLoaders: ArrayList<ModelLoader> = ArrayList<ModelLoader>()
+    private let resourceModelLoaders: ArrayList<ModelLoader> = ArrayList<ModelLoader>()
 
     // decoders
     private let drawableResourceDecoders: ArrayList<ResourceDecoder<Array<UInt8>, Drawable>> = ArrayList<ResourceDecoder<Array<UInt8>, Drawable>>()
@@ -20,7 +21,7 @@ public class Manager {
     public init(mtx: ReentrantMutex) {
         this.mtx = mtx
         this.stringModelLoaders.append(StringModelLoader())
-
+        this.resourceModelLoaders.append(ResourceModelLoader())
         this.fileModelLoaders.append(FileModelLoader())
 
         this.drawableResourceDecoders.append(PixelMapDrawableResourceDecoder())
@@ -35,6 +36,12 @@ public class Manager {
         }
     }
 
+      func getResourceModelLoaders(): ArrayList<ModelLoader> {
+        synchronized (mtx) {
+            return resourceModelLoaders
+        }
+    }
+
      func getFileModelLoaders(): ArrayList<ModelLoader> {
         synchronized (mtx) {
             return fileModelLoaders
@@ -45,6 +52,13 @@ public class Manager {
         synchronized (mtx) {
             this.stringModelLoaders.clear()
             this.stringModelLoaders.append(modelLoader)
+        }
+    }
+
+    func setResourceModelLoader(modelLoader: ModelLoader): Unit {
+        synchronized (mtx) {
+            this.resourceModelLoaders.clear()
+            this.resourceModelLoaders.append(modelLoader)
         }
     }
 

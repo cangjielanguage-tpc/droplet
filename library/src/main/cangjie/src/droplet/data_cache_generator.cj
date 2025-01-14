@@ -23,6 +23,7 @@ public class DataCacheGenerator <: DataFetcherGenerator {
   // In some cases we may want to load a specific cache key (when loading from source written to
   // cache), so we accept a list of keys rather than just obtain the list from the helper.
 
+
   public func startNext(): Bool {
     
     try {
@@ -45,6 +46,8 @@ public class DataCacheGenerator <: DataFetcherGenerator {
     } finally {
     }
   }
+
+
 
 
   public func cancel(): Unit {

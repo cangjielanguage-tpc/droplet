@@ -127,6 +127,10 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return loadGeneric(LoadModel(model))
     }
 
+    func load(model: CJResource): RequestBuilder<TranscodeType> {
+        return loadGeneric(LoadModel(model))
+    }
+
     public func clone(): RequestBuilder<TranscodeType> {
         return super.clone(
             RequestBuilder<TranscodeType>(this.droplet, this.requestManager, this.transcodeTypeClass, this.context))
