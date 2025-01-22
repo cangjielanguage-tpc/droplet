@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -40,9 +40,9 @@ public class DiskCacheStrategyALL <: DiskCacheStrategy {
         }
     }
 
-    public func isResourceCacheable(isFromAlternateCacheKey: Bool,
+    public func isResourceCacheable(_: Bool,
         dataSource: DataSource,
-        encodeStrategy: EncodeStrategy): Bool {
+        _: EncodeStrategy): Bool {
             
             return match(dataSource) {
                 case RESOURCE_DISK_CACHE => 
@@ -76,13 +76,13 @@ public class DiskCacheStrategyNONE <: DiskCacheStrategy {
         return false
     }
 
-    public func isDataCacheable(dataSource: DataSource): Bool {
+    public func isDataCacheable(_: DataSource): Bool {
         return false;
     }
 
-    public func isResourceCacheable(isFromAlternateCacheKey: Bool,
-        dataSource: DataSource,
-        encodeStrategy: EncodeStrategy): Bool {
+    public func isResourceCacheable(_: Bool,
+        _: DataSource,
+        _: EncodeStrategy): Bool {
             return false;
     }
 
@@ -116,9 +116,9 @@ public class DiskCacheStrategyDATA <: DiskCacheStrategy {
             }
     }
 
-    public func isResourceCacheable(isFromAlternateCacheKey: Bool,
-        dataSource: DataSource,
-        encodeStrategy: EncodeStrategy): Bool {
+    public func isResourceCacheable(_: Bool,
+        _: DataSource,
+        _: EncodeStrategy): Bool {
         return false;
     }
 
@@ -145,13 +145,13 @@ public class DiskCacheStrategyRESOURCE <: DiskCacheStrategy {
         return false
     }
 
-    public func isDataCacheable(dataSource: DataSource): Bool {
+    public func isDataCacheable(_: DataSource): Bool {
         return false;
     }
 
-    public func isResourceCacheable(isFromAlternateCacheKey: Bool,
+    public func isResourceCacheable(_: Bool,
         dataSource: DataSource,
-        encodeStrategy: EncodeStrategy): Bool {
+        _: EncodeStrategy): Bool {
 
             return match(dataSource) {
                 case RESOURCE_DISK_CACHE => false

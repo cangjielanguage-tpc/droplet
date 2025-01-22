@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
 package ohos_app_cangjie_entry
 
@@ -10,6 +10,8 @@ import ohos.state_macro_manage.*
 import ohos.base.*
 import ohos.ability.*
 import ohos.window.*
+
+
 
 class MyAbilityStage <: AbilityStage {
     public override func onCreate(): Unit {

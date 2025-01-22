@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -20,7 +20,7 @@ public class LruResourceCache <: LruCache<AnyKey, AnyDropletResource> & MemoryCa
     this.listener = listener;
   }
 
-  protected override func onItemEvicted(key: AnyKey, item: AnyDropletResource): Unit {
+  protected override func onItemEvicted(_: AnyKey, item: AnyDropletResource): Unit {
     if (match(listener) {
       case Some(x) => true
       case _ => false

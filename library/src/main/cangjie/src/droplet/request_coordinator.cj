@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -175,7 +175,7 @@ public class ErrorRequestCoordinator <: RequestCoordinator & LoadRequest {
     return false;
   }
 
-  public override func canSetImage(request: LoadRequest): Bool {
+  public override func canSetImage(_: LoadRequest): Bool {
     synchronized (requestLock) {
       // Only one of primary or error runs at a time, so if we've reached this point and nothing
       // else is broken, we should have nothing else to enforce.
