@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -85,7 +85,7 @@ public class EngineKey <: AnyKey {
         options=${options}}""";
   }
 
-  public func updateDiskCacheKey(md5: MD5): Unit {
+  public func updateDiskCacheKey(_: MD5): Unit {
     throw Exception("droplet not updateDiskCacheKey error")
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
 
 package droplet.droplet
@@ -12,7 +12,7 @@ package droplet.droplet
  *
  * NEUQUANT Neural-Net quantization algorithm by Anthony Dekker, 1994. See
  * "Kohonen neural networks for optimal colour quantization" in "Network:
- * Computation in Neural Systems" Vol. 5 (1994) pp 351-367. for a discussion of	 * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Computation in Neural Systems" Vol. 5 (1994) pp 351-367. for a discussion of	 * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  * the algorithm.
  *
  * Any party obtaining a copy of these files from the author, directly or

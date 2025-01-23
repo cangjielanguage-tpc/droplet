@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
 
 package droplet.droplet
@@ -39,12 +39,12 @@ public class TransformationPixelMap <: TransformationType {
         return 0
     }
 
-    public operator func ==(that: TransformationType): Bool {
+    public operator func ==(_: TransformationType): Bool {
         return true
         // TODO PixelMap
     }
 
-    public operator func !=(that: TransformationType): Bool {
+    public operator func !=(_: TransformationType): Bool {
         return false
         // TODO PixelMap
     }
@@ -134,8 +134,8 @@ public abstract open class PixelMapTransformation <: Transformation<PixelMap> {
 }
 
 ////////////////////////////////////////////////////////
-public class Rotate <: PixelMapTransformation {
-    private static let ID: String = "com.cj.droplet.load.resource.pixelmap.Rotate"
+public class RotateTrans <: PixelMapTransformation {
+    private static let ID: String = "com.cj.droplet.load.resource.pixelmap.RotateTrans"
     private static let tfId: UInt32 = unsafe { getRotateIdx() }
     var degree: Float32
     var wi: Int32 = 0
@@ -183,7 +183,7 @@ public class Rotate <: PixelMapTransformation {
         }
     }
 
-    protected func transform(toTransform: PixelMap, outWidth: Int64, outHeight: Int64): PixelMap {
+    protected func transform(toTransform: PixelMap, _: Int64, _: Int64): PixelMap {
         let arr: Array<UInt8> = Array<UInt8>(Int64(toTransform.getPixelBytesNumber()), item: 0)
         toTransform.readPixelsToBuffer(arr)
         var info = toTransform.getImageInfo()
@@ -228,7 +228,7 @@ public class Rotate <: PixelMapTransformation {
     }
 
     public func toString(): String {
-        return "Rotate(degree=${degree})";
+        return "RotateTrans(degree=${degree})";
     }
 
     public func hashCode(): Int64 {
@@ -238,8 +238,8 @@ public class Rotate <: PixelMapTransformation {
     }
 
     public operator func ==(that: AnyKey): Bool {
-        if (that is Rotate) {
-            var other: Rotate = (that as Rotate).getOrThrow();
+        if (that is RotateTrans) {
+            var other: RotateTrans = (that as RotateTrans).getOrThrow();
             return degree == other.degree
         } else {
             return false
@@ -247,8 +247,8 @@ public class Rotate <: PixelMapTransformation {
     }
 
     public operator func !=(that: AnyKey): Bool {
-        if (that is Rotate) {
-            var other: Rotate = (that as Rotate).getOrThrow();
+        if (that is RotateTrans) {
+            var other: RotateTrans = (that as RotateTrans).getOrThrow();
             return degree != other.degree
         } else {
             return true
@@ -621,7 +621,7 @@ public class RoundedCorners <: PixelMapTransformation {
         nParam = 8
     }
 
-    protected func transform(toTransform: PixelMap, outWidth: Int64, outHeight: Int64): PixelMap {
+    protected func transform(toTransform: PixelMap, _: Int64, _: Int64): PixelMap {
         let arr: Array<UInt8> = Array<UInt8>(Int64(toTransform.getPixelBytesNumber()), item: 0)
         toTransform.readPixelsToBuffer(arr)
         var info = toTransform.getImageInfo()
@@ -706,7 +706,7 @@ public class GranularRoundedCorners <: PixelMapTransformation {
         nParam = 5
     }
 
-    protected func transform(toTransform: PixelMap, outWidth: Int64, outHeight: Int64): PixelMap {
+    protected func transform(toTransform: PixelMap, _: Int64, _: Int64): PixelMap {
         let arr: Array<UInt8> = Array<UInt8>(Int64(toTransform.getPixelBytesNumber()), item: 0)
         toTransform.readPixelsToBuffer(arr)
         var info = toTransform.getImageInfo()

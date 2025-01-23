@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
 
 package droplet.droplet
@@ -281,7 +281,9 @@ public class DiskLruCache {
     }
 
     private static func deleteIfExistsStatic(file: DropletFile): Unit {
-        if (file.exists() && !file.delete()) {
+        let flagA = file.exists()
+        let flagB = file.delete()
+        if (flagA && !flagB) {
             throw Exception("droplet error: deleteIfExistsStatic");
         }
     }
@@ -485,8 +487,8 @@ public class DiskLruCache {
                 journalWriter.getOrThrow().write('\n');
             }
             flushWriter(journalWriter.getOrThrow());
-
-            if (size > maxSize || journalRebuildRequired()) {
+            let flagA = journalRebuildRequired()
+            if (size > maxSize || flagA) {
                 // 开线程
                 executorServiceSubmit()
             }
@@ -542,7 +544,9 @@ public class DiskLruCache {
             var i=0
             while(i < valueCount) {
                 var file: DropletFile = entry.getOrThrow().getCleanFile(i);
-                if (file.exists() && !file.delete()) {
+                let flagA = file.exists()
+                let flagB = file.delete()
+                if (flagA && !flagB) {
                     throw Exception("droplet error: failed to delete ");
                 }
                 size -= entry.getOrThrow().lengths[i];

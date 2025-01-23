@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -24,7 +24,10 @@ public open class DiskLruCacheFactory <: DiskCacheFactory {
     public override func build(): DiskCache {
         var cacheDir: DropletFile = cacheDirectoryGetter.getCacheDirectory();
 
-        if (cacheDir.isDirectory() || cacheDir.mkdirs()) {
+        let flagA = cacheDir.isDirectory()
+        let flagB = cacheDir.mkdirs()
+
+        if (flagA || flagB) {
             return DiskLruCacheWrapper.create(cacheDir, diskCacheSize);
         }
         throw Exception("dropleterror: dropletfile create error")

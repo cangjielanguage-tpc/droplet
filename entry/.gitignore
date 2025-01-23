@@ -3,4 +3,4 @@
 /.preview
 /build
 /.cxx
-/.test
+/src/main/cangjie/build-script-cache

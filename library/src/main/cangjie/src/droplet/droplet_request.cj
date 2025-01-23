@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -83,11 +83,11 @@ public class NoRequest <: LoadRequest {
     return false
   }
 
-  public func isEquivalentTo(other: LoadRequest): Bool {
+  public func isEquivalentTo(_: LoadRequest): Bool {
     return true
   }
 
-  public func equals(that: LoadRequest): Bool {
+  public func equals(_: LoadRequest): Bool {
     return true
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -19,8 +19,8 @@ public class NoneDrawable <: Drawable {
         let arr: Array<UInt8> = Array<UInt8>(96, item: 0)
         return createPixelMap(arr, InitializationOptions(size: size))
     }
-    public override func draw(isErrorPic:Bool): Unit {}
-    public override func setDrawFunc(drawFunc: (PixelMap) -> Unit): Unit {}
+    public override func draw(_:Bool): Unit {}
+    public override func setDrawFunc(_: (PixelMap) -> Unit): Unit {}
     public override func getType(): Int64 {
         return -1
     }
@@ -42,7 +42,7 @@ public class PixelMapDrawable <: Drawable {
         return this.pixelMap
     }
 
-    public override func draw(isErrorPic:Bool): Unit {
+    public override func draw(_:Bool): Unit {
         if(this.drawFunc.size > 0) {
             for(f in this.drawFunc) {
                 f(this.pixelMap)
@@ -85,7 +85,7 @@ public class CJResourceDrawable <: Drawable {
         }
     }
 
-    public override func setDrawFunc(drawFunc: (PixelMap) -> Unit): Unit {
+    public override func setDrawFunc(_: (PixelMap) -> Unit): Unit {
     }
 
      func setDrawFuncCJResource(drawFunc: (CJResource,Bool) -> Unit): Unit {

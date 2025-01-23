@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -10,7 +10,7 @@ public interface TransitionDrawableAdapter {
 }
 
 public class DrawableTransition <: Transition<Drawable> {
-    public func transition(current: Drawable, adapter: TransitionDrawableAdapter): Bool {
+    public func transition(_: Drawable, _: TransitionDrawableAdapter): Bool {
         // TODO 过渡动画
         return true
     }

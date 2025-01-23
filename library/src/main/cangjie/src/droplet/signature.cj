@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -19,7 +19,7 @@ public class EmptySignature <: AnyKey {
     return "EmptySignature";
   }
 
-  public func updateDiskCacheKey(md5: MD5): Unit {
+  public func updateDiskCacheKey(_: MD5): Unit {
     // Do nothing.
   }
 

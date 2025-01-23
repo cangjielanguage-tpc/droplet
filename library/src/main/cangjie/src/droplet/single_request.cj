@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -618,7 +618,7 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
 
     /** A callback method that should never be invoked directly. */
     public override func onResourceReady(resource: Option<AnyDropletResource>, dataSource: DataSource,
-        isLoadedFromAlternateCacheKey: Bool): Unit {
+        _: Bool): Unit {
         stateVerifier.throwIfRecycled();
 
         let fff = match (status) {
@@ -782,7 +782,7 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
         return requestLock;
     }
 
-    private func onLoadFailed(e: DropletException, maxLogLevel: Int64) {
+    private func onLoadFailed(e: DropletException, _: Int64) {
         stateVerifier.throwIfRecycled();
         synchronized(requestLock) {
 

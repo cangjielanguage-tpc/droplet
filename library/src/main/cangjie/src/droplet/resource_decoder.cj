@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -9,14 +9,14 @@ public class PixelMapDrawableResourceParser <: ResourceDecoder<Array<UInt8>, Dra
 
     public static let SIZE_ORIGINAL: Int64 = -0x7FFFFFFFFFFFFFFF
 
-    public func setTransformation(transformation: Option<AnyTransformation>): Unit {}
+    public func setTransformation(_: Option<AnyTransformation>): Unit {}
 
-    public func handles(data: Array<UInt8>, options: DropletOptions): Bool {
+    public func handles(_: Array<UInt8>, _: DropletOptions): Bool {
         return true
     }
 
 
-    public func decode(source: Array<UInt8>, width: Int64, height: Int64, options: DropletOptions): Drawable {
+    public func decode(source: Array<UInt8>, _: Int64, _: Int64, _: DropletOptions): Drawable {
         let finalWidth: Int32 = Int32(UInt16(source[0]) << 8 | UInt16(source[1]))
         let finalHeight: Int32 = Int32(UInt16(source[2]) << 8 | UInt16(source[3]))
         let pixelMap: PixelMap = ImageUtils.arrToPixelMap(source[4..source.size], finalWidth, finalHeight)
@@ -29,9 +29,9 @@ public class PixelMapDrawableResourceDecoder <: ResourceDecoder<Array<UInt8>, Dr
 
     private let downsampler: Downsampler = Downsampler()
 
-    public func setTransformation(transformation: Option<AnyTransformation>): Unit {}
+    public func setTransformation(_: Option<AnyTransformation>): Unit {}
 
-    public func handles(data: Array<UInt8>, options: DropletOptions): Bool {
+    public func handles(data: Array<UInt8>, _: DropletOptions): Bool {
         return !isGif(data)
     }
 
@@ -56,7 +56,7 @@ public class GifDrawableResourceDecoder <: ResourceDecoder<Array<UInt8>, Drawabl
         this.transformation = transformation
     }
 
-    public func handles(data: Array<UInt8>, options: DropletOptions): Bool {
+    public func handles(data: Array<UInt8>, _: DropletOptions): Bool {
         return isGif(data)
     }
 
@@ -68,7 +68,7 @@ public class GifDrawableResourceDecoder <: ResourceDecoder<Array<UInt8>, Drawabl
         return ImageUtils.getImageType(data) == ImageUtils.ImageFormatGIF
     }
 
-    private func decodeImageGIF(buffer: Array<UInt8>, requestedWidth: Int64, requestedHeight: Int64, options: DropletOptions, transformation: Option<AnyTransformation>): Option<GifDrawable> {
+    private func decodeImageGIF(buffer: Array<UInt8>, requestedWidth: Int64, requestedHeight: Int64, _: DropletOptions, transformation: Option<AnyTransformation>): Option<GifDrawable> {
         let decoder: GifDecoder = StandardGifDecoder(Int32(requestedWidth), Int32(requestedHeight), buffer)
         decoder.advance();
         let (ret1,firstFrame) = decoder.getNextFrame();
@@ -79,9 +79,9 @@ public class GifDrawableResourceDecoder <: ResourceDecoder<Array<UInt8>, Drawabl
 public class PixelMapResourceDecoder <: ResourceDecoder<Array<UInt8>, PixelMap> {
     private let downsampler: Downsampler = Downsampler()
 
-    public func setTransformation(transformation: Option<AnyTransformation>): Unit {}
+    public func setTransformation(_: Option<AnyTransformation>): Unit {}
 
-    public func handles(data: Array<UInt8>, options: DropletOptions): Bool {
+    public func handles(data: Array<UInt8>, _: DropletOptions): Bool {
         return !isGif(data)
     }
 

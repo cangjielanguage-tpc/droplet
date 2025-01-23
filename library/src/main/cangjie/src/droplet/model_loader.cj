@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
 
 package droplet.droplet
@@ -9,7 +9,7 @@ public interface ModelLoader {
 }
 
 public class FileModelLoader <: ModelLoader {
-    public override func loadModel(o: Any, options: DropletOptions): Option<InputStream> {
+    public override func loadModel(o: Any, _: DropletOptions): Option<InputStream> {
         if (o is File) {
             return (o as File).getOrThrow()
         } else {
@@ -19,7 +19,7 @@ public class FileModelLoader <: ModelLoader {
 }
 
 public class ResourceModelLoader <: ModelLoader {
-    public override func loadModel(o: Any, options: DropletOptions): Option<InputStream> {
+    public override func loadModel(o: Any, _: DropletOptions): Option<InputStream> {
         if (o is CJResource) {
             return getImageFromResource((o as CJResource).getOrThrow())
         } else {
@@ -31,7 +31,7 @@ public class ResourceModelLoader <: ModelLoader {
           try {
             let resourceManager = ResourceManager.getResourceManager(
                 getStageContext(Droplet.globalcontext.getOrThrow()))
-            let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(res.id),120)
+            let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(res.id),0)
             var byteStream: ByteArrayStream = ByteArrayStream()
             byteStream.write(arr)
             return byteStream
@@ -42,7 +42,7 @@ public class ResourceModelLoader <: ModelLoader {
 }
 
 public class StringModelLoader <: ModelLoader {
-    public override func loadModel(o: Any, options: DropletOptions): Option<InputStream> {
+    public override func loadModel(o: Any, _: DropletOptions): Option<InputStream> {
         if (o is String) {
             let s: String = (o as String).getOrThrow()
             getImage(s)

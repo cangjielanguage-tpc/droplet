@@ -4,3 +4,5 @@
 /build
 /.cxx
 /.test
+BuildProfile.ets
+*.lock

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
  
 package droplet.droplet
@@ -66,7 +66,7 @@ public class ResourceCacheGenerator <: DataFetcherGenerator {
       cb.onDataFetcherReady(sourceKey.getOrThrow(), Some(data), DataSource.RESOURCE_DISK_CACHE);
     }
 
-   func onLoadFailed(e: DropletException): Unit {
+   func onLoadFailed(_: DropletException): Unit {
     cb.onDataFetcherFailed();
 
   }
