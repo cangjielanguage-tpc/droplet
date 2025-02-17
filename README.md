@@ -5,7 +5,7 @@
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.0.1-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.53.17-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v0.53.18-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/project-open-brightgreen" style="display: inline-block;" />
 </p>
 
@@ -170,8 +170,17 @@ class MyView {
                     //droplet选项
                     dropletOption: option,//(必选)
                     // 生命周期标签 （可选） 同一个页面不同组件保持相同的标签,或者都不加,
-                    label: label
-                    )
+                    label: label,
+                    resourceFn: {
+                        pixelMap =>
+                        var width = pixelMap.getImageInfo().size.width
+                        var height = pixelMap.getImageInfo().size.height
+                        AppLog.error("droplet--- resourceFn width=${width} height=${height}") //加载成功的回调
+                    },
+                    failedFn: {
+                        e => AppLog.error("droplet--- failedFn")
+                    }  //加载失败的回调
+                )
             }.width(100.percent)
         }
     }
@@ -191,9 +200,9 @@ load成功
 
 ## 约束与限制
 
-IDE : DevEco Studio 5.0.1 Release (5.0.5.315)
+IDE : DevEco Studio 5.0.2 Release (5.0.7.200)
 
-Plugins (SDK) : DevEco Studio-Cangjie Plugin Beta1(5.0.5.306.117)
+Plugins (SDK) : DevEco Studio-Cangjie Plugin Beta1(5.0.7.100)
 
 ## 开源协议
 
