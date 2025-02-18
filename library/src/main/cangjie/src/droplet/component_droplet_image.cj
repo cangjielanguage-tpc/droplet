@@ -26,7 +26,6 @@ internal import ohos.resource_manager.*
 internal import ohos.animator.*
 internal import ohos.ability.*
 internal import ohos.concurrency.*
-
 internal import net.http.*
 internal import std.socket.*
 internal import net.tls.*
@@ -50,7 +49,6 @@ internal import std.convert.*
  */
 @Observed
 public class DropletRequestOption {
-
     @Publish
     public var loadSrc: String = ""
 
@@ -70,11 +68,10 @@ public class DropletRequestOption {
     public var transformCate: ?PixelMapTransformation = Option<PixelMapTransformation>.None
     //是否禁用内存缓存
     @Publish
-    public var transformListCate: ?ArrayList<PixelMapTransformation> = Option<ArrayList<PixelMapTransformation>>
-        .None
+    public var transformListCate: ?ArrayList<PixelMapTransformation> = Option<ArrayList<PixelMapTransformation>>.None
 
     @Publish
-     public var isSkipMemory: ?Bool = Option<Bool>.None
+    public var isSkipMemory: ?Bool = Option<Bool>.None
     //Override
     @Publish
     public var overrideWH: ?(Int64, Int64) = Option<(Int64, Int64)>.None
@@ -102,12 +99,10 @@ public class DropletRequestOption {
     //trisition
     @Publish
     public var transitionOption: ?TransitionOption = Option<TransitionOption>.None
-
 }
 
 @Component
 public class DropletImageComponent {
-
     @Link
     @Watch[onOptionChanged]
     var dropletOption: DropletRequestOption
@@ -115,10 +110,10 @@ public class DropletImageComponent {
     var globalContext: Option<AbilityContext> = Option<AbilityContext>.None
 
     @State
-    var imageViewWidth: Length = Length(100,unitType: LengthType.percent)
+    var imageViewWidth: Length = Length(100, unitType: LengthType.percent)
 
     @State
-    var imageViewHeight: Length =  Length(100, unitType: LengthType.percent)
+    var imageViewHeight: Length = Length(100, unitType: LengthType.percent)
 
     @State
     var imageFit: ImageFit = ImageFit.ScaleDown
@@ -158,12 +153,19 @@ public class DropletImageComponent {
     @State
     var pixelMap: PixelMap = createPixelMap(color, opts)
 
+    @State
+    var resourceFn: Option<(PixelMap) -> Unit> = Option<(PixelMap) -> Unit>.None
+
+    @State
+    var failedFn: Option<(DropletException) -> Unit> = Option<(DropletException) -> Unit>.None
+
     func onOptionChanged() {
         updateImg(oldWidth, oldHeight)
     }
 
     func updateImg(width: Int64, height: Int64) {
-        if ((dropletOption.loadSrc != "" && width > 0 && height > 0) || (!dropletOption.loadSrcRes.isNone() && width > 0 && height > 0)) {
+        if ((dropletOption.loadSrc != "" && width > 0 && height > 0) || (!dropletOption.loadSrcRes.isNone() && width > 0 &&
+            height > 0)) {
             var requestManager = Option<RequestManager>.None
 
             if (let Some(v) <- dropletOption.useDefaultRequestOption) {
@@ -220,7 +222,7 @@ public class DropletImageComponent {
                 }
             }
 
-              if (let Some(v) <- dropletOption.dontTransform) {
+            if (let Some(v) <- dropletOption.dontTransform) {
                 if (v) {
                     builder = builder.dontTransform(builder)
                 }
@@ -234,7 +236,7 @@ public class DropletImageComponent {
                 builder = builder.apply(v)
             }
 
-             if (let Some(v) <- dropletOption.signature) {
+            if (let Some(v) <- dropletOption.signature) {
                 builder = builder.setSignature(StringKey(v))
             }
 
@@ -242,10 +244,18 @@ public class DropletImageComponent {
                 .listener(
                     {
                         drawable: Drawable, model: Model, target: Target<Drawable>, datasource: DataSource, 
-                        isFirstResource: Bool => return false
+                        isFirstResource: Bool =>
+                        if (resourceFn.isSome()) {
+                            resourceFn.getOrThrow()(drawable.getPixelMap())
+                        }
+                        return false
                     },
                     {
-                        e: DropletException, model: Model, target: Target<Drawable>, isFirstResource: Bool => return false
+                        e: DropletException, model: Model, target: Target<Drawable>, isFirstResource: Bool =>
+                        if (failedFn.isSome()) {
+                            failedFn.getOrThrow()(e)
+                        }
+                        return false
                     }
                 )
                 .into(
@@ -295,9 +305,9 @@ public class DropletImageComponent {
                         cjres: CJResource, isErrorPic: Bool => if (isErrorPic) {
                             launch {
                                 isError = true
-                                 if (let Some(v) <- dropletOption.errholder) {
+                                if (let Some(v) <- dropletOption.errholder) {
                                     this.pixelMap = errorhoderToPiexlMap().getOrThrow()
-                                 }
+                                }
                             }
                         }
                     },
@@ -308,22 +318,22 @@ public class DropletImageComponent {
     }
 
     protected override func aboutToAppear() {
-         if (let Some(v) <- dropletOption.placeholder) {
+        if (let Some(v) <- dropletOption.placeholder) {
             this.pixelMap = placehoderToPiexlMap().getOrThrow()
         }
     }
 
-
-
-    func errorhoderToPiexlMap():?PixelMap{
+    func errorhoderToPiexlMap(): ?PixelMap {
         if (let Some(v) <- dropletOption.errholder) {
             //这里将他转化为pixleMap
             let resourceManager = ResourceManager.getResourceManager(getStageContext(globalContext.getOrThrow()))
-            let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(v.id),0)
-            let imageSource:ImageSource =  createImageSource(arr)
-            let regionSize: Size = Size(width: imageSource.getImageInfo().size.width, height: imageSource.getImageInfo().size.height)
+            let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(v.id), 0)
+            let imageSource: ImageSource = createImageSource(arr)
+            let regionSize: Size = Size(width: imageSource.getImageInfo().size.width,
+                height: imageSource.getImageInfo().size.height)
             let desiredRegion: Region = Region(regionSize, 0, 0)
-            let desiredSize: Size = Size(width: imageSource.getImageInfo().size.width, height: imageSource.getImageInfo().size.height)
+            let desiredSize: Size = Size(width: imageSource.getImageInfo().size.width,
+                height: imageSource.getImageInfo().size.height)
             let decodingOptions = DecodingOptions(
                 rotate: 0, //rotate: UInt32, //旋转角度。
                 desiredSize: desiredSize, //desiredSize: Size, //期望输出大小。
@@ -334,21 +344,22 @@ public class DropletImageComponent {
                 sampleSize: 1
             )
             return imageSource.createPixelMap(options: decodingOptions)
-        }else{
+        } else {
             return Option<PixelMap>.None
         }
     }
 
-
-    func placehoderToPiexlMap():?PixelMap{
+    func placehoderToPiexlMap(): ?PixelMap {
         if (let Some(v) <- dropletOption.placeholder) {
             //这里将他转化为pixleMap
             let resourceManager = ResourceManager.getResourceManager(getStageContext(globalContext.getOrThrow()))
-            let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(v.id),0)
-            let imageSource:ImageSource =  createImageSource(arr)
-            let regionSize: Size = Size(width: imageSource.getImageInfo().size.width, height: imageSource.getImageInfo().size.height)
+            let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(v.id), 0)
+            let imageSource: ImageSource = createImageSource(arr)
+            let regionSize: Size = Size(width: imageSource.getImageInfo().size.width,
+                height: imageSource.getImageInfo().size.height)
             let desiredRegion: Region = Region(regionSize, 0, 0)
-            let desiredSize: Size = Size(width: imageSource.getImageInfo().size.width, height: imageSource.getImageInfo().size.height) // 548 342
+            let desiredSize: Size = Size(width: imageSource.getImageInfo().size.width,
+                height: imageSource.getImageInfo().size.height)
             let decodingOptions = DecodingOptions(
                 rotate: 0, //rotate: UInt32, //旋转角度。
                 desiredSize: desiredSize, //desiredSize: Size, //期望输出大小。
@@ -359,12 +370,10 @@ public class DropletImageComponent {
                 sampleSize: 1
             )
             return imageSource.createPixelMap(options: decodingOptions)
-
-        }else{
+        } else {
             return Option<PixelMap>.None
         }
     }
-
 
     func build() {
         Image(this.pixelMap)
