@@ -13,6 +13,7 @@ class Index_LLT {
         [
             "CaseAddListener",
             "TestCallBack",
+            "TestGetOriSize",
             "CaseAddListener2",
             "CaseTrans",
             "CaseRes",

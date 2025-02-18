@@ -289,7 +289,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
             Option<RequestBuilder<TranscodeType>>.None);
     }
 
-    func into(width: Int64, height: Int64): Target<TranscodeType> {
+    public func into(width: Int64, height: Int64): Target<TranscodeType> {
         let target: Target<TranscodeType> = (StringDrawableTarget(width, height) as Target<TranscodeType>).getOrThrow()
         return into<Target<TranscodeType>>(target);
     }
