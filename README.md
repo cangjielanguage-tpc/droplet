@@ -175,8 +175,8 @@ class MyView {
                         pixelMap =>
                         var width = pixelMap.getImageInfo().size.width
                         var height = pixelMap.getImageInfo().size.height
-                        AppLog.error("droplet--- resourceFn width=${width} height=${height}") //加载成功的回调
-                    },
+                        AppLog.error("droplet--- resourceFn width=${width} height=${height}") 
+                    }, //加载成功的回调 可以获取显示在控件上的图片的宽和高
                     failedFn: {
                         e => AppLog.error("droplet--- failedFn")
                     }  //加载失败的回调
@@ -195,6 +195,36 @@ class MyView {
 
 ```shell
 load成功
+```
+
+#### 3.获取原图的宽高
+示例代码如下：
+
+```cangjie
+   
+         var url = "https://xxxxxxxx"
+
+         Droplet.withContext(globalAbilityContext.getOrThrow())
+                .load(url)
+                .listener(
+                    {
+                        drawable: Drawable, model: Model, target: Target<Drawable>, datasource: DataSource, 
+                        isFirstResource: Bool =>
+                        var width = drawable.getPixelMap().getImageInfo().size.width
+                        var height = drawable.getPixelMap().getImageInfo().size.height
+                        AppLog.error("原图宽为width=${width} 原图高为height=${height}")
+                        //可以获取原图的宽高
+                        return false
+                    },
+                    {
+                        e: DropletException, model: Model, target: Target<Drawable>, isFirstResource: Bool => return false
+                    }
+                )
+                .into(
+                    Downsampler.SIZE_ORIGINAL,
+                    Downsampler.SIZE_ORIGINAL
+                )
+
 ```
 
 
