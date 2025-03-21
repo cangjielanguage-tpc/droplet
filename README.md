@@ -230,9 +230,9 @@ load成功
 
 ## 约束与限制
 
-IDE : DevEco Studio 5.0.2 Release (5.0.7.200)
-
-Plugins (SDK) : DevEco Studio-Cangjie Plugin Beta1(5.0.7.100)
+DevEco Studio (5.0.9.100)
+Cangjie Support Plugin 5.0.9.100
+Cangjie Compiler: 0.53.18
 
 ## 开源协议
 

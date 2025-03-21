@@ -395,7 +395,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
     /**
      * 加载图片不显示
      *
-     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     * @返回值 FutureTarget<TranscodeType> - FutureTarget<TranscodeType>数据类型
      */
     public func submit(): FutureTarget<TranscodeType> 
     
@@ -404,7 +404,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
      *
      * @参数 width  Int64，图片宽
      * @参数 height  Int64，图片高
-     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     * @返回值 FutureTarget<TranscodeType> - FutureTarget<TranscodeType>数据类型
      */
     public func submit(width: Int64, height: Int64): FutureTarget<TranscodeType>
     
@@ -420,7 +420,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
      * 缩略图为原图缩放,参数是缩小的倍数 值在0-1之间,根据缩略图和原图的加载速度差异不保证必现
      *
      * @参数 sizeMultiplier  Float32，缩放的倍数
-     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     * @返回值 RequestBuilder<TranscodeType> - RequestBuilder<TranscodeType>数据类型
      */
     public func thumbnail(sizeMultiplier: Float32): RequestBuilder<TranscodeType>
     
@@ -428,7 +428,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
      * 缩略图为指定图的缩放,根据缩略图和原图的加载速度差异不保证必现
      *
      * @参数 thumbnailRequest  Option<RequestBuilder<TranscodeType>>，指定的缩略图
-     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     * @返回值 RequestBuilder<TranscodeType> - RequestBuilder<TranscodeType>数据类型
      */
     public func thumbnail(thumbnailRequest: Option<RequestBuilder<TranscodeType>>): RequestBuilder<TranscodeType> {
 
@@ -477,8 +477,8 @@ public interface RequestListener<R> {
      * @参数 model - Model数据类型，图片模型
      * @参数 target - Target<R>数据类型，图片请求构建器
      * @参数 dataSource - DataSource数据类型，数据源
-     * @参数 isFirstResource - Boolean数据类型，是否是第一个资源
-     * @返回值 Boolean 是否消费事件 true：消费事件，停止后续加载流程，取消图片显示流程 false：不消费事件，继续图片加载流程，图片正常显示
+     * @参数 isFirstResource - Bool数据类型，是否是第一个资源
+     * @返回值 Bool 是否消费事件 true：消费事件，停止后续加载流程，取消图片显示流程 false：不消费事件，继续图片加载流程，图片正常显示
      */
     func onResourceReady(resource: R, model: Model, target: Target<R>, dataSource: DataSource, isFirstResource: Bool): Bool;
 
@@ -488,8 +488,8 @@ public interface RequestListener<R> {
      * @参数 e - DropletException数据类型，图片加载异常
      * @参数 model - Model数据类型，图片模型
      * @参数 target - Target<R>数据类型，图片请求构建器
-     * @参数 isFirstResource - Boolean数据类型，是否是第一个资源
-     * @返回值 Boolean 是否消费事件 true：消费事件，停止后续加载流程，不显示错误图 false：继续图片加载流程，显示错误图
+     * @参数 isFirstResource - Bool数据类型，是否是第一个资源
+     * @返回值 Bool 是否消费事件 true：消费事件，停止后续加载流程，不显示错误图 false：继续图片加载流程，显示错误图
      */
     func onLoadFailed(e: DropletException, model: Model, target: Target<R>, isFirstResource: Bool): Bool;
 }
