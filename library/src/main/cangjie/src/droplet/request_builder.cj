@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
  
 package droplet.droplet
@@ -289,7 +289,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
             Option<RequestBuilder<TranscodeType>>.None);
     }
 
-    public func into(width: Int64, height: Int64): Target<TranscodeType> {
+    func into(width: Int64, height: Int64): Target<TranscodeType> {
         let target: Target<TranscodeType> = (StringDrawableTarget(width, height) as Target<TranscodeType>).getOrThrow()
         return into<Target<TranscodeType>>(target);
     }

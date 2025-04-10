@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
 
 package droplet.droplet
@@ -28,11 +28,11 @@ public interface ResourceEncoder<T> <: Encoder<DropletResource<T>> & AnyResource
 }
 
 public class PixelMapEncoder <: ResourceEncoder<PixelMap> {
-  public func getEncodeStrategy(_: DropletOptions): EncodeStrategy {
+  public func getEncodeStrategy(options: DropletOptions): EncodeStrategy {
     return EncodeStrategy.TRANSFORMED
   }
 
-  public func encode(data: DropletResource<PixelMap>, file: DropletFile, _: DropletOptions): Bool {
+  public func encode(data: DropletResource<PixelMap>, file: DropletFile, options: DropletOptions): Bool {
     let pixelMap: PixelMap = data.get()
     let info = pixelMap.getImageInfo()
     let arr: Array<UInt8> = Array<UInt8>(Int64(pixelMap.getPixelBytesNumber()), item: 0)
@@ -56,11 +56,11 @@ public class PixelMapEncoder <: ResourceEncoder<PixelMap> {
 }
 
 public class PixelMapDrawableEncoder <: ResourceEncoder<PixelMapDrawable> {
-  public func getEncodeStrategy(_: DropletOptions): EncodeStrategy {
+  public func getEncodeStrategy(options: DropletOptions): EncodeStrategy {
     return EncodeStrategy.TRANSFORMED
   }
 
-  public func encode(data: DropletResource<PixelMapDrawable>, file: DropletFile, _: DropletOptions): Bool {
+  public func encode(data: DropletResource<PixelMapDrawable>, file: DropletFile, options: DropletOptions): Bool {
     let pixelMap: PixelMap = data.get().getPixelMap()
     let info = pixelMap.getImageInfo()
     let arr: Array<UInt8> = Array<UInt8>(Int64(pixelMap.getPixelBytesNumber()), item: 0)

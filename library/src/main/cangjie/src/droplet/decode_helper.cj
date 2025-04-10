@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
  
 package droplet.droplet
@@ -187,7 +187,7 @@ public class InputStreamEncoder <: Encoder<InputStream> {
   }
 
 
-  public func encode(d: InputStream, file: DropletFile, _: DropletOptions): Bool {
+  public func encode(d: InputStream, file: DropletFile, options: DropletOptions): Bool {
 
     let buf: Array<UInt8> = byteArrayPool.get(LruArrayPool.STANDARD_BUFFER_SIZE_BYTES);
 
@@ -228,11 +228,11 @@ public class UnitTransformation<T> <: Transformation<T> {
     }
   }
 
-  public func transform(resource: DropletResource<T>, _: Int64, _: Int64): DropletResource<T> {
+  public func transform(resource: DropletResource<T>, outWidth: Int64, outHeight: Int64): DropletResource<T> {
     return resource;
   }
 
-  public func updateDiskCacheKey(_: MD5) {
+  public func updateDiskCacheKey(md5: MD5) {
   }
 
   public func toString(): String {

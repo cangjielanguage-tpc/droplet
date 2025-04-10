@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
  
 package droplet.droplet
@@ -34,7 +34,7 @@ public class DownsampleFitCenter <: DownsampleStrategy {
         return min(widthPercentage, heightPercentage);
     }
 
-    public override func getSampleSizeRounding(_: Int64, _: Int64, _: Int64, _: Int64): SampleSizeRounding {
+    public override func getSampleSizeRounding(sourceWidth: Int64, sourceHeight: Int64, requestedWidth: Int64, requestedHeight: Int64): SampleSizeRounding {
         return SampleSizeRounding.QUALITY;
     }
 
@@ -73,7 +73,7 @@ public class DownsampleCenterOutside <: DownsampleStrategy {
         return max(widthPercentage, heightPercentage);
     }
 
-    public override func getSampleSizeRounding(_: Int64, _: Int64, _: Int64, _: Int64): SampleSizeRounding {
+    public override func getSampleSizeRounding(sourceWidth: Int64, sourceHeight: Int64, requestedWidth: Int64, requestedHeight: Int64): SampleSizeRounding {
         return SampleSizeRounding.QUALITY;
     }
 
@@ -115,7 +115,7 @@ public class DownsampleAtLeast <: DownsampleStrategy {
         }
     }
 
-    public func getSampleSizeRounding(_: Int64, _: Int64, _: Int64, _: Int64): SampleSizeRounding {
+    public func getSampleSizeRounding(sourceWidth: Int64, sourceHeight: Int64, requestedWidth: Int64, requestedHeight: Int64): SampleSizeRounding {
         return SampleSizeRounding.QUALITY;
     }
 
@@ -156,7 +156,7 @@ public class DownsampleAtMost <: DownsampleStrategy {
         return 1.0 / Float64(greaterOrEqualSampleSize);
     }
 
-    public func getSampleSizeRounding(_: Int64, _: Int64, _: Int64, _: Int64): SampleSizeRounding {
+    public func getSampleSizeRounding(sourceWidth: Int64, sourceHeight: Int64, requestedWidth: Int64, requestedHeight: Int64): SampleSizeRounding {
         return SampleSizeRounding.MEMORY;
     }
 
@@ -189,11 +189,11 @@ public class DownsampleNone <: DownsampleStrategy {
 
     public let label: String = "DownsampleNone"
 
-    public override func getScaleFactor(_: Int64, _: Int64, _: Int64, _: Int64): Float64 {
+    public override func getScaleFactor(sourceWidth: Int64, sourceHeight: Int64, requestedWidth: Int64, requestedHeight: Int64): Float64 {
         return 1.0;
     }
 
-    public override func getSampleSizeRounding(_: Int64, _: Int64, _: Int64, _: Int64): SampleSizeRounding{
+    public override func getSampleSizeRounding(sourceWidth: Int64, sourceHeight: Int64, requestedWidth: Int64, requestedHeight: Int64): SampleSizeRounding{
         return SampleSizeRounding.QUALITY;
     }
 

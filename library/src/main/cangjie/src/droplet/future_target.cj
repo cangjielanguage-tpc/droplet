@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
  
 package droplet.droplet
@@ -45,15 +45,15 @@ public class RequestFutureTarget<R> <: FutureTarget<R> & RequestListener<R> {
       })
   }
 
-  public func onLoadStarted(_: Option<CJResourceDrawable>): Unit {
+  public func onLoadStarted(placeholder: Option<CJResourceDrawable>): Unit {
     start()
   }
 
-  public func onLoadFailed(_: Option<CJResourceDrawable>): Unit {
+  public func onLoadFailed(placeholder: Option<CJResourceDrawable>): Unit {
     loadFailed = true
   }
 
-  public func onLoadCleared(_: Option<CJResourceDrawable>): Unit {
+  public func onLoadCleared(placeholder: Option<CJResourceDrawable>): Unit {
   }
 
   public func getSize(cb: SizeReadyCallback): Unit {
@@ -89,7 +89,7 @@ public class RequestFutureTarget<R> <: FutureTarget<R> & RequestListener<R> {
     return resource
   }
 
-  public func onResourceReady(_: R, _: Option<DrawableTransition>): Unit {
+  public func onResourceReady(resource: R, transition: Option<DrawableTransition>): Unit {
   }
 
   public func onStart(): Unit {}
@@ -98,13 +98,13 @@ public class RequestFutureTarget<R> <: FutureTarget<R> & RequestListener<R> {
 
   public func onDestroy(): Unit {}
 
-  public func onLoadFailed(e: DropletException, _: Model, _: Target<R>, _: Bool): Bool {
+  public func onLoadFailed(e: DropletException, model: Model, target: Target<R>, isFirstResource: Bool): Bool {
     loadFailed = true;
     exception = e
     return false;
   }
 
-  public func onResourceReady(resource: R, _: Model, _: Target<R>, _: DataSource, _: Bool): Bool {
+  public func onResourceReady(resource: R, model: Model, target: Target<R>, dataSource: DataSource, isFirstResource: Bool): Bool {
     resultReceived = true;
 
     if(resource is ByteArrayStream) {

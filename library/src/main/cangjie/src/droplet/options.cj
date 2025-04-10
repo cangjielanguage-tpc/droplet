@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
  
 package droplet.droplet
@@ -25,7 +25,7 @@ public interface CacheKeyUpdater<T> {
 }
 
 public class EmptyUpdater<T> <: CacheKeyUpdater<T> {
-    public func update(_: String, _: T, _: MD5): Unit {}
+    public func update(str: String, value: T, md5: MD5): Unit {}
 }
 
 public class DropletOptions <: AnyKey {

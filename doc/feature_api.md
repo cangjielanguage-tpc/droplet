@@ -37,21 +37,14 @@ class MyView {
 
     @State
     var option: DropletRequestOption = DropletRequestOption (
-         //网络图片
-         loadSrc: "http://www....../testjpg.jpg", 
-         //本地图片
-         loadSrc: "/data/storage/el1/bundle/testjpg.jpg",   
-         //加载raw文件图片
-         loadSrc："raw1.png"  //要加载的raw文件夹下图片名称
-         //读取res下的资源文件
-         loadSrcRes: @r(app.media.startIcon), //loadSrc和loadSrcRes二选一 loadSrc优先
         
-         placeholder: @r(app.media.loading),             // 占位图使用本地资源icon_loading（可选）自己定义
-         errholder: @r(app.media.img),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
-         strategy: DiskCacheStrategyDATA(),       // 磁盘缓存策略（可选）
-         signature:"1111", //不同的signature可保证缓存key的唯一    （可选）   
-         transformCate:RoundedCorners(50), //transform效果 （可选）
-         transitionOption:TransitionOption(TransitionType.Opacity,0.0,1.0,1000)  //过渡动画 （可选）
+        placeholder: Option<CJResource>.Some(@r(app.media.loading)),             // 占位图使用本地资源icon_loading（可选）自己定义
+        errholder: Option<CJResource>.Some(@r(app.media.img)),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
+        strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
+                                                                                  //  这样每个页面的组件会用相同的requestManager管理生命周期
+        signature:Option<String>.Some("1111"), //不同的signature可保证缓存key的唯一    （可选）   
+        transformCate:Option<PixelMapTransformation>.Some(RoundedCorners(50)), //transform效果 （可选）
+        transitionOption:Option<TransitionOption>.Some(TransitionOption(TransitionType.Opacity,0.0,1.0,1000))  //过渡动画 （可选）
     )
 
     protected open func aboutToAppear(){
@@ -61,23 +54,31 @@ class MyView {
     
     protected open func aboutToDisappear(){
         Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(label) //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致
-                                                                            //组件没设置label,就调用空参的onDisAppear
+                                                                                 //组件没设置label,就调用空参的onDisAppear
     }
 
     func build() {
         Column(30) {
             Column() {
                 DropletImageComponent(
-                    //控件宽度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewWidth: Length(50, unitType: LengthType.percent), 
-                    //控件高度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewHeight: Length(120.0, unitType: LengthType.vp), 
+                    //网络图片
+                    loadSrc: "http://www....../testjpg.jpg", 
+                    //本地图片
+                    loadSrc: "/data/storage/el1/bundle/testjpg.jpg",   
+                    //加载raw文件图片
+                    loadSrc："raw1.png"  //要加载的raw文件夹下图片名称
+                    //读取res下的资源文件
+                    loadSrcRes: @r(app.media.startIcon), //loadSrc和loadSrcRes二选一 loadSrc优先
+                    //控件宽度 支持百分比和vp 可选
+                    imageViewWidth: Length(50, unitType: LengthType.percent), //建议都设置(有一个为空则宽按屏幕宽度计算，建议指明宽高) 
+                    //控件高度 支持百分比和vp 可选
+                    imageViewHeight: Length(120.0, unitType: LengthType.vp), //建议都设置(有一个为空则宽按屏幕宽度计算,建议指明宽高) 
                     //图片相对控件对齐方式 默认ImageFit.Scale 可选
                     imageFit: ImageFit.Contain,
                     //context对象
                     globalContext:globalAbilityContext, //(必选)
-                    //droplet选项
-                    dropletOption: option,//(必选)
+                    //可选
+                    option: Option<DropletRequestOption>.Some(option),
                     // 生命周期标签 （可选） 同一个页面不同组件保持相同的标签,或者都不加,
                     label: label
                     )
@@ -101,37 +102,37 @@ load成功
 
 
 ### DropletImageComponent 参数列表
-| 参数名称            | 入参内容                             | 功能简介                          |
-|---------------------|--------------------------------------|-------------------------------|
-| globalContext       | Option<AbilityContext>               | 上下文对象（必选）                     |
-| imageViewWidth      | Length                               | 控件宽度（可选）建议设置 默认为100.percent   |
-| imageViewHeight     | Length                               | 控件高度（可选）建议设置 默认为100.percent |
-| imageFit            | ImageFit                             | 主题填充效果（可选）默认为ImageFit.Scale   |
-| label               | String                               | 生命周期标签（可选）                    |
-| option              | Option<DropletRequestOption>         | droplet其他参数选项（必选）             |
+| 参数名称            | 入参内容                             | 功能简介     |
+|---------------------|--------------------------------------|--------------|
+| globalContext       | Option<AbilityContext>               | 上下文对象（必选） |
+| loadSrc             | String                               | 图片url 可加载网络图片,本地图片和raw文件夹下图片 和loadSrcRes 二选一 必选|
+| loadSrcRes          | Option<CJResource>                   | 图片url 可加载resource下的资源文件 和loadSrcRes 二选一loadSrc 必选|
+| imageViewWidth      | Length                               | 控件宽度（可选）建议设置 宽高有一个为空则宽按屏幕宽度计算 |
+| imageViewHeight     | Length                               | 控件高度（可选）建议设置 宽高有一个为空则宽按屏幕宽度计算 |
+| imageFit            | ImageFit                             | 主题填充效果（可选）默认为ImageFit.Scale |
+| label               | String                               | 生命周期标签（可选） |
+| option              | Option<DropletRequestOption>         | droplet其他参数选项（可选） |
 
 
 
 ### DropletRequestOption 参数列表
-| 参数名称                    | 入参内容                                      | 功能简介     |
-|-------------------------|-------------------------------------------|--------------|
-| loadSrc                 | String                                    | 图片url 可加载网络图片,本地图片和raw文件夹下图片 和loadSrcRes 二选一 必选|
-| loadSrcRes              | Option<CJResource>                        | 图片url 可加载resource下的资源文件 和loadSrcRes 二选一loadSrc 必选|
-| placeholder             | Option<CJResource>                        | 占位图 |
-| errholder               | Option<CJResource>                        | 错误图 |
-| strategy                | Option<DiskCacheStrategy>                 | 图片加载缓存策略|
-| transformCate           | Option<PixelMapTransformation>            | 图片变换对象 |
-| transformListCate       | Option<ArrayList<PixelMapTransformation>> | 多个图片变换对象 |
-| isSkipMemory            | Option<Bool>                              | 是否禁用内存缓存 |
-| overrideWH              | Option<(Int64, Int64)>                    | 指定pixelmap的宽高 |
-| applyRequestOption      | Option<RequestOptions>                    | 要运行的一些设置选项 |
-| onlyRetrieveFromCache   | Option<Bool>                              | 是否只从缓存读取数据 |
-| dontTransform           | Option<Bool>                              | 是否禁用动画 |
-| useDefaultRequestOption | Option<RequestOptions>                    | 要运行的一些默认设置选项 |
-| thumbnail               | Option<Float32>                           | 缩略图为原图的缩放比例 |
-| thumbnaildrawable       | Option<RequestBuilder<Drawable>>          | 缩略图为指定图片 由于和原图加载先后随机不一定保证能看到
-| signature               | Option<String>                            | 图片唯一标记选项 |
-| transitionOption        | Option<TransitionOption>                  | 过渡动画选项 |
+| 参数名称                  | 入参内容                                   | 功能简介     |
+|---------------------------|---------------------------------------------|--------------|
+| placeholder               | Option<CJResource>                          | 占位图 |
+| errholder                 | Option<CJResource>                          | 错误图 |
+| strategy                  | Option<DiskCacheStrategy>                   | 图片加载缓存策略|
+| transformCate             | Option<PixelMapTransformation>              | 图片变换对象 |
+| transformListCate         | Option<ArrayList<PixelMapTransformation>>   | 多个图片变换对象 |
+| isSkipMemory              | Option<Bool>                                | 是否禁用内存缓存 |
+| overrideWH                | Option<(Int64, Int64)>                      | 指定pixelmap的宽高 |
+| applyRequestOption        | Option<RequestOptions>                      | 要运行的一些设置选项 |
+| onlyRetrieveFromCache     | Option<Bool>                                | 是否只从缓存读取数据 |
+| dontTransform             | Option<Bool>                                | 是否禁用动画 |
+| useDefaultRequestOption   | Option<RequestOptions>                      | 要运行的一些默认设置选项 |
+| thumbnail                 | Option<Float32>                             | 缩略图为原图的缩放比例 |
+| thumbnaildrawable         | Option<RequestBuilder<Drawable>>            | 缩略图为指定图片 由于和原图加载先后随机不一定保证能看到
+| signature                 | Option<String>                              | 图片唯一标记选项 |
+| transitionOption          | Option<TransitionOption>                    | 过渡动画选项 |
 
 
 

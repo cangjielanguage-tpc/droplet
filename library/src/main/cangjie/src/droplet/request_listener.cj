@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
 
 package droplet.droplet
@@ -88,11 +88,11 @@ public abstract class ExperimentalRequestListener<ResourceT> <: RequestListener<
 
 public class NoRequestListener<ResourceT> <: RequestListener<ResourceT> {
 
-  public func onLoadFailed(_: DropletException, _: Model, _: Target<ResourceT>, _: Bool): Bool {
+  public func onLoadFailed(e: DropletException, model: Model, target: Target<ResourceT>, isFirstResource: Bool): Bool {
     return false
   }
 
-  public func onResourceReady(_: ResourceT, _: Model, _: Target<ResourceT>, _: DataSource, _: Bool): Bool {
+  public func onResourceReady(resource: ResourceT, model: Model, target: Target<ResourceT>, dataSource: DataSource, isFirstResource: Bool): Bool {
     return false
   }
 

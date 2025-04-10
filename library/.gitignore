@@ -4,6 +4,3 @@
 /build
 /.cxx
 /.test
-BuildProfile.ets
-oh-package-lock.json5
-/src/main/cangjie/build-script-cache

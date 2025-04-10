@@ -5,7 +5,7 @@
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.0.1-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.53.18-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v0.53.13-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/project-open-brightgreen" style="display: inline-block;" />
 </p>
 
@@ -129,20 +129,14 @@ class MyView {
 
     @State
     var option: DropletRequestOption = DropletRequestOption (
-         //网络图片
-         loadSrc: "http://www....../testjpg.jpg", 
-         //本地图片
-         loadSrc: "/data/storage/el1/bundle/testjpg.jpg",   
-         //加载raw文件图片
-         loadSrc："raw1.png"  //要加载的raw文件夹下图片名称
-         //读取res下的资源文件
-         loadSrcRes: @r(app.media.startIcon), //loadSrc和loadSrcRes二选一 loadSrc优先
-         placeholder: @r(app.media.loading),             // 占位图使用本地资源icon_loading（可选）自己定义
-         errholder: @r(app.media.img),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
-         strategy: DiskCacheStrategyDATA(),       // 磁盘缓存策略（可选）
-         signature:"1111", //不同的signature可保证缓存key的唯一    （可选）   
-         transformCate:RoundedCorners(50), //transform效果 （可选）
-         transitionOption:TransitionOption(TransitionType.Opacity,0.0,1.0,1000)  //过渡动画 （可选）
+        
+        placeholder: Option<CJResource>.Some(@r(app.media.loading)),             // 占位图使用本地资源icon_loading（可选）自己定义
+        errholder: Option<CJResource>.Some(@r(app.media.img)),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
+        strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
+                                                                                  //  这样每个页面的组件会用相同的requestManager管理生命周期
+        signature:Option<String>.Some("1111"), //不同的signature可保证缓存key的唯一    （可选）   
+        transformCate:Option<PixelMapTransformation>.Some(RoundedCorners(50)), //transform效果 （可选）
+        transitionOption:Option<TransitionOption>.Some(TransitionOption(TransitionType.Opacity,0.0,1.0,1000))  //过渡动画 （可选）
     )
 
     protected open func aboutToAppear(){
@@ -152,35 +146,34 @@ class MyView {
     
     protected open func aboutToDisappear(){
         Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(label) //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致
-                                                                            //组件没设置label,就调用空参的onDisAppear
+                                                                                 //组件没设置label,就调用空参的onDisAppear
     }
 
     func build() {
         Column(30) {
             Column() {
                 DropletImageComponent(
-                    //控件宽度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewWidth: Length(50, unitType: LengthType.percent), 
-                    //控件高度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewHeight: Length(120.0, unitType: LengthType.vp), 
+                    //网络图片
+                    loadSrc: "http://www....../testjpg.jpg", 
+                    //本地图片
+                    loadSrc: "/data/storage/el1/bundle/testjpg.jpg",   
+                    //加载raw文件图片
+                    loadSrc："raw1.png"  //要加载的raw文件夹下图片名称
+                    //读取res下的资源文件
+                    loadSrcRes: @r(app.media.startIcon), //loadSrc和loadSrcRes二选一 loadSrc优先
+                    //控件宽度 支持百分比和vp 可选
+                    imageViewWidth: Length(50, unitType: LengthType.percent), //建议都设置(有一个为空则宽按屏幕宽度计算，建议指明宽高) 
+                    //控件高度 支持百分比和vp 可选
+                    imageViewHeight: Length(120.0, unitType: LengthType.vp), //建议都设置(有一个为空则宽按屏幕宽度计算,建议指明宽高) 
                     //图片相对控件对齐方式 默认ImageFit.Scale 可选
                     imageFit: ImageFit.Contain,
                     //context对象
                     globalContext:globalAbilityContext, //(必选)
-                    //droplet选项
-                    dropletOption: option,//(必选)
+                    //可选
+                    option: Option<DropletRequestOption>.Some(option),
                     // 生命周期标签 （可选） 同一个页面不同组件保持相同的标签,或者都不加,
-                    label: label,
-                    resourceFn: {
-                        pixelMap =>
-                        var width = pixelMap.getImageInfo().size.width
-                        var height = pixelMap.getImageInfo().size.height
-                        AppLog.error("droplet--- resourceFn width=${width} height=${height}") 
-                    }, //加载成功的回调 可以获取显示在控件上的图片的宽和高
-                    failedFn: {
-                        e => AppLog.error("droplet--- failedFn")
-                    }  //加载失败的回调
-                )
+                    label: label
+                    )
             }.width(100.percent)
         }
     }
@@ -197,42 +190,12 @@ class MyView {
 load成功
 ```
 
-#### 3.获取原图的宽高
-示例代码如下：
-
-```cangjie
-   
-         var url = "https://xxxxxxxx"
-
-         Droplet.withContext(globalAbilityContext.getOrThrow())
-                .load(url)
-                .listener(
-                    {
-                        drawable: Drawable, model: Model, target: Target<Drawable>, datasource: DataSource, 
-                        isFirstResource: Bool =>
-                        var width = drawable.getPixelMap().getImageInfo().size.width
-                        var height = drawable.getPixelMap().getImageInfo().size.height
-                        AppLog.error("原图宽为width=${width} 原图高为height=${height}")
-                        //可以获取原图的宽高
-                        return false
-                    },
-                    {
-                        e: DropletException, model: Model, target: Target<Drawable>, isFirstResource: Bool => return false
-                    }
-                )
-                .into(
-                    Downsampler.SIZE_ORIGINAL,
-                    Downsampler.SIZE_ORIGINAL
-                )
-
-```
-
 
 ## 约束与限制
 
-IDE : DevEco Studio 5.0.2 Release (5.0.7.200)
+DevEco Studio:  DevEco Studio 5.0.0 Release Build Version 5.0.3.906
 
-Plugins (SDK) : DevEco Studio-Cangjie Plugin Beta1(5.0.7.100)
+Cangjie support Plugin: DevEco Studio-Cangjie Plugin Beta2(5.0.3.906)
 
 ## 开源协议
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
  
 package droplet.droplet
@@ -58,7 +58,7 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
         return 2
     }
 
-    public override func draw(_:Bool): Unit {
+    public override func draw(isErrorPic:Bool): Unit {
         if(this.drawFunc.size > 0) {
             for(f in this.drawFunc) {
                 drawCurrentFrame(f)

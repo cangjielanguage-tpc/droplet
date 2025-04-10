@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights resvered.
  */
 
 package droplet.droplet
@@ -47,7 +47,7 @@ public open class LruCache<T, Y> where T <: DropletAny<T>, Y <: DropletAny<Y> {
    *
    * @param item The item to get the size of.
    */
-  protected open func getSize(_: Y): Int64 {
+  protected open func getSize(item: Y): Int64 {
     return 1;
   }
 
@@ -64,7 +64,7 @@ public open class LruCache<T, Y> where T <: DropletAny<T>, Y <: DropletAny<Y> {
    * @param key The key of the evicted item.
    * @param item The evicted item.
    */
-  protected open func onItemEvicted(_: T , _: Y): Unit {
+  protected open func onItemEvicted(key: T , item: Y): Unit {
     // optional override
   }
 
