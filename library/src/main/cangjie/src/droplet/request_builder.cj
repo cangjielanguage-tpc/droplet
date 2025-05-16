@@ -32,7 +32,7 @@ public interface AnyRequestBuilder <: AnyRequestOptions {
     func getThumbSizeMultiplier(): Float32
     func getDefaultTransitionOptionsSet(): Bool
     func getModelSet(): Bool
-    func getContext(): AbilityContext
+    func getContext(): StageContext
     func getDroplet(): Droplet
     func getRequestManager(): RequestManager
     func getOverrideWidth(): Int64
@@ -46,7 +46,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
 
     public var isModelSet: Bool = false
 
-    public var context: AbilityContext
+    public var context: StageContext
 
     public var droplet: Droplet
     public var dropletContext: DropletContext
@@ -65,7 +65,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
     public var thumbSizeMultiplier: Float32 = 0.0;
 
     init(droplet: Droplet, requestManager: RequestManager, transcodeTypeClass: TransformationKey,
-        context: AbilityContext) {
+        context: StageContext) {
         this.droplet = droplet
         this.requestManager = requestManager
         this.transcodeTypeClass = transcodeTypeClass
@@ -95,7 +95,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         apply(other);
     }
 
-    public func getContext(): AbilityContext {
+    public func getContext(): StageContext {
         return context;
     }
 
@@ -244,6 +244,17 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
 
     public func submit(): FutureTarget<TranscodeType> {
         return submit(Downsampler.SIZE_ORIGINAL, Downsampler.SIZE_ORIGINAL);
+    }
+
+
+    public func preload(width: Int64, height: Int64):Target<TranscodeType>{
+         let target:PreloadTarget<TranscodeType> = PreloadTarget.obtain(requestManager, width, height)
+         return into(target)
+    }
+
+
+    public func preload():Target<TranscodeType>{
+         return preload(Downsampler.SIZE_ORIGINAL, Downsampler.SIZE_ORIGINAL);
     }
 
     func getDownloadOnlyRequest(): RequestBuilder<InputStream> {

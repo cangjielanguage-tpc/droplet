@@ -21,7 +21,7 @@
     path = "../../../../library/src/main/cangjie"
 
 [package]
-  cjc-version = "0.53.18"
+  cjc-version = "0.53.19"
   compile-option = ""
   description = "CangjieUI Application"
   link-option = ""

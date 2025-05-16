@@ -16,7 +16,7 @@ public class RequestManagerRetriever {
         lifecycleRequestManagerRetriever = LifecycleRequestManagerRetriever(this.factory);
     }
 
-    func get(context: AbilityContext, key: String) {
+    func get(context: StageContext, key: String) {
         var droplet: Droplet = Droplet.get(context);
         return lifecycleRequestManagerRetriever.getOrCreate(
             context,
@@ -31,11 +31,11 @@ public class RequestManagerRetriever {
 }
 
 public class DefaultRequestManagerFactory <: RequestManagerFactory {
-    public func build(droplet: Droplet, dropletLifecycle: LifecycleLifecycle, context: AbilityContext, key: String): RequestManager {
+    public func build(droplet: Droplet, dropletLifecycle: LifecycleLifecycle, context: StageContext, key: String): RequestManager {
         return RequestManager(droplet, dropletLifecycle, context, key)
     }
 }
 
 public interface RequestManagerFactory {
-    func build(droplet: Droplet, dropletLifecycle: LifecycleLifecycle, context: AbilityContext, key: String): RequestManager
+    func build(droplet: Droplet, dropletLifecycle: LifecycleLifecycle, context: StageContext, key: String): RequestManager
 }

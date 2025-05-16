@@ -37,11 +37,11 @@ public abstract class BaseTarget<R> <: Target<R> {
 
   protected var request: Option<LoadRequest> = None;
 
-  public func setRequest(request: Option<LoadRequest>): Unit {
+  public override func setRequest(request: Option<LoadRequest>): Unit {
     this.request = request
   }
 
-  public func getRequest(): Option<LoadRequest> {
+  public override func getRequest(): Option<LoadRequest> {
     return this.request
   }
 

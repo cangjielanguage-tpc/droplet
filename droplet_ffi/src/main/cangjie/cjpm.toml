@@ -19,7 +19,7 @@
     version = "1.0.0"
 
 [package]
-  cjc-version = "0.53.18"
+  cjc-version = "0.53.19"
   compile-option = ""
   description = "CangjieUI Application"
   link-option = ""

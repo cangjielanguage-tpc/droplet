@@ -32,7 +32,7 @@ public class LifecycleRequestManagerRetriever {
     }
 
      func getOrCreate(
-        context: AbilityContext,
+        context: StageContext,
         droplet: Droplet,
         key: String,
         isParentVisible: Bool): RequestManager {

@@ -62,7 +62,7 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
 
     private let requestCoordinator: Option<RequestCoordinator>
 
-    private let context: AbilityContext
+    private let context: StageContext
 
     private let dropletContext: DropletContext
 
@@ -169,7 +169,7 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
 
 
     public static func obtain<R2>(
-        context: AbilityContext,
+        context: StageContext,
         dropletContext: DropletContext,
         requestLock: ReentrantMutex,
         model: Model,
@@ -204,7 +204,7 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
 
     // We are in fact locking on the same lock that will be used for all subsequent method calls.
     public init(
-        context: AbilityContext,
+        context: StageContext,
         dropletContext: DropletContext,
         requestLock: ReentrantMutex,
         model: Model,
@@ -269,7 +269,6 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
 
     public override func begin(): Unit {
         synchronized(requestLock) {
-            assertNotCallingCallbacks();
             stateVerifier.throwIfRecycled();
 
             if (match (status) {
@@ -332,7 +331,6 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
      * @see #clear()
      */
     private func cancel(): Unit {
-        assertNotCallingCallbacks();
         stateVerifier.throwIfRecycled();
         target.removeCallback();
 
@@ -346,18 +344,7 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
         }
     }
 
-    // Avoids difficult to understand errors like #2413.
-    private func assertNotCallingCallbacks(): Unit {
-        if (isCallingCallbacks) {
-            throw IllegalStateException(
-                """
-          You can't start or clear loads in RequestListener or 
-          Target callbacks. If you're trying to start a fallback request when a load fails, 
-          use RequestBuilder#error(RequestBuilder). Otherwise consider posting your into()
-         or clear() calls to the main thread using a Handler instead."""
-            );
-        }
-    }
+
 
     /**
      * Cancels the current load if it is in progress, clears any resources held onto by the request
@@ -370,7 +357,6 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
     public override func clear(): Unit {
         var toRelease: Option<DropletResource<R>> = None;
         synchronized(requestLock) {
-            assertNotCallingCallbacks();
             stateVerifier.throwIfRecycled();
 
             let ffff = match (status) {

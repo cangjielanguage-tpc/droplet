@@ -113,25 +113,25 @@ load成功
 
 
 ### DropletRequestOption 参数列表
-| 参数名称                    | 入参内容                                      | 功能简介     |
-|-------------------------|-------------------------------------------|--------------|
-| loadSrc                 | String                                    | 图片url 可加载网络图片,本地图片和raw文件夹下图片 和loadSrcRes 二选一 必选|
-| loadSrcRes              | Option<CJResource>                        | 图片url 可加载resource下的资源文件 和loadSrcRes 二选一loadSrc 必选|
-| placeholder             | Option<CJResource>                        | 占位图 |
-| errholder               | Option<CJResource>                        | 错误图 |
-| strategy                | Option<DiskCacheStrategy>                 | 图片加载缓存策略|
-| transformCate           | Option<PixelMapTransformation>            | 图片变换对象 |
-| transformListCate       | Option<ArrayList<PixelMapTransformation>> | 多个图片变换对象 |
-| isSkipMemory            | Option<Bool>                              | 是否禁用内存缓存 |
-| overrideWH              | Option<(Int64, Int64)>                    | 指定pixelmap的宽高 |
-| applyRequestOption      | Option<RequestOptions>                    | 要运行的一些设置选项 |
-| onlyRetrieveFromCache   | Option<Bool>                              | 是否只从缓存读取数据 |
-| dontTransform           | Option<Bool>                              | 是否禁用动画 |
-| useDefaultRequestOption | Option<RequestOptions>                    | 要运行的一些默认设置选项 |
-| thumbnail               | Option<Float32>                           | 缩略图为原图的缩放比例 |
-| thumbnaildrawable       | Option<RequestBuilder<Drawable>>          | 缩略图为指定图片 由于和原图加载先后随机不一定保证能看到
-| signature               | Option<String>                            | 图片唯一标记选项 |
-| transitionOption        | Option<TransitionOption>                  | 过渡动画选项 |
+| 参数名称                    | 入参内容                                      | 功能简介                                              |
+|-------------------------|-------------------------------------------|---------------------------------------------------|
+| loadSrc                 | String                                    | 图片url 可加载网络图片,本地图片和raw文件夹下图片 和loadSrcRes 二选一 必选   |
+| loadSrcRes              | Option<CJResource>                        | 图片url 可加载resource下的资源文件 和loadSrcRes 二选一loadSrc 必选 |
+| placeholder             | Option<CJResource>                        | 占位图                                               |
+| errholder               | Option<CJResource>                        | 错误图                                               |
+| strategy                | Option<DiskCacheStrategy>                 | 图片加载缓存策略                                          |
+| transformCate           | Option<PixelMapTransformation>            | 图片变换对象                                            |
+| transformListCate       | Option<ArrayList<PixelMapTransformation>> | 多个图片变换对象                                          |
+| isSkipMemory            | Option<Bool>                              | 是否禁用内存缓存                                          |
+| overrideWH              | Option<(Int64, Int64)>                    | 指定预期pixelmap的宽高，不指定就是默认控件宽高                       |
+| applyRequestOption      | Option<RequestOptions>                    | 要运行的一些设置选项                                        |
+| onlyRetrieveFromCache   | Option<Bool>                              | 是否只从缓存读取数据                                        |
+| dontTransform           | Option<Bool>                              | 是否禁用动画                                            |
+| useDefaultRequestOption | Option<RequestOptions>                    | 要运行的一些默认设置选项                                      |
+| thumbnail               | Option<Float32>                           | 缩略图为原图的缩放比例                                       |
+| thumbnaildrawable       | Option<RequestBuilder<Drawable>>          | 缩略图为指定图片 由于和原图加载先后随机不一定保证能看到                      
+| signature               | Option<String>                            | 图片唯一标记选项                                          |
+| transitionOption        | Option<TransitionOption>                  | 过渡动画选项                                            |
 
 
 
@@ -391,6 +391,25 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
      * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
      */
     public func into(f: (PixelMap) -> Unit, r: (CJResource) -> Unit, width: Int64, height: Int64): Target<TranscodeType>
+    
+    
+    /**
+     * 预加载图片带参数,直接将图片加载到内存
+     * 
+     * @参数 width Int64类型，预期加载图片的宽
+     * @参数 height Int64类型，预期加载图片的高
+     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     */
+    public func preload(width: Int64, height: Int64):Target<TranscodeType>
+
+    
+    /**
+     * 预加载图片不带参数,直接将图片加载到内存
+     *
+     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     */
+    public func preload():Target<TranscodeType>
+
     
     /**
      * 加载图片不显示

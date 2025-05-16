@@ -5,8 +5,8 @@
 package droplet.droplet
 
 public class InternalCacheDiskCacheFactory <: DiskLruCacheFactory {
-    /** 250 MB of cache. */
-    public static let DEFAULT_DISK_CACHE_SIZE: Int64 = 250 * 1024 * 1024;
+    /** 1 GB of cache. */
+    public static let DEFAULT_DISK_CACHE_SIZE: Int64 = 1024 * 1024 * 1024;
 
     public static let DEFAULT_DISK_CACHE_DIR: String = "image_manager_disk_cache";
     

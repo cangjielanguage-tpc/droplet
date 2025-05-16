@@ -29,8 +29,7 @@ public class ResourceModelLoader <: ModelLoader {
 
     private func getImageFromResource(res:CJResource): Option<InputStream> {
           try {
-            let resourceManager = ResourceManager.getResourceManager(
-                getStageContext(Droplet.globalcontext.getOrThrow()))
+            let resourceManager = ResourceManager.getResourceManager(Droplet.globalcontext.getOrThrow())
             let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(res.id),0)
             var byteStream: ByteArrayStream = ByteArrayStream()
             byteStream.write(arr)
@@ -81,7 +80,7 @@ public class StringModelLoader <: ModelLoader {
     private func getImageFromRawFile(rawFileName: String): Option<InputStream> {
         try {
             let resourceManager = ResourceManager.getResourceManager(
-                getStageContext(Droplet.globalcontext.getOrThrow()))
+                Droplet.globalcontext.getOrThrow())
             let arr: Array<UInt8> = resourceManager.getRawFileContent(rawFileName)
             var byteStream: ByteArrayStream = ByteArrayStream()
             byteStream.write(arr)
