@@ -330,6 +330,7 @@ public enum RunStage {
 public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallback {
 
     private static let mtxtrans = ReentrantMutex()
+    public static let mtx = ReentrantMutex()
 
     private let model: Model
     private var width: Int64
@@ -438,7 +439,8 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
 
             case SWITCH_TO_SOURCE_SERVICE => runGenerators();
 
-            case DECODE_DATA => decodeFromRetrievedData();
+            case DECODE_DATA =>
+                decodeFromRetrievedData();
         }
     }
 
@@ -791,7 +793,7 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
                 case Some(x) => true
                 case _ => false
             }) {
-            isStarted = currentGenerator.getOrThrow().startNext()
+               isStarted = currentGenerator.getOrThrow().startNext()
             if (isStarted) {
                 break;
             }

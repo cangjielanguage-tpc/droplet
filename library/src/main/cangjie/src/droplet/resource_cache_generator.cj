@@ -20,6 +20,7 @@ public class ResourceCacheGenerator <: DataFetcherGenerator {
   }
 
   public func startNext(): Bool {
+    synchronized (DecodeJob.mtx){
     try {
     let transformationKey: TransformationKey = helper.getTransformationKey()
     // 查询缓存
@@ -57,6 +58,7 @@ public class ResourceCacheGenerator <: DataFetcherGenerator {
       return false;
     } finally {
     }
+   }
   }
 
   public func cancel(): Unit {

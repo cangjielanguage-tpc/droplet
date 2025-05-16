@@ -26,7 +26,7 @@
       path = "../../../libs/arm64-v8a"
 
 [package]
-  cjc-version = "0.53.18"
+  cjc-version = "0.53.19"
   compile-option = ""
   description = "cangjie droplet"
   link-option = ""

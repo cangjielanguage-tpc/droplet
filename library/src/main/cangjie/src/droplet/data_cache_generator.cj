@@ -25,7 +25,7 @@ public class DataCacheGenerator <: DataFetcherGenerator {
 
 
   public func startNext(): Bool {
-    
+    synchronized (DecodeJob.mtx){
     try {
       // 从磁盘缓存获取图片
       let originalKey: AnyKey = DataCacheKey(ModelKey(helper.getModel()), helper.getSignature());
@@ -45,6 +45,7 @@ public class DataCacheGenerator <: DataFetcherGenerator {
       return false
     } finally {
     }
+   }
   }
 
 

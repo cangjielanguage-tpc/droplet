@@ -170,13 +170,13 @@ public class DropletFile <: DropletAny<DropletFile> {
     }
 
      func toByteArrayStream(): ByteArrayStream {
-        let outStream: ByteArrayStream = ByteArrayStream()
         synchronized (mtx) {
+            let outStream: ByteArrayStream = ByteArrayStream()
             safeOpenFile()
             this.file.getOrThrow().copyTo(outStream)
             this.file.getOrThrow().close()
+            return outStream
         }
-        return outStream
     }
 
      func length(): Int64 {

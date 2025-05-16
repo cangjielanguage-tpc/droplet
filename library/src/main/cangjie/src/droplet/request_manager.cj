@@ -16,7 +16,7 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
     private var requestOptions: RequestOptions
 
     protected let droplet: Droplet
-    protected let context: AbilityContext
+    protected let context: StageContext
     public var requestManagerKey: String
     public var lifecycle: Lifecycle
 
@@ -28,7 +28,7 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
     private let requestTracker: RequestTracker
     private let targetTracker: TargetTracker = TargetTracker();
 
-    init(droplet: Droplet, lifecycle: Lifecycle, context: AbilityContext, key: String) {
+    init(droplet: Droplet, lifecycle: Lifecycle, context: StageContext, key: String) {
         this.context = context
         this.droplet = droplet
         this.lifecycle = lifecycle

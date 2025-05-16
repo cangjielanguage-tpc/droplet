@@ -634,7 +634,11 @@ public class DiskLruCache {
     private func trimToSize(): Unit {
         var i=0
         while (size > maxSize) {
-            remove(lruEntries.list[i].k);
+           let res =  remove(lruEntries.list[i].k);
+           if(!res){
+                //新加的防止死循环
+                break
+            }
         }
     }
 

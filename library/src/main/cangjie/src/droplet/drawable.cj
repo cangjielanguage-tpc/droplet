@@ -51,6 +51,7 @@ public class PixelMapDrawable <: Drawable {
     }
 
     public override func setDrawFunc(drawFunc: (PixelMap) -> Unit): Unit {
+        this.drawFunc.clear()
         this.drawFunc.append(drawFunc)
     }
 }
@@ -89,6 +90,7 @@ public class CJResourceDrawable <: Drawable {
     }
 
      func setDrawFuncCJResource(drawFunc: (CJResource,Bool) -> Unit): Unit {
+        this.drawFunc.clear()
         this.drawFunc.append(drawFunc)
     }
 }

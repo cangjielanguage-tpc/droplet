@@ -31,7 +31,7 @@ public class DropletBuilder {
         return this;
     }
 
-    public func build(context: AbilityContext) {
+    public func build(context: StageContext) {
 
         if (match(arrayPool) {
             case Some(x) => false
@@ -78,7 +78,7 @@ public class DropletBuilder {
 
 public class Droplet <: ActiveResourceRemovedListener {
 
-    public static var globalcontext:Option<AbilityContext> = Option<AbilityContext>.None
+    public static var globalcontext:Option<StageContext> = Option<StageContext>.None
 
     public static let LIFECYCLE_KEY_GLOBAL: String = "global"
 
@@ -100,7 +100,7 @@ public class Droplet <: ActiveResourceRemovedListener {
 
     public var arrayPool: ArrayPool
 
-    init(requestManagerRetriever: RequestManagerRetriever, defaultRequestOptionsFactory: RequestOptionsFactory, memoryCache: MemoryCache, activeResources: ActiveResources, context: AbilityContext, engine: Engine, arrayPool: ArrayPool) {
+    init(requestManagerRetriever: RequestManagerRetriever, defaultRequestOptionsFactory: RequestOptionsFactory, memoryCache: MemoryCache, activeResources: ActiveResources, context: StageContext, engine: Engine, arrayPool: ArrayPool) {
         this.requestManagerRetriever = requestManagerRetriever
         this.dropletContext = DropletContext(defaultRequestOptionsFactory, context, arrayPool)
         this.memoryCache = memoryCache
@@ -131,7 +131,7 @@ public class Droplet <: ActiveResourceRemovedListener {
         this.dropletContext.getManager().setFileModelLoader(modelLoader)
     }
 
-    public static func get(context: AbilityContext): Droplet {
+    public static func get(context: StageContext): Droplet {
         if (match(droplet) {
             case Some(x) => false
             case _ => true
@@ -148,7 +148,7 @@ public class Droplet <: ActiveResourceRemovedListener {
         return droplet.getOrThrow()
     }
 
-    static func checkAndInitializeDroplet(context: AbilityContext) {
+    static func checkAndInitializeDroplet(context: StageContext) {
         if(isInitializing) {
             throw IllegalStateException("You cannot call Droplet.get() in registerComponents(), use the provided Droplet instance instead")
         }
@@ -158,25 +158,29 @@ public class Droplet <: ActiveResourceRemovedListener {
         isInitializing = false;
     }
 
-    private static func initializeDroplet(context: AbilityContext, builder: DropletBuilder) {
+    private static func initializeDroplet(context: StageContext, builder: DropletBuilder) {
         let dropletLocal: Droplet = builder.build(context)
 
         Droplet.droplet = Some(dropletLocal)
+    }
+
+    public func setMemoryCache(memoryCache: MemoryCache): Unit {
+        this.memoryCache = memoryCache
     }
 
     func getRequestManagerRetriever() {
         return this.requestManagerRetriever
     }
 
-    static func getRetriever(context: AbilityContext): RequestManagerRetriever {
+    static func getRetriever(context: StageContext): RequestManagerRetriever {
         return Droplet.get(context).getRequestManagerRetriever()
     }
 
-    public static func withContext(context: AbilityContext): RequestManager {
+    public static func withContext(context: StageContext): RequestManager {
         return getRetriever(context).get(context, LIFECYCLE_KEY_GLOBAL)
     }
 
-    public static func withContext(context: AbilityContext, label: String): RequestManager {
+    public static func withContext(context: StageContext, label: String): RequestManager {
         if (label.isEmpty()) {
             return getRetriever(context).get(context, LIFECYCLE_KEY_GLOBAL)
         }
@@ -258,6 +262,4 @@ public class Droplet <: ActiveResourceRemovedListener {
             managers.remove(requestManager);
         }
     }
-
-
 }

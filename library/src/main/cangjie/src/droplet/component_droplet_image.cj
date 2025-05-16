@@ -43,80 +43,395 @@ internal import std.sync.*
 internal import std.format.Formatter
 internal import std.overflow.*
 internal import std.convert.*
+internal import ohos.emitter.*
+internal import ohos.ark_interop_helper.StageContext
 
 /**
  * Created on 2024/3/4
  */
-@Observed
 public class DropletRequestOption {
-    @Publish
-    public var loadSrc: String = ""
 
-    @Publish
-    public var loadSrcRes: ?CJResource = Option<CJResource>.None
+    private static let count = AtomicInt64(1)
 
-    @Publish
-    public var placeholder: ?CJResource = Option<CJResource>.None
-    // 失败占位图使用本地资源icon_failed（可选）
-    @Publish
-    public var errholder: ?CJResource = Option<CJResource>.None
-    // 磁盘缓存策略（可选）
-    @Publish
-    public var strategy: ?DiskCacheStrategy = Option<DiskCacheStrategy>.None
-    //transform
-    @Publish
-    public var transformCate: ?PixelMapTransformation = Option<PixelMapTransformation>.None
-    //是否禁用内存缓存
-    @Publish
-    public var transformListCate: ?ArrayList<PixelMapTransformation> = Option<ArrayList<PixelMapTransformation>>.None
+    private let id = count.fetchAdd(1)
 
-    @Publish
-    public var isSkipMemory: ?Bool = Option<Bool>.None
-    //Override
-    @Publish
-    public var overrideWH: ?(Int64, Int64) = Option<(Int64, Int64)>.None
-    //apply
-    @Publish
-    public var applyRequestOption: ?RequestOptions = Option<RequestOptions>.None
-    //只从缓存读取数据
-    @Publish
-    public var onlyRetrieveFromCache: ?Bool = Option<Bool>.None
-    //禁用动画
-    @Publish
-    public var dontTransform: ?Bool = Option<Bool>.None
-    //usedefault
-    @Publish
-    public var useDefaultRequestOption: ?RequestOptions = Option<RequestOptions>.None
-    //thumbnail float
-    @Publish
-    public var thumbnail: ?Float32 = Option<Float32>.None
-    //thumnail drawable
-    @Publish
-    public var thumbnaildrawable: ?RequestBuilder<Drawable> = Option<RequestBuilder<Drawable>>.None
-    //signature
-    @Publish
-    public var signature: ?String = Option<String>.None
-    //trisition
-    @Publish
-    public var transitionOption: ?TransitionOption = Option<TransitionOption>.None
+    let emitkey = "updateImg${id}"
+
+    private var _loadSrc:String = ""
+
+    public mut prop loadSrc:String{
+        get(){
+            _loadSrc
+        }
+        set(v){
+            _loadSrc = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+    private var _loadSrcRes : ?CJResource = Option<CJResource>.None
+
+    public mut prop loadSrcRes:?CJResource{
+        get(){
+            _loadSrcRes
+        }
+        set(v){
+            _loadSrcRes = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+    private var _placeholder : ?CJResource = Option<CJResource>.None
+
+    public mut prop placeholder:?CJResource{
+        get(){
+            _placeholder
+        }
+        set(v){
+            _placeholder = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+
+    private var _errholder : ?CJResource = Option<CJResource>.None
+
+    public mut prop errholder:?CJResource{
+        get(){
+            _errholder
+        }
+        set(v){
+            _errholder = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+
+    private var _strategy : ?DiskCacheStrategy = Option<DiskCacheStrategy>.None
+
+    public mut prop strategy:?DiskCacheStrategy{
+        get(){
+            _strategy
+        }
+        set(v){
+            _strategy = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+     private var _transformCate : ?PixelMapTransformation = Option<PixelMapTransformation>.None
+
+    public mut prop transformCate:?PixelMapTransformation{
+        get(){
+            _transformCate
+        }
+        set(v){
+            _transformCate = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+    private var _transformListCate : ?ArrayList<PixelMapTransformation> = Option<ArrayList<PixelMapTransformation>>.None
+
+    public mut prop transformListCate:?ArrayList<PixelMapTransformation>{
+        get(){
+            _transformListCate
+        }
+        set(v){
+            _transformListCate = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+
+    private var _isSkipMemory : ?Bool = Option<Bool>.None
+
+    public mut prop isSkipMemory:?Bool{
+        get(){
+            _isSkipMemory
+        }
+        set(v){
+            _isSkipMemory = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+
+    private var _overrideWH : ?(Int64, Int64) = Option<(Int64, Int64)>.None
+
+    public mut prop overrideWH:?(Int64, Int64){
+        get(){
+            _overrideWH
+        }
+        set(v){
+            _overrideWH = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+
+     private var _applyRequestOption : ?RequestOptions = Option<RequestOptions>.None
+
+    public mut prop applyRequestOption:?RequestOptions{
+        get(){
+            _applyRequestOption
+        }
+        set(v){
+            _applyRequestOption = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+    private var _onlyRetrieveFromCache : ?Bool = Option<Bool>.None
+
+    public mut prop onlyRetrieveFromCache:?Bool{
+        get(){
+            _onlyRetrieveFromCache
+        }
+        set(v){
+            _onlyRetrieveFromCache = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+
+     private var _dontTransform : ?Bool = Option<Bool>.None
+
+    public mut prop dontTransform:?Bool{
+        get(){
+            _dontTransform
+        }
+        set(v){
+            _dontTransform = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+
+   private var _useDefaultRequestOption : ?RequestOptions = Option<RequestOptions>.None
+
+    public mut prop useDefaultRequestOption:?RequestOptions{
+        get(){
+            _useDefaultRequestOption
+        }
+        set(v){
+            _useDefaultRequestOption = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+
+    private var _thumbnail : ?Float32 = Option<Float32>.None
+
+    public mut prop thumbnail:?Float32{
+        get(){
+            _thumbnail
+        }
+        set(v){
+            _thumbnail = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+
+    private var _thumbnaildrawable : ?RequestBuilder<Drawable> = Option<RequestBuilder<Drawable>>.None
+
+    public mut prop thumbnaildrawable:?RequestBuilder<Drawable>{
+        get(){
+            _thumbnaildrawable
+        }
+        set(v){
+            _thumbnaildrawable = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+
+    private var _signature : ?String = Option<String>.None
+
+    public mut prop signature:?String{
+        get(){
+            _signature
+        }
+        set(v){
+            _signature = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+    private var _transitionOption : ?TransitionOption = Option<TransitionOption>.None
+
+    public mut prop transitionOption:?TransitionOption{
+        get(){
+            _transitionOption
+        }
+        set(v){
+            _transitionOption = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+    private var _imageFit:ImageFit = ImageFit.ScaleDown
+
+    public mut prop imageFit:ImageFit{
+        get(){
+            _imageFit
+        }
+        set(v){
+            _imageFit = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+    public init(
+        loadSrc!: String = "",
+        loadSrcRes!: ?CJResource = None,
+        placeholder!: ?CJResource = None,
+        errholder!: ?CJResource = None,
+        strategy!: ?DiskCacheStrategy = None,
+        transformCate!: ?PixelMapTransformation = None,
+        transformListCate!: ?ArrayList<PixelMapTransformation> = None,
+        isSkipMemory!: ?Bool = None,
+        overrideWH!: ?(Int64,Int64) = None,
+        applyRequestOption!: ?RequestOptions = None,
+        onlyRetrieveFromCache!: ?Bool = None,
+        dontTransform!: ?Bool = None,
+        useDefaultRequestOption!: ?RequestOptions = None,
+        thumbnail!: ?Float32 = None,
+        thumbnaildrawable!: ?RequestBuilder<Drawable> = None,
+        signature!: ?String = None,
+        transitionOption!: ?TransitionOption = None,
+        imageFit !: ImageFit = ImageFit.ScaleDown
+    ){
+        this._loadSrc = loadSrc
+        this._loadSrcRes = loadSrcRes
+        this._placeholder = placeholder
+        this._errholder = errholder
+        this._strategy = strategy
+        this._transformCate = transformCate
+        this._transformListCate = transformListCate
+        this._isSkipMemory = isSkipMemory
+        this._overrideWH = overrideWH
+        this._applyRequestOption = applyRequestOption
+        this._onlyRetrieveFromCache = onlyRetrieveFromCache
+        this._dontTransform = dontTransform
+        this._useDefaultRequestOption = useDefaultRequestOption
+        this._thumbnail = thumbnail
+        this._thumbnaildrawable = thumbnaildrawable
+        this._signature = signature
+        this._transitionOption = transitionOption
+        this._imageFit = imageFit
+    }
+
+    public func update(
+        loadSrc!: ?String = None,
+        loadSrcRes!: ??CJResource = None,
+        placeholder!: ??CJResource = None,
+        errholder!: ??CJResource = None,
+        strategy!: ??DiskCacheStrategy = None,
+        transformCate!: ??PixelMapTransformation = None,
+        transformListCate!: ??ArrayList<PixelMapTransformation> = None,
+        isSkipMemory!: ??Bool = None,
+        overrideWH!: ??(Int64,Int64) = None,
+        applyRequestOption!: ??RequestOptions = None,
+        onlyRetrieveFromCache!: ??Bool = None,
+        dontTransform!: ??Bool = None,
+        useDefaultRequestOption!: ??RequestOptions = None,
+        thumbnail!: ??Float32 = None,
+        thumbnaildrawable!: ??RequestBuilder<Drawable> = None,
+        signature!: ??String = None,
+        transitionOption!: ??TransitionOption = None,
+        imageFit !: ?ImageFit = None
+    ):Unit{
+        if(let Some(i) <- loadSrc){
+            this._loadSrc = i
+        }
+
+        if(let Some(i) <- loadSrcRes){
+            this._loadSrcRes = i
+        }
+
+        if(let Some(i) <- placeholder){
+            this._placeholder = i
+        }
+
+        if(let Some(i) <- errholder){
+            this._errholder = i
+        }
+
+        if(let Some(i) <- strategy){
+            this._strategy = i
+        }
+
+        if(let Some(i) <- transformCate){
+            this._transformCate = i
+        }
+
+        if(let Some(i) <- transformListCate){
+            this._transformListCate = i
+        }
+
+        if(let Some(i) <- isSkipMemory){
+            this._isSkipMemory = i
+        }
+
+        if(let Some(i) <- overrideWH){
+            this._overrideWH = i
+        }
+
+         if(let Some(i) <- applyRequestOption){
+            this._applyRequestOption = i
+        }
+
+         if(let Some(i) <- onlyRetrieveFromCache){
+            this._onlyRetrieveFromCache = i
+        }
+
+         if(let Some(i) <- dontTransform){
+            this._dontTransform = i
+        }
+
+        if(let Some(i) <- useDefaultRequestOption){
+            this._useDefaultRequestOption = i
+        }
+
+         if(let Some(i) <- thumbnail){
+            this._thumbnail = i
+        }
+
+        if(let Some(i) <- thumbnaildrawable){
+            this._thumbnaildrawable = i
+        }
+
+        if(let Some(i) <- signature){
+            this._signature = i
+        }
+
+        if(let Some(i) <- transitionOption){
+            this._transitionOption = i
+        }
+
+         if(let Some(i) <- imageFit){
+            this._imageFit = i
+        }
+
+        Emitter.emit(emitkey)
+    }
+
 }
 
 @Component
 public class DropletImageComponent {
     @Link
-    @Watch[onOptionChanged]
     var dropletOption: DropletRequestOption
 
-    var globalContext: Option<AbilityContext> = Option<AbilityContext>.None
+    var globalContext: Option<StageContext> = Option<StageContext>.None
 
     @State
     var imageViewWidth: Length = Length(100, unitType: LengthType.percent)
 
     @State
     var imageViewHeight: Length = Length(100, unitType: LengthType.percent)
-
-    @State
-    var imageFit: ImageFit = ImageFit.ScaleDown
 
     /*生命周期管理用到的标签名称 */
     @State
@@ -158,10 +473,6 @@ public class DropletImageComponent {
 
     @State
     var failedFn: Option<(DropletException) -> Unit> = Option<(DropletException) -> Unit>.None
-
-    func onOptionChanged() {
-        updateImg(oldWidth, oldHeight)
-    }
 
     func updateImg(width: Int64, height: Int64) {
         if ((dropletOption.loadSrc != "" && width > 0 && height > 0) || (!dropletOption.loadSrcRes.isNone() && width > 0 &&
@@ -317,16 +628,28 @@ public class DropletImageComponent {
         }
     }
 
+    func callback(eventData:EventData):Unit{
+        updateImg(oldWidth,oldHeight)
+    }
+
+
     protected override func aboutToAppear() {
         if (let Some(v) <- dropletOption.placeholder) {
             this.pixelMap = placehoderToPiexlMap().getOrThrow()
         }
+        let f = EventCallback("updateImgcallback",callback)
+        Emitter.on(dropletOption.emitkey,f)
     }
+
+    protected override func aboutToDisappear() {
+        Emitter.off(dropletOption.emitkey)
+    }
+
 
     func errorhoderToPiexlMap(): ?PixelMap {
         if (let Some(v) <- dropletOption.errholder) {
             //这里将他转化为pixleMap
-            let resourceManager = ResourceManager.getResourceManager(getStageContext(globalContext.getOrThrow()))
+            let resourceManager = ResourceManager.getResourceManager(globalContext.getOrThrow())
             let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(v.id), 0)
             let imageSource: ImageSource = createImageSource(arr)
             let regionSize: Size = Size(width: imageSource.getImageInfo().size.width,
@@ -352,7 +675,7 @@ public class DropletImageComponent {
     func placehoderToPiexlMap(): ?PixelMap {
         if (let Some(v) <- dropletOption.placeholder) {
             //这里将他转化为pixleMap
-            let resourceManager = ResourceManager.getResourceManager(getStageContext(globalContext.getOrThrow()))
+            let resourceManager = ResourceManager.getResourceManager(globalContext.getOrThrow())
             let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(v.id), 0)
             let imageSource: ImageSource = createImageSource(arr)
             let regionSize: Size = Size(width: imageSource.getImageInfo().size.width,
@@ -379,7 +702,7 @@ public class DropletImageComponent {
         Image(this.pixelMap)
             .width(imageViewWidth)
             .height(imageViewHeight)
-            .objectFit(imageFit)
+            .objectFit(dropletOption.imageFit)
             .opacity(opacityValue)
             .rotate(rotateValue)
             .scale(scaleValue)

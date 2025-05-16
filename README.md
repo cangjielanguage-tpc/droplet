@@ -5,7 +5,7 @@
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.0.1-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.53.18-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v0.53.19-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/project-open-brightgreen" style="display: inline-block;" />
 </p>
 
@@ -134,11 +134,11 @@ class MyView {
          //网络图片
          loadSrc: "http://www....../testjpg.jpg", 
          //本地图片
-         loadSrc: "/data/storage/el1/bundle/testjpg.jpg",   
+         //loadSrc: "/data/storage/el1/bundle/testjpg.jpg",   
          //加载raw文件图片
-         loadSrc："raw1.png"  //要加载的raw文件夹下图片名称
+         //loadSrc："raw1.png"  //要加载的raw文件夹下图片名称
          //读取res下的资源文件
-         loadSrcRes: @r(app.media.startIcon), //loadSrc和loadSrcRes二选一 loadSrc优先
+         //loadSrcRes: @r(app.media.startIcon), //loadSrc和loadSrcRes二选一 二者都存在的话loadSrc优先
          placeholder: @r(app.media.loading),             // 占位图使用本地资源icon_loading（可选）自己定义
          errholder: @r(app.media.img),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
          strategy: DiskCacheStrategyDATA(),       // 磁盘缓存策略（可选）
@@ -148,13 +148,11 @@ class MyView {
     )
 
     protected open func aboutToAppear(){
-        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(label)  //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致,
-                                                                               //组件没设置label,就调用空参的onAppear                      
+        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(label)  //onAppear和onDisAppear一起使用，参数和组件的label保持一致,
     }               
     
     protected open func aboutToDisappear(){
-        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(label) //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致
-                                                                            //组件没设置label,就调用空参的onDisAppear
+        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(label) //onAppear和onDisAppear一起使用,参数和组件的label保持一致
     }
 
     func build() {
@@ -171,7 +169,7 @@ class MyView {
                     globalContext:globalAbilityContext, //(必选)
                     //droplet选项
                     dropletOption: option,//(必选)
-                    // 生命周期标签 （可选） 同一个页面不同组件保持相同的标签,或者都不加,
+                    // 生命周期标签 同一个页面不同组件保持相同的标签,
                     label: label,
                     resourceFn: {
                         pixelMap =>
@@ -199,7 +197,38 @@ class MyView {
 load成功
 ```
 
-#### 3.获取原图的宽高
+#### 3. preload预加载的使用,将图片加载到内存，使用时候直接从内存取
+示例代码如下：
+```cangjie
+    //urlList为图片的url列表
+    //preload参数为预期的pixelmap宽高 
+    Button("preload").onClick{
+        for(i in 0..urlList.size){
+            Droplet.withContext(stageContext.getOrThrow()).load(urlList[i]).preload(1400,1400)
+        }
+    }
+
+    //使用时候需要由于内存的key是和预期的pixelmap宽高有关联的，所以需要指定 overrideWH: (1400, 1400)和preload(1400,1400)的宽高一致，
+    //这样内存的key才能找到，要是不一样，内存无法找到对应的值
+
+    var option: DropletRequestOption = DropletRequestOption(
+        loadSrc: urlList[i],
+        placeholder: Option<CJResource>.Some(@r(app.media.loading)),
+        errholder: Option<CJResource>.Some(@r(app.media.img)),
+        overrideWH: (1400, 1400)
+    )
+
+    DropletImageComponent(
+        globalContext: stageContext.getOrThrow(),
+        dropletOption: option,
+        imageViewWidth: Length(50.0, unitType: LengthType.percent),
+        imageViewHeight: Length(20.0, unitType: LengthType.percent),
+    )
+
+```
+
+
+#### 4.获取原图的宽高
 示例代码如下：
 
 ```cangjie
@@ -232,9 +261,9 @@ load成功
 
 ## 约束与限制
 
-DevEco Studio (5.0.9.100)
-Cangjie Support Plugin 5.0.9.100
-Cangjie Compiler: 0.53.18
+DevEco Studio (5.0.11.100)
+Cangjie Support Plugin 5.0.11.100
+Cangjie Compiler: 0.53.19
 
 ## 开源协议
 

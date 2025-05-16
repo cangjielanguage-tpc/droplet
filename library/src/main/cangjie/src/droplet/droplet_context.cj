@@ -11,7 +11,7 @@ public class DropletContext {
     private var defaultRequestOptions: Option<RequestOptions> = None
     private let defaultRequestOptionsFactory: RequestOptionsFactory;
     
-    public var ctx: AbilityContext;
+    public var ctx: StageContext;
 
     private let manager: Manager = Manager(mtx)
 
@@ -23,7 +23,7 @@ public class DropletContext {
     private let glProcessLock:ReentrantMutex = ReentrantMutex()
 
 
-    public init(defaultRequestOptionsFactory: RequestOptionsFactory, context: AbilityContext, arrayPool: ArrayPool) {
+    public init(defaultRequestOptionsFactory: RequestOptionsFactory, context: StageContext, arrayPool: ArrayPool) {
         this.defaultRequestOptionsFactory = defaultRequestOptionsFactory
         this.ctx = context
         this.arrayPool = arrayPool
