@@ -195,9 +195,16 @@ public class Droplet {
     /**
      * 清空MemoryCache 注：不是活跃内存缓存
      * 
-     * @参数 key - String数据类型
      */
     public func clearMemory(): Unit
+    
+    /**
+     * 取消对应url的网络请求，不获取网络请求结果
+     * 
+     * @参数 url - String数据类型 对应图片的url
+     */
+    public func cancelHttpRequest(url:String):Unit
+
 
     
 }
@@ -394,7 +401,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
     
     
     /**
-     * 预加载图片带参数,直接将图片加载到内存
+     * 预加载图片带参数,直接将图片加载到内存,带参数是预期加载指定宽和高的pixelmap,当宽和高小于0的时候会抛出异常
      * 
      * @参数 width Int64类型，预期加载图片的宽
      * @参数 height Int64类型，预期加载图片的高
@@ -404,7 +411,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
 
     
     /**
-     * 预加载图片不带参数,直接将图片加载到内存
+     * 预加载图片不带参数,直接将图片加载到内存,不带参数默认是预期加载原图宽高的pixelmap,用这个无法命中内存缓存key
      *
      * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
      */

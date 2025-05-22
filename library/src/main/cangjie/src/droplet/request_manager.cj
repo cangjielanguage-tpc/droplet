@@ -98,6 +98,10 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
         return decodeAs<Drawable>(TransformationKey(TransformationKey.TRANSFORMATION_DRAWABLE)).load(model)
     }
 
+    public func load(model: String,customeGetImage:Option<(String)->InputStream>,paramMap:?HashMap<String,String>): RequestBuilder<Drawable> {
+        return decodeAs<Drawable>(TransformationKey(TransformationKey.TRANSFORMATION_DRAWABLE)).load(model,customeGetImage,paramMap)
+    }
+
     public func load(model: CJResource): RequestBuilder<Drawable> {
         return decodeAs<Drawable>(TransformationKey(TransformationKey.TRANSFORMATION_DRAWABLE)).load(model)
     }

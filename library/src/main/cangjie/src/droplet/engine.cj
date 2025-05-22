@@ -639,30 +639,8 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
     }
 
     private func decodeFromDataSub<DATA>(dataSource: DataSource, arrData: Array<UInt8>): Option<DATA> {
-        var result = Option<DATA>.None
-        if (match (dataSource) {
-            case RESOURCE_DISK_CACHE => true
-            case _ => false
-        }) {
-            let parser: ResourceDecoder<Array<UInt8>, Drawable> = decodeHelper.getDrawableResourceParser()
-            let d: Drawable = parser.decode(arrData, this.width, this.height, decodeHelper.getOptions())
-
-
-            if (d is GifDrawable) {
-                let dd: GifDrawable = (d as GifDrawable).getOrThrow()
-                result = dd as DATA
-            } else if (d is PixelMapDrawable) {
-                let dd: PixelMapDrawable = (d as PixelMapDrawable).getOrThrow()
-                let res: DropletResource<PixelMapDrawable> = onResourceDecoded<PixelMapDrawable>(dataSource,
-                    PixelMapDrawableResource.obtain(dd))
-
-                result = res.get() as DATA
-            } else {
-                throw DropletException("Drawable type error")
-            }
-        } else {
-            let decoders: ArrayList<ResourceDecoder<Array<UInt8>, Drawable>> = decodeHelper.getDrawableResourceDecoders(
-            )
+            var result = Option<DATA>.None
+            let decoders: ArrayList<ResourceDecoder<Array<UInt8>, Drawable>> = decodeHelper.getDrawableResourceDecoders()
 
             var i: Int64 = decoders.size - 1
             while (i >= 0) {
@@ -671,6 +649,7 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
                     let d: Drawable = r.decode(arrData, this.width, this.height, decodeHelper.getOptions())
                     if (d is GifDrawable) {
                         let dd: GifDrawable = (d as GifDrawable).getOrThrow()
+                        //GIF没有写resource本地
                         result = dd as DATA
                     } else if (d is PixelMapDrawable) {
                         let dd: PixelMapDrawable = (d as PixelMapDrawable).getOrThrow()
@@ -686,7 +665,6 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
                 }
                 i--
             }
-        }
         return result
     }
 

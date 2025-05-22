@@ -17,13 +17,11 @@
   [dependencies.cj_res_library]
     path = "./cj_res"
     version = "1.0.0"
-  [dependencies.droplet_ffi]
-    path = "../../../../droplet_ffi/src/main/cangjie"
 
 [ffi]
   [ffi.c]
     [ffi.c.glwrapper]
-      path = "../../../libs/arm64-v8a"
+      path = "../../../../droplet_ffi/build/default/intermediates/cmake/default/obj/${ABI}"
 
 [package]
   cjc-version = "0.53.19"

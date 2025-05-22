@@ -5,11 +5,11 @@
 package droplet.droplet
 
 public interface ModelLoader {
-    func loadModel(t: Any, options: DropletOptions): Option<InputStream>
+    func loadModel(t: Any, options: DropletOptions,customGetImage:Option<(String)->InputStream>,paramMap:?HashMap<String,String>): Option<InputStream>
 }
 
 public class FileModelLoader <: ModelLoader {
-    public override func loadModel(o: Any, _: DropletOptions): Option<InputStream> {
+    public override func loadModel(o: Any, _: DropletOptions,_:Option<(String)->InputStream>,_:?HashMap<String,String>): Option<InputStream> {
         if (o is File) {
             return (o as File).getOrThrow()
         } else {
@@ -19,7 +19,7 @@ public class FileModelLoader <: ModelLoader {
 }
 
 public class ResourceModelLoader <: ModelLoader {
-    public override func loadModel(o: Any, _: DropletOptions): Option<InputStream> {
+    public override func loadModel(o: Any, _: DropletOptions,_:Option<(String)->InputStream>,_:?HashMap<String,String>): Option<InputStream> {
         if (o is CJResource) {
             return getImageFromResource((o as CJResource).getOrThrow())
         } else {
@@ -40,22 +40,35 @@ public class ResourceModelLoader <: ModelLoader {
     }
 }
 
+
+ class CancelBean{
+    public var isCancel:Bool = false
+
+    public func setCancel(b:Bool){
+        this.isCancel = b
+    }
+ }
+
 public class StringModelLoader <: ModelLoader {
-    public override func loadModel(o: Any, _: DropletOptions): Option<InputStream> {
+    public override func loadModel(o: Any, _: DropletOptions,customeGetImage:Option<(String)->InputStream>,paramMap:?HashMap<String,String>): Option<InputStream> {
         if (o is String) {
             let s: String = (o as String).getOrThrow()
-            getImage(s)
+            getImage(s,customeGetImage,paramMap)
         } else {
             return None
         }
     }
 
-    private func getImage(path: String): Option<InputStream> {
+    private func getImage(path: String,customeGetImage:Option<(String)->InputStream>,paramMap:?HashMap<String,String>): Option<InputStream> {
         let s: String = path.trimAscii()
         if (s.startsWith("/")) {
             return getImageFromFile(s)
         } else if (s.startsWith("http")) {
-            return getImageFromHttpClient(s)
+            if(customeGetImage.isNone()){
+                return getImageFromHttpClient(s,paramMap)
+            }else{
+                return customeGetImage.getOrThrow()(s)
+            }
         } else {
             return getImageFromRawFile(s)
         }
@@ -69,11 +82,43 @@ public class StringModelLoader <: ModelLoader {
         return None
     }
 
-    private func getImageFromHttpClient(path: String): Option<InputStream> {
+    private func getImageFromHttpClient(path: String,headerMap:?HashMap<String,String>): Option<InputStream> {
+        let cancelBean = CancelBean()
+        let f = EventCallback("callback",{
+            e:EventData =>
+                cancelBean.setCancel(true)
+                Emitter.off(path)
+                })
+        Emitter.once(path,f)
         var tls = TlsClientConfig()
         tls.verifyMode = CertificateVerifyMode.TrustAll
         var client = ClientBuilder().readTimeout(Duration.minute * 1).tlsConfig(tls).build()
-        let resp = client.get(path)
+
+        var requestBuilder = HttpRequestBuilder()
+
+        if(!headerMap.isNone()){
+            for((k,v) in headerMap.getOrThrow()){
+                requestBuilder.header(k,v)
+            }
+        }
+
+        let req = requestBuilder
+                   .method("GET")
+                   .url(path)
+                   .build()
+
+        if(cancelBean.isCancel){
+            Emitter.off(path)
+            client.close()
+            return None
+        }
+        let resp = client.send(req)
+        if(cancelBean.isCancel){
+            Emitter.off(path)
+            client.close()
+            return None
+        }
+        Emitter.off(path)
         return Some(resp.body)
     }
 

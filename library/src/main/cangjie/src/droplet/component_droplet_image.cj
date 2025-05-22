@@ -45,6 +45,9 @@ internal import std.overflow.*
 internal import std.convert.*
 internal import ohos.emitter.*
 internal import ohos.ark_interop_helper.StageContext
+internal import ohos.image.ImagePacker
+internal import ohos.image.createImagePacker
+internal import ohos.image.PackingOption
 
 /**
  * Created on 2024/3/4
@@ -283,6 +286,30 @@ public class DropletRequestOption {
         }
     }
 
+   private var _customGetImage : Option<(String) -> InputStream> = Option<(String) -> InputStream>.None
+
+   public mut prop customGetImage:Option<(String) -> InputStream>{
+        get(){
+            _customGetImage
+        }
+        set(v){
+            _customGetImage = v
+            Emitter.emit(emitkey)
+        }
+    }
+
+    private var _paramMap:?HashMap<String,String> = Option<HashMap<String,String>>.None
+
+    public mut prop paramMap:Option<HashMap<String,String>>{
+        get(){
+            _paramMap
+        }
+        set(v){
+            _paramMap = v
+            Emitter.emit(emitkey)
+        }
+    }
+
     public init(
         loadSrc!: String = "",
         loadSrcRes!: ?CJResource = None,
@@ -301,7 +328,9 @@ public class DropletRequestOption {
         thumbnaildrawable!: ?RequestBuilder<Drawable> = None,
         signature!: ?String = None,
         transitionOption!: ?TransitionOption = None,
-        imageFit !: ImageFit = ImageFit.ScaleDown
+        imageFit !: ImageFit = ImageFit.ScaleDown,
+        customGetImage !: Option<(String) -> InputStream> = None,
+        paramMap !: ?HashMap<String,String> = None
     ){
         this._loadSrc = loadSrc
         this._loadSrcRes = loadSrcRes
@@ -321,6 +350,8 @@ public class DropletRequestOption {
         this._signature = signature
         this._transitionOption = transitionOption
         this._imageFit = imageFit
+        this._customGetImage = customGetImage
+        this._paramMap = paramMap
     }
 
     public func update(
@@ -341,7 +372,9 @@ public class DropletRequestOption {
         thumbnaildrawable!: ??RequestBuilder<Drawable> = None,
         signature!: ??String = None,
         transitionOption!: ??TransitionOption = None,
-        imageFit !: ?ImageFit = None
+        imageFit !: ?ImageFit = None,
+        customGetImage !: Option<Option<(String) -> InputStream>> = None,
+        paramMap !: ??HashMap<String,String> = None
     ):Unit{
         if(let Some(i) <- loadSrc){
             this._loadSrc = i
@@ -415,9 +448,15 @@ public class DropletRequestOption {
             this._imageFit = i
         }
 
+        if(let Some(i) <- customGetImage){
+            this._customGetImage = i
+        }
+
+        if(let Some(i) <- paramMap){
+            this._paramMap = i
+        }
         Emitter.emit(emitkey)
     }
-
 }
 
 @Component
@@ -487,7 +526,7 @@ public class DropletImageComponent {
 
             var tempBuilder: Option<RequestBuilder<Drawable>> = Option<RequestBuilder<Drawable>>.None
             if (dropletOption.loadSrc != "") {
-                tempBuilder = requestManager.getOrThrow().load(dropletOption.loadSrc)
+                tempBuilder = requestManager.getOrThrow().load(dropletOption.loadSrc,dropletOption.customGetImage,dropletOption.paramMap)
             } else if (!dropletOption.loadSrcRes.isNone()) {
                 tempBuilder = requestManager.getOrThrow().load(dropletOption.loadSrcRes.getOrThrow())
             } else {
@@ -715,9 +754,23 @@ public class DropletImageComponent {
                     if (oldWidth != newWidth || oldHeight != newHeight) {
                         if (!flag && newWidth > 0 && newHeight > 0) {
                             flag = true
-                            updateImg(newWidth, newHeight)
-                            oldWidth = newWidth
-                            oldHeight = newHeight
+                            let widthpx: ?Length = vp2px(newWidth.vp)
+                            let heightpx:?Length = vp2px(newHeight.vp)
+                            let width:Int64 = if(let Some(v) <- widthpx){
+                                 Int64(v.value)
+                            }else{
+                                0
+                            }
+
+                            let height:Int64 = if(let Some(v) <- heightpx){
+                                 Int64(v.value)
+                            }else{
+                                0
+                            }
+
+                            updateImg(width, height)
+                            oldWidth = width
+                            oldHeight = height
                         }
                     }
                 }
