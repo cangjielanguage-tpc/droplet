@@ -127,6 +127,10 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return loadGeneric(LoadModel(model))
     }
 
+    func load(model: String,customeGetImage:Option<(String)->InputStream>,paramMap:?HashMap<String,String>): RequestBuilder<TranscodeType> {
+        return loadGeneric(LoadModel(model,customeGetImage,paramMap))
+    }
+
     func load(model: CJResource): RequestBuilder<TranscodeType> {
         return loadGeneric(LoadModel(model))
     }
@@ -280,10 +284,6 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         this.thumbSizeMultiplier = sizeMultiplier
 
         return selfOrThrowIfLocked();
-    }
-
-    func error(src: String): RequestBuilder<TranscodeType> {
-        return error(LoadModel(src))
     }
 
     private func error(errorBuilder: Option<RequestBuilder<TranscodeType>>): RequestBuilder<TranscodeType> {

@@ -17,6 +17,8 @@ public abstract class Model <: DropletAny<Model> {
     public var res: CJResource = CJResource(0,0,"")
     public var decoder: Option<GifDecoder> = None
     public var modelType: ModelType = ModelType.NONE
+    public var mCustomeGetImage:Option<(String)->InputStream> = Option<(String)->InputStream>.None
+    public var mParamMap:?HashMap<String,String> = Option<HashMap<String,String>>.None
 
     init(arr: Array<UInt8>) {
         this.arr = arr
@@ -25,6 +27,13 @@ public abstract class Model <: DropletAny<Model> {
 
     init(str: String) {
         this.str = str
+        this.modelType = ModelType.STRING
+    }
+
+    init(str: String,customeGetImage:Option<(String)->InputStream>,paramMap:?HashMap<String,String>) {
+        this.str = str
+        this.mCustomeGetImage = customeGetImage
+        this.mParamMap = paramMap
         this.modelType = ModelType.STRING
     }
 
@@ -113,6 +122,10 @@ public class LoadModel <: Model {
 
     init(str: String) {
         super(str)
+    }
+
+    init(str: String,customeGetImage:Option<(String)->InputStream>,paramMap:?HashMap<String,String>) {
+        super(str,customeGetImage,paramMap)
     }
 
     init(file: FSPath) {

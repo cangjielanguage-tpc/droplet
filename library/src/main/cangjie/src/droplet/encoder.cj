@@ -4,7 +4,8 @@
 
 package droplet.droplet
 
-
+import ohos.file_fs.FileFs
+import ohos.file_fs.OpenMode
 
 public interface Encoder<T> {
   /**
@@ -60,26 +61,18 @@ public class PixelMapDrawableEncoder <: ResourceEncoder<PixelMapDrawable> {
     return EncodeStrategy.TRANSFORMED
   }
 
-  public func encode(data: DropletResource<PixelMapDrawable>, file: DropletFile, _: DropletOptions): Bool {
-    let pixelMap: PixelMap = data.get().getPixelMap()
-    let info = pixelMap.getImageInfo()
-    let arr: Array<UInt8> = Array<UInt8>(Int64(pixelMap.getPixelBytesNumber()), item: 0)
-    pixelMap.readPixelsToBuffer(arr)
-    if(arr.size > 0) {
-      let width: Int32 = info.size.width
-      let height: Int32 = info.size.height
-      let imageInfoArr: Array<UInt8> = Array<UInt8>(4, item: 0)
-      imageInfoArr[0] = UInt8(width >> 8 & 0xFF);
-      imageInfoArr[1] = UInt8(width & 0xFF);
-      imageInfoArr[2] = UInt8(height >> 8 & 0xFF);
-      imageInfoArr[3] = UInt8(height & 0xFF);
-      let f = file.getFile()
-      f.write(imageInfoArr)
-      f.write(arr)
-      f.flush()
-      f.close()
-    }
-    return true
-  }
+    public func encode(data: DropletResource<PixelMapDrawable>, file: DropletFile, _: DropletOptions): Bool {
+            let pixelMap:PixelMap = data.get().getPixelMap()
+            let imagePacker : ImagePacker = createImagePacker()
+            let path = file.filePath.toString()
+            let tempFile = FileFs.open(path,mode:CREATE.mode|WRITE_ONLY.mode)
+            let packingOption = PackingOption("image/jpeg")
+            try{
+                imagePacker.packToFile(pixelMap, IntNative(tempFile.fd), packingOption)
+            }catch(e:Exception){
+                AppLog.error("${e.toString()}")
+            }
+         return true
+     }
 }
 

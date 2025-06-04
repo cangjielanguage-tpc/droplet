@@ -262,4 +262,13 @@ public class Droplet <: ActiveResourceRemovedListener {
             managers.remove(requestManager);
         }
     }
+
+
+    //取消网络请求
+    public func cancelHttpRequest(url:String):Unit{
+        Emitter.emit(url)
+    }
+
+
+
 }

@@ -76,9 +76,9 @@ public class SourceGenerator <: DataFetcherGenerator & FetcherReadyCallback {
         let modelLoader: ModelLoader = modelLoaders.getOrThrow()[0]
 
         let o: Option<InputStream> = match (model.modelType) {
-            case ModelType.STRING => modelLoader.loadModel(model.str, this.helper.getOptions())
-            case ModelType.CJRESOURCE => modelLoader.loadModel(model.res, this.helper.getOptions())
-            case ModelType.FILE => modelLoader.loadModel(model.file.getFileNoSeek(), this.helper.getOptions())
+            case ModelType.STRING => modelLoader.loadModel(model.str, this.helper.getOptions(),model.mCustomeGetImage,model.mParamMap)
+            case ModelType.CJRESOURCE => modelLoader.loadModel(model.res, this.helper.getOptions(),model.mCustomeGetImage,model.mParamMap)
+            case ModelType.FILE => modelLoader.loadModel(model.file.getFileNoSeek(), this.helper.getOptions(),model.mCustomeGetImage,model.mParamMap)
             case ModelType.GIFDECODER => None
             case _ => None
         }
