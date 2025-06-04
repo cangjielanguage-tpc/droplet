@@ -108,6 +108,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         excutor.execute(job)
     }
 
+    //最后的去渲染
      func callCallbackOnResourceReady(cb: ResourceCallback): Unit {
             cb.onResourceReady(engineResource.getOrThrow() as AnyDropletResource, dataSource.getOrThrow(), isLoadedFromAlternateCacheKey);
     }
@@ -175,6 +176,7 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
 
         engineJobListener.onEngineJobComplete(this, localKey, Some(localResource));
 
+        //最后的渲染
         for (entry in copy) {
             entry.executor.execute(CallResourceReady("notifyCallbacksOfResult", entry.cb, this));
         }
@@ -405,6 +407,7 @@ public class CallResourceReady <: DropletThread<Option<InputStream>> {
                 try {
                     if (this.ej.cbs.contains(ResourceCallbackAndExecutor(cb, this.ej.excutor))) {
                         this.ej.engineResource.getOrThrow().acquire();
+                        //最后的渲染
                         this.ej.callCallbackOnResourceReady(cb);
                         this.ej.removeCallback(cb);
                     }
