@@ -73,7 +73,7 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         options: DropletOptions,
         isMemoryCacheable: Bool,
         onlyRetrieveFromCache: Bool,
-        cb: ResourceCallback
+        cb: ResourceCallback   //siglerequest
     ): Option<LoadStatus> {
 
         var key: EngineKey = keyFactory.buildKey(
@@ -137,7 +137,7 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         options: DropletOptions,
         isMemoryCacheable: Bool,
         onlyRetrieveFromCache: Bool,
-        cb: ResourceCallback,
+        cb: ResourceCallback, //singlerequest
         key: EngineKey
     ): Option<LoadStatus> {
         let callbackExecutor = DropletExecutor<Option<InputStream>>()
@@ -393,7 +393,7 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
         isScaleOnlyOrNoTransform: Bool,
         onlyRetrieveFromCache: Bool,
         options: DropletOptions,
-        callback: DecodeJobCallback
+        callback: DecodeJobCallback  //engineJob
     ) {
         super(name)
         this.model = model
@@ -531,13 +531,6 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
 
             var result: DropletResource<R> = resource;
             var lockedResource: Option<LockedResource<R>> = None;
-
-            if (match (deferredEncodeManager) {
-                case Some(x) => true
-                case _ => false
-            }) {
-            } else {
-            }
 
             if (match (deferredEncodeManager) {
                 case Some(x) => true
