@@ -519,6 +519,8 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
                 requestOptions.getOptions(),
                 requestOptions.getCacheable(),
                 requestOptions.getOnlyRetrieveFromCache(),
+                requestOptions.getPlaceHolderFunc(),
+                requestOptions.getPlaceholderDrawable(),
                 this
             )
 

@@ -45,8 +45,8 @@ public class DropletOptions <: AnyKey {
         (values.get(option).getOrDefault({=> option.getDefaultValue().getOrThrow()}) as V).getOrThrow()
     }
 
-     func setOptions<V>(option: String, value: String): DropletOptions where V <: AnyDropletOptionValue {
-        values.put((DropletOption<V>.memory(option) as AnyDropletOptionKey).getOrThrow(),
+     func setOptions(option: String, value: String): DropletOptions{
+        values.put((DropletOption<DropletString>.memory(option) as AnyDropletOptionKey).getOrThrow(),
             (DropletString(value) as AnyDropletOptionValue).getOrThrow());
         return this;
     }

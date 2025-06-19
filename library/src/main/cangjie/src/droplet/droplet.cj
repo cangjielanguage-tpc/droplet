@@ -266,6 +266,9 @@ public class Droplet <: ActiveResourceRemovedListener {
 
     //取消网络请求
     public func cancelHttpRequest(url:String):Unit{
+        if(url.size == 0){
+            return
+        }
         Emitter.emit(url)
     }
 
