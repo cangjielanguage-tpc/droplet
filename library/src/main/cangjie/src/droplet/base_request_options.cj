@@ -32,6 +32,8 @@ public interface AnyRequestOptions {
 
     func getOnlyRetrieveFromCache(): Bool
 
+    func getPlaceHolderFunc():Option<(PixelMap)->Unit>
+
     func equals(o: Any): Bool
 
     func getOptions(): DropletOptions
@@ -110,6 +112,8 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
 
     public var transitionOption: Option<TransitionOption> = Option<TransitionOption>.None
 
+    public var placeholderFunc:Option<(PixelMap)->Unit> = Option<(PixelMap)->Unit>.None
+
     public func getFields(): Int64 {
         return fields
     }
@@ -128,6 +132,10 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
 
     public func getOnlyRetrieveFromCache(): Bool {
         return onlyRetrieveFromCache
+    }
+
+    public func getPlaceHolderFunc():Option<(PixelMap) -> Unit>{
+        return placeholderFunc
     }
 
     public func getSignature(): AnyKey {
@@ -413,6 +421,10 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
         t.fields |= IS_CACHEABLE
 
         return t.selfOrThrowIfLocked();
+    }
+
+    func setPlaceholderFunc(f:(PixelMap)->Unit){
+        this.placeholderFunc = f
     }
 
     public func onlyRetrieveFromCachecj(flag: Bool): T {

@@ -578,6 +578,15 @@ public class DropletImageComponent {
                 }
             }
 
+            if(let Some(v) <- dropletOption.placeholder){
+                builder = builder.placeholder(v)
+                builder.setPlaceholderFunc({
+                    p:PixelMap => launch{
+                        pixelMap = p
+                    }
+                })
+            }
+
             if (let Some(v) <- dropletOption.errholder) {
                 builder = builder.error(v)
             }
@@ -673,9 +682,6 @@ public class DropletImageComponent {
 
 
     protected override func aboutToAppear() {
-        if (let Some(v) <- dropletOption.placeholder) {
-            this.pixelMap = placehoderToPiexlMap().getOrThrow()
-        }
         let f = EventCallback("updateImgcallback",callback)
         Emitter.on(dropletOption.emitkey,f)
     }
@@ -711,31 +717,6 @@ public class DropletImageComponent {
         }
     }
 
-    func placehoderToPiexlMap(): ?PixelMap {
-        if (let Some(v) <- dropletOption.placeholder) {
-            //这里将他转化为pixleMap
-            let resourceManager = ResourceManager.getResourceManager(globalContext.getOrThrow())
-            let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(v.id), 0)
-            let imageSource: ImageSource = createImageSource(arr)
-            let regionSize: Size = Size(width: imageSource.getImageInfo().size.width,
-                height: imageSource.getImageInfo().size.height)
-            let desiredRegion: Region = Region(regionSize, 0, 0)
-            let desiredSize: Size = Size(width: imageSource.getImageInfo().size.width,
-                height: imageSource.getImageInfo().size.height)
-            let decodingOptions = DecodingOptions(
-                rotate: 0, //rotate: UInt32, //旋转角度。
-                desiredSize: desiredSize, //desiredSize: Size, //期望输出大小。
-                desiredRegion: desiredRegion, //desiredRegion: Region, //解码区域。
-                index: 0, //index: Int32, //解码图片序号。
-                desiredPixelFormat: PixelMapFormat.RGBA_8888, //解码的像素格式。
-                editable: true,
-                sampleSize: 1
-            )
-            return imageSource.createPixelMap(options: decodingOptions)
-        } else {
-            return Option<PixelMap>.None
-        }
-    }
 
     func build() {
         Image(this.pixelMap)

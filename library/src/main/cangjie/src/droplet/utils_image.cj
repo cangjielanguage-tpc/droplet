@@ -102,4 +102,26 @@ public class ImageUtils {
 
         return imageSource.createPixelMap(options: decodingOptions)
     }
+
+       public static func placehoderToPiexlMap(resource:CJResource,globalContext:Option<StageContext>): ?PixelMap {
+            //这里将他转化为pixleMap
+            let resourceManager = ResourceManager.getResourceManager(globalContext.getOrThrow())
+            let arr: Array<UInt8> = resourceManager.getMediaContent(Int32(resource.id), 0)
+            let imageSource: ImageSource = createImageSource(arr)
+            let regionSize: Size = Size(width: imageSource.getImageInfo().size.width,
+                height: imageSource.getImageInfo().size.height)
+            let desiredRegion: Region = Region(regionSize, 0, 0)
+            let desiredSize: Size = Size(width: imageSource.getImageInfo().size.width,
+                height: imageSource.getImageInfo().size.height)
+            let decodingOptions = DecodingOptions(
+                rotate: 0, //rotate: UInt32, //旋转角度。
+                desiredSize: desiredSize, //desiredSize: Size, //期望输出大小。
+                desiredRegion: desiredRegion, //desiredRegion: Region, //解码区域。
+                index: 0, //index: Int32, //解码图片序号。
+                desiredPixelFormat: PixelMapFormat.RGBA_8888, //解码的像素格式。
+                editable: true,
+                sampleSize: 1
+            )
+            return imageSource.createPixelMap(options: decodingOptions)
+    }
 }

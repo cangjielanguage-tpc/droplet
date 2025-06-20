@@ -73,6 +73,8 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         options: DropletOptions,
         isMemoryCacheable: Bool,
         onlyRetrieveFromCache: Bool,
+        placeholderfunc:Option<(PixelMap)->Unit>,
+        placeholderDrawable:Option<CJResourceDrawable>,
         cb: ResourceCallback   //siglerequest
     ): Option<LoadStatus> {
 
@@ -95,6 +97,14 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
                 case Some(x) => false
                 case _ => true
             }) {
+
+                if(let Some(res) <- placeholderDrawable){
+                    if(let Some(holderfunc) <- placeholderfunc){
+                        let p = ImageUtils.placehoderToPiexlMap(res.getCJResource(),dropletContext.ctx).getOrThrow()
+                        holderfunc(p)
+                    }
+                }
+
                 return waitForExistingOrStartNewJob(
                     dropletContext,
                     model,
