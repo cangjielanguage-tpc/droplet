@@ -126,31 +126,23 @@ public class DrawableTarget <: AnimatableTarget<Drawable> {
         super(f, drawFuncCJResource, width, height)
     }
 
-    public func onResourceReady(resource: Drawable, transition: Option<DrawableTransition>): Unit {
-        let bo = match(transition) {
+    public func onResourceReady(resourceDraw: Drawable, transitionDraw: Option<DrawableTransition>): Unit {
+        if (match(transitionDraw) {
             case Some(x) => false
             case _ => true
-        }
-        if (match(transition) {
-            case Some(x) => false
-            case _ => true
-        } || !(transition.getOrThrow().transition(resource, this))) {
-            setResourceInternal(Some(resource));
+        } || !(transitionDraw.getOrThrow().transition(resourceDraw, this))) {
+            setResourceInternal(Some(resourceDraw))
         } else {
-            maybeUpdateAnimatable(Some(resource));
+            maybeUpdateAnimatable(Some(resourceDraw))
         }
     }
 
-    protected func setResource(resource: Option<Drawable>): Unit {
-        if(match(resource) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            resource.getOrThrow().setDrawFunc(drawFunc)
-            resource.getOrThrow().draw(false)
+    protected func setResource(resourceDraw: Option<Drawable>): Unit {
+        if(let Some(i) <- resourceDraw){
+            i.setDrawFunc(drawFunc)
+            i.draw(false)
         }
     }
-
 
     public func removeCallback(): Unit {
         // 不支持监听显示组件尺寸变化，需要接口
@@ -159,39 +151,36 @@ public class DrawableTarget <: AnimatableTarget<Drawable> {
     public override func hashCode(): Int64 {
         Utils.hashCodeWrite(width.hashCode(), reset: true)
         Utils.hashCodeWrite(height.hashCode())
-        if(match(request) {
-        case Some(x) => true
-        case _ => false
-        }) {
-            Utils.hashCodeWrite(request.getOrThrow().hashCode())
+        if(let Some(i) <- request){
+            Utils.hashCodeWrite(i.hashCode())
         }
         return Utils.hashCodeFinish()
     }
 
-    public operator func ==(that: LifecycleListener): Bool {
-        if(that is DrawableTarget) {
-            return this.request == (that as DrawableTarget).getOrThrow().request
+    public operator func ==(thatDraw: LifecycleListener): Bool {
+        if(thatDraw is DrawableTarget) {
+            return this.request == (thatDraw as DrawableTarget).getOrThrow().request
         }
         return false
     }
 
-    public operator func !=(that: LifecycleListener): Bool {
-        if(that is DrawableTarget) {
-            return this.request != (that as DrawableTarget).getOrThrow().request
+    public operator func !=(thatDraw: LifecycleListener): Bool {
+        if(thatDraw is DrawableTarget) {
+            return this.request != (thatDraw as DrawableTarget).getOrThrow().request
         }
         return true
     }
 
-    public operator func ==(that: AnyTarget): Bool {
-        if(that is DrawableTarget) {
-            return this.request == (that as DrawableTarget).getOrThrow().request
+    public operator func ==(thatDraw: AnyTarget): Bool {
+        if(thatDraw is DrawableTarget) {
+            return this.request == (thatDraw as DrawableTarget).getOrThrow().request
         }
         return false
     }
 
-    public operator func !=(that: AnyTarget): Bool {
-        if(that is DrawableTarget) {
-            return this.request != (that as DrawableTarget).getOrThrow().request
+    public operator func !=(thatDraw: AnyTarget): Bool {
+        if(thatDraw is DrawableTarget) {
+            return this.request != (thatDraw as DrawableTarget).getOrThrow().request
         }
         return true
     }
@@ -206,10 +195,6 @@ public class StringDrawableTarget <: AnimatableTarget<Drawable> {
     }
 
     public func onResourceReady(resource: Drawable, transition: Option<DrawableTransition>): Unit {
-        let bo = match(transition) {
-            case Some(x) => false
-            case _ => true
-        }
         if (match(transition) {
             case Some(x) => false
             case _ => true
