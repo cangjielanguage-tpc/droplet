@@ -804,58 +804,57 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
         }
     }
 
-    public override func isEquivalentTo(o: LoadRequest): Bool {
-        if (!(o is AnySingleRequest)) {
-            return false;
+    public override func isEquivalentTo(loadRequest: LoadRequest): Bool {
+        if (!(loadRequest is AnySingleRequest)) {
+            return false
         }
-
-        var localOverrideWidth: Int64 = 0;
-        var localOverrideHeight: Int64 = 0;
-        var localModel: Model
+        var localOverrideWidthlr: Int64 = 0
+        var localOverrideHeightlr: Int64 = 0
+        var localModellr: Model
 
         // TODO TranscodeTypeClass
-        var localRequestOptions: AnyRequestOptions
-        var localPriority: Priority
-        var localListenerCount: Int64 = 0;
+        var localRequestOptionslr: AnyRequestOptions
+        var localPrioritylr: Priority
+        var localListenerCountlr: Int64 = 0
         synchronized(requestLock) {
-            localOverrideWidth = overrideWidth
-            localOverrideHeight = overrideHeight
-            localModel = model
-            localRequestOptions = requestOptions
-            localPriority = priority
-            localListenerCount = requestListeners.size
+            localOverrideWidthlr = overrideWidth
+            localOverrideHeightlr = overrideHeight
+            localModellr = model
+            localRequestOptionslr = requestOptions
+            localPrioritylr = priority
+            localListenerCountlr = requestListeners.size
         }
 
-        var other: AnySingleRequest = (o as AnySingleRequest).getOrThrow();
-        var otherLocalOverrideWidth: Int64 = 0;
-        var otherLocalOverrideHeight: Int64 = 0;
-        var otherLocalModel: Model
+        var otherlr: AnySingleRequest = (loadRequest as AnySingleRequest).getOrThrow();
+        var otherLocalOverrideWidthlr: Int64 = 0
+        var otherLocalOverrideHeightlr: Int64 = 0
+        var otherLocalModellr: Model
         // TODO TranscodeTypeClass
-        var otherLocalRequestOptions: AnyRequestOptions
-        var otherLocalPriority: Priority
-        var otherLocalListenerCount: Int64 = 0;
-        synchronized(other.getRequestLock()) {
-            otherLocalOverrideWidth = other.getOverrideWidth()
-            otherLocalOverrideHeight = other.getOverrideHeight()
-            otherLocalModel = other.getModel()
-            otherLocalRequestOptions = other.getRequestOptions()
-            otherLocalPriority = other.getPriority()
-            otherLocalListenerCount = other.getRequestListenersSize()
+        var otherLocalRequestOptionslr: AnyRequestOptions
+        var otherLocalPrioritylr: Priority
+        var otherLocalListenerCountlr: Int64 = 0
+        synchronized(otherlr.getRequestLock()) {
+            otherLocalOverrideWidthlr = otherlr.getOverrideWidth()
+            otherLocalOverrideHeightlr = otherlr.getOverrideHeight()
+            otherLocalModellr = otherlr.getModel()
+            otherLocalRequestOptionslr = otherlr.getRequestOptions()
+            otherLocalPrioritylr = otherlr.getPriority()
+            otherLocalListenerCountlr = otherlr.getRequestListenersSize()
         }
 
         // If there's ever a case where synchronization matters for these values, something else has
         // gone wrong. It indicates that we'er comparing at least one recycled object, which has to be
         // protected against via other means. None of these values changes aside from object re-use.
-        return localOverrideWidth == otherLocalOverrideWidth
-            && localOverrideHeight == otherLocalOverrideHeight
-            && localModel == otherLocalModel
+        return localOverrideWidthlr == otherLocalOverrideWidthlr
+            && localOverrideHeightlr == otherLocalOverrideHeightlr
+            && localModellr == otherLocalModellr
             // TODO TranscodeTypeClass
-            && localRequestOptions.equals(otherLocalRequestOptions)
-            && localPriority == otherLocalPriority
+            && localRequestOptionslr.equals(otherLocalRequestOptionslr)
+            && localPrioritylr == otherLocalPrioritylr
             // We do not want to require that RequestListeners implement equals/hashcode, so we
             // don't compare them using equals(). We can however, at least assert that the same
             // amount of request listeners are present in both requests.
-            && localListenerCount == otherLocalListenerCount;
+            && localListenerCountlr == otherLocalListenerCountlr
     }
 
     public func getUniqueCode(): Int64 {
