@@ -46,15 +46,12 @@ public abstract class BaseKeyPool<T> where T <: Poolable {
   private static let MAX_SIZE: Int64 = 20;
   private let keyPool: Queue<T> = Queue<T>(MAX_SIZE);
 
-   func get(): T {
-    var result: Option<T> = keyPool.poll();
-    if (match(result) {
-      case Some(x) => false
-      case _ => true
-    }) {
-      return create();
-    }
-    return result.getOrThrow();
+  func get(): T {
+     var result: Option<T> = keyPool.poll()
+     if(result.isNone()){
+        return create()
+     }
+     return result.getOrThrow()
   }
 
    func offer(key: T): Unit {

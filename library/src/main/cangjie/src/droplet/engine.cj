@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
  */
- 
+
 package droplet.droplet
 
 /** Responsible for starting loads and managing active and cached resources. */
@@ -32,15 +32,10 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
     public func onEngineJobComplete(engineJob: EngineJob, key: AnyKey, resource: Option<AnyEngineResource>): Unit {
         // A null resource indicates that the load failed, usually due to an exception.
         synchronized(mtx) {
-
-            if (match (resource) {
-                case Some(x) => true
-                case _ => false
-            }) {
-                activeResources.put(key, resource.getOrThrow())
+            if(let Some(i) <- resource){
+                activeResources.put(key,i)
             }
-
-            jobs.removeIfCurrent(key, engineJob);
+            jobs.removeIfCurrent(key, engineJob)
         }
     }
 
@@ -50,15 +45,15 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         }
     }
 
-     func setActiveResourceRemovedListener() {
+    func setActiveResourceRemovedListener() {
         this.activeResources.setActiveResourceRemovedListener(this);
     }
 
-     func setResourceRemovedListener() {
+    func setResourceRemovedListener() {
         this.cache.setResourceRemovedListener(this);
     }
 
-     func load(
+    func load(
         dropletContext: DropletContext,
         signature: AnyKey,
         model: Model,
@@ -73,11 +68,10 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         options: DropletOptions,
         isMemoryCacheable: Bool,
         onlyRetrieveFromCache: Bool,
-        placeholderfunc:Option<(PixelMap)->Unit>,
-        placeholderDrawable:Option<CJResourceDrawable>,
-        cb: ResourceCallback   //siglerequest
+        placeholderfunc: Option<(PixelMap) -> Unit>,
+        placeholderDrawable: Option<CJResourceDrawable>,
+        cb: ResourceCallback //siglerequest
     ): Option<LoadStatus> {
-
         var key: EngineKey = keyFactory.buildKey(
             model,
             signature,
@@ -93,14 +87,10 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         synchronized(mtx) {
             memoryResource = loadFromMemory(key, isMemoryCacheable)
 
-            if (match (memoryResource) {
-                case Some(x) => false
-                case _ => true
-            }) {
-
-                if(let Some(res) <- placeholderDrawable){
-                    if(let Some(holderfunc) <- placeholderfunc){
-                        let p = ImageUtils.placehoderToPiexlMap(res.getCJResource(),dropletContext.ctx).getOrThrow()
+            if(memoryResource.isNone()){
+                if (let Some(res) <- placeholderDrawable) {
+                    if (let Some(holderfunc) <- placeholderfunc) {
+                        let p = ImageUtils.placehoderToPiexlMap(res.getCJResource(), dropletContext.ctx).getOrThrow()
                         holderfunc(p)
                     }
                 }
@@ -122,7 +112,7 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
                     onlyRetrieveFromCache,
                     cb,
                     key
-                );
+                )
             }
         }
 
@@ -151,13 +141,11 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         key: EngineKey
     ): Option<LoadStatus> {
         let callbackExecutor = DropletExecutor<Option<InputStream>>()
-        var current: Option<EngineJob> = jobs.get(key, onlyRetrieveFromCache);
-        if (match (current) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            current.getOrThrow().addCallback(cb, callbackExecutor);
-            return LoadStatus(cb, mtx, current.getOrThrow());
+        var current: Option<EngineJob> = jobs.get(key, onlyRetrieveFromCache)
+
+        if(let Some(i) <- current){
+            i.addCallback(cb, callbackExecutor)
+            return LoadStatus(cb, mtx, i)
         }
 
         let engineJob: EngineJob = EngineJob(callbackExecutor, this, this, resourceTypeClass).initEngine(
@@ -197,71 +185,56 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
 
     private func loadFromMemory(key: EngineKey, isMemoryCacheable: Bool): Option<AnyEngineResource> {
         if (!isMemoryCacheable) {
-            return None;
+            return None
         }
 
-        var active: Option<AnyEngineResource> = loadFromActiveResources(key);
-        if (match (active) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            return active;
+        var active: Option<AnyEngineResource> = loadFromActiveResources(key)
+
+        if(active.isSome()){
+            return active
         }
 
-        var cached: Option<AnyEngineResource> = loadFromCache(key);
-        if (match (cached) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            return cached;
+        var cached: Option<AnyEngineResource> = loadFromCache(key)
+
+        if(cached.isSome()){
+            return cached
         }
 
-        return None;
+        return None
     }
 
-
     private func loadFromActiveResources(key: AnyKey): Option<AnyEngineResource> {
-        var active: Option<AnyDropletResource> = activeResources.get(key);
-        if (match (active) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            return None
+        var active: Option<AnyDropletResource> = activeResources.get(key)
+        if (active.isNone()) {
+             return None
         }
         return (active.getOrThrow() as AnyEngineResource)
     }
 
     private func loadFromCache(key: AnyKey): Option<AnyEngineResource> {
         let r: Option<AnyEngineResource> = getEngineResourceFromCache(key)
-        if (match (r) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            activeResources.put(key, r.getOrThrow())
+        if(let Some(i) <- r){
+             activeResources.put(key, i)
         }
-        return r;
+        return r
     }
 
     private func getEngineResourceFromCache(key: AnyKey): Option<AnyEngineResource> {
-        var cached: Option<AnyDropletResource> = cache.remove(key);
+        var cached: Option<AnyDropletResource> = cache.remove(key)
 
         var result: Option<AnyEngineResource>
-        if (match (cached) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if (cached.isNone()) {
             result = None
         } else if (cached.getOrThrow() is AnyEngineResource) {
             // Save an object allocation if we've cached an EngineResource (the typical case).
             result = cached.getOrThrow() as AnyEngineResource
         } else {
-            result = Some(
-                AnyEngineResource(cached.getOrThrow(), /*isMemoryCacheable=*/ true, /*isRecyclable=*/ true, key, /*listener=*/ this, ResourceTypeClass.RESOURCE_TYPE_PIXELMAP))
+            result = AnyEngineResource(cached.getOrThrow(), /*isMemoryCacheable=*/ true, /*isRecyclable=*/ true, key, /*listener=*/ this, ResourceTypeClass.RESOURCE_TYPE_PIXELMAP)
         }
-        return result;
+        return result
     }
 
-     func release(resource: AnyDropletResource): Unit {
+    func release(resource: AnyDropletResource): Unit {
         if (resource is AnyEngineResource) {
             (resource as AnyEngineResource).getOrThrow().release();
         } else {
@@ -296,10 +269,10 @@ public class Engine <: ActiveResourceRemovedListener & ResourceRemovedListener &
         }
     }
 
-     func clearDiskCache(): Unit {
+    func clearDiskCache(): Unit {
     }
 
-     func shutdown(): Unit {
+    func shutdown(): Unit {
     }
 }
 
@@ -335,10 +308,27 @@ public enum RunStage {
     |
         /** No more viable stages. */
         FINISHED
+
+
+    operator func ==(that: RunStage): Bool {
+        match ((this, that)) {
+            case (INITIALIZE, INITIALIZE) => true
+            case (RESOURCE_CACHE, RESOURCE_CACHE) => true
+            case (DATA_CACHE, DATA_CACHE) => true
+            case (SOURCE, SOURCE) => true
+            case (ENCODE, ENCODE) => true
+            case (FINISHED, FINISHED) => true
+            case _ => false
+        }
+    }
+
+    operator func !=(that: RunStage): Bool {
+       !(this==that)
+    }
+
 }
 
 public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallback {
-
     private static let mtxtrans = ReentrantMutex()
     public static let mtx = ReentrantMutex()
 
@@ -403,7 +393,7 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
         isScaleOnlyOrNoTransform: Bool,
         onlyRetrieveFromCache: Bool,
         options: DropletOptions,
-        callback: DecodeJobCallback  //engineJob
+        callback: DecodeJobCallback //engineJob
     ) {
         super(name)
         this.model = model
@@ -449,18 +439,17 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
 
             case SWITCH_TO_SOURCE_SERVICE => runGenerators();
 
-            case DECODE_DATA =>
-                decodeFromRetrievedData();
+            case DECODE_DATA => decodeFromRetrievedData();
         }
     }
 
     public func runWrap(): Option<InputStream> {
         try {
             if (isCancelled) {
-                notifyFailed();
-                return Option<InputStream>.None;
+                notifyFailed()
+                return Option<InputStream>.None
             }
-            runWrapped();
+            runWrapped()
         } catch (e: Exception) {
             // Catch Throwable and not Exception to handle OOMs. Throwables are swallowed by our
             // usage of .submit() in DropletExecutor so we're not silently hiding crashes by doing this. We
@@ -469,33 +458,29 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
             // loads to silently hang forever, a case that's especially bad for users using Futures on
             // background threads.
             // When we're encoding we've already notified our callback and it isn't safe to do so again.
-            if (match (runStage) {
-                case RunStage.ENCODE => false
-                case _ => true
-            }) {
-                notifyFailed();
+
+            if (runStage != RunStage.ENCODE) {
+                notifyFailed()
             }
+
             if (!isCancelled) {
-                throw e;
+                throw e
             }
-            throw e;
+            throw e
         }
 
-        return Option<InputStream>.None;
+        return Option<InputStream>.None
     }
 
-     func cancel(): Unit {
+    func cancel(): Unit {
         isCancelled = true
-        let local: Option<DataFetcherGenerator> = currentGenerator;
-        if (match (local) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            local.getOrThrow().cancel();
+        let local: Option<DataFetcherGenerator> = currentGenerator
+        if(let Some(i) <- local){
+            i.cancel()
         }
     }
 
-     func release(isRemovedFromQueue: Bool): Unit {
+    func release(isRemovedFromQueue: Bool): Unit {
         if (releaseManager.release(isRemovedFromQueue)) {
             releaseInternal();
         }
@@ -504,27 +489,21 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
     private func decodeFromRetrievedData(): Unit {
         if (currentData.getOrThrow() is InputStream) {
             let data: Any = currentData.getOrThrow()
-            let rs: Option<Any> = decodeFromData<Any>(Some(data), currentDataSource.getOrThrow());
-            if (match (rs) {
-                case Some(x) => true
-                case _ => false
-            }) {
-                let rr: Any = rs.getOrThrow()
+            let rs: Option<Any> = decodeFromData<Any>(Some(data), currentDataSource.getOrThrow())
+            if(let Some(i) <- rs){
+                let rr: Any = i
                 if (rr is ByteArrayStream) {
                     let ri: InputStream = (rr as ByteArrayStream).getOrThrow()
                     let resource: DropletResource<InputStream> = InputStreamResource.obtain(ri)
-                    notifyEncodeAndRelease<InputStream>(resource, currentDataSource.getOrThrow(),
-                        isLoadingFromAlternateCacheKey);
+                    notifyEncodeAndRelease<InputStream>(resource, currentDataSource.getOrThrow(),isLoadingFromAlternateCacheKey)
                 } else if (rr is GifDrawable) {
                     let ri: GifDrawable = (rr as GifDrawable).getOrThrow()
                     let resource: DropletResource<GifDrawable> = GifDrawableResource.obtain(ri)
-                    notifyEncodeAndRelease<GifDrawable>(resource, currentDataSource.getOrThrow(),
-                        isLoadingFromAlternateCacheKey);
+                    notifyEncodeAndRelease<GifDrawable>(resource, currentDataSource.getOrThrow(),isLoadingFromAlternateCacheKey)
                 } else if (rr is PixelMapDrawable) {
                     let ri: PixelMapDrawable = (rr as PixelMapDrawable).getOrThrow()
                     let resource: DropletResource<PixelMapDrawable> = PixelMapDrawableResource.obtain(ri)
-                    notifyEncodeAndRelease<PixelMapDrawable>(resource, currentDataSource.getOrThrow(),
-                        isLoadingFromAlternateCacheKey);
+                    notifyEncodeAndRelease<PixelMapDrawable>(resource, currentDataSource.getOrThrow(),isLoadingFromAlternateCacheKey)
                 } else {
                     throw DropletException("rr is nothing")
                 }
@@ -538,37 +517,27 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
         isLoadedFromAlternateCacheKey: Bool
     ): Unit {
         try {
-
-            var result: DropletResource<R> = resource;
-            var lockedResource: Option<LockedResource<R>> = None;
-
-            if (match (deferredEncodeManager) {
-                case Some(x) => true
-                case _ => false
-            } && deferredEncodeManager.getOrThrow().hasResourceToEncode()) {
-                lockedResource = Some(LockedResource.obtain(resource))
-                result = lockedResource.getOrThrow()
+            var result: DropletResource<R> = resource
+            var lockedResource: Option<LockedResource<R>> = None
+            if(let Some(i) <- deferredEncodeManager){
+                if(i.hasResourceToEncode()){
+                    lockedResource = LockedResource.obtain(resource)
+                    result = lockedResource.getOrThrow()
+                }
             }
-
             notifyComplete(result, dataSource, isLoadedFromAlternateCacheKey);
-
             runStage = RunStage.ENCODE
             try {
-                if (match (deferredEncodeManager) {
-                    case Some(x) => true
-                    case _ => false
-                } && deferredEncodeManager.getOrThrow().hasResourceToEncode()) {
-                    deferredEncodeManager.getOrThrow().encode(diskCacheProvider, options);
+                if(let Some(i) <- deferredEncodeManager){
+                    if(i.hasResourceToEncode()){
+                        i.encode(diskCacheProvider, options)
+                    }
                 }
             } finally {
-                if (match (lockedResource) {
-                    case Some(x) => true
-                    case _ => false
-                }) {
-                    lockedResource.getOrThrow().unlock();
+                if(let Some(i) <- lockedResource){
+                     i.unlock()
                 }
             }
-
             // Call onEncodeComplete outside the finally block so that it's not called if the encode
             // process
             // throws.
@@ -584,17 +553,12 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
     }
 
     private func releaseInternal(): Unit {
-        releaseManager.reset();
-        if (match (deferredEncodeManager) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            deferredEncodeManager.getOrThrow().clear()
+        releaseManager.reset()
+        if(let Some(i) <- deferredEncodeManager){
+             i.clear()
         }
-
-        decodeHelper.clear();
+        decodeHelper.clear()
         isCallbackNotified = false
-
         // TODO  回收dropletContext
         // TODO  回收signature
         // TODO  回收options
@@ -613,7 +577,6 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
         // TODO  回收model
 
     }
-
 
     private func notifyComplete<R>(
         resource: DropletResource<R>,
@@ -642,32 +605,32 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
     }
 
     private func decodeFromDataSub<DATA>(dataSource: DataSource, arrData: Array<UInt8>): Option<DATA> {
-            var result = Option<DATA>.None
-            let decoders: ArrayList<ResourceDecoder<Array<UInt8>, Drawable>> = decodeHelper.getDrawableResourceDecoders()
+        var result = Option<DATA>.None
+        let decoders: ArrayList<ResourceDecoder<Array<UInt8>, Drawable>> = decodeHelper.getDrawableResourceDecoders()
 
-            var i: Int64 = decoders.size - 1
-            while (i >= 0) {
-                let r: ResourceDecoder<Array<UInt8>, Drawable> = decoders[i]
-                if (r.handles(arrData, decodeHelper.getOptions())) {
-                    let d: Drawable = r.decode(arrData, this.width, this.height, decodeHelper.getOptions())
-                    if (d is GifDrawable) {
-                        let dd: GifDrawable = (d as GifDrawable).getOrThrow()
-                        //GIF没有写resource本地
-                        result = dd as DATA
-                    } else if (d is PixelMapDrawable) {
-                        let dd: PixelMapDrawable = (d as PixelMapDrawable).getOrThrow()
-                        let res: DropletResource<PixelMapDrawable> = onResourceDecoded<PixelMapDrawable>(dataSource,
-                            PixelMapDrawableResource.obtain(dd))
+        var i: Int64 = decoders.size - 1
+        while (i >= 0) {
+            let r: ResourceDecoder<Array<UInt8>, Drawable> = decoders[i]
+            if (r.handles(arrData, decodeHelper.getOptions())) {
+                let d: Drawable = r.decode(arrData, this.width, this.height, decodeHelper.getOptions())
+                if (d is GifDrawable) {
+                    let dd: GifDrawable = (d as GifDrawable).getOrThrow()
+                    //GIF没有写resource本地
+                    result = dd as DATA
+                } else if (d is PixelMapDrawable) {
+                    let dd: PixelMapDrawable = (d as PixelMapDrawable).getOrThrow()
+                    let res: DropletResource<PixelMapDrawable> = onResourceDecoded<PixelMapDrawable>(dataSource,
+                        PixelMapDrawableResource.obtain(dd))
 
-                        result = res.get() as DATA
-                    } else {
-                        throw DropletException("Drawable type error")
-                    }
-
-                    break
+                    result = res.get() as DATA
+                } else {
+                    throw DropletException("Drawable type error")
                 }
-                i--
+
+                break
             }
+            i--
+        }
         return result
     }
 
@@ -689,15 +652,12 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
         return result
     }
 
-    var isByteArrayStream:Bool = false
+    var isByteArrayStream: Bool = false
 
     private func decodeFromData<DATA>(data: Option<DATA>, dataSource: DataSource): Option<DATA> {
         try {
-            if (match (data) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                return None;
+            if(data.isNone()){
+                return None
             }
             var result: Option<DATA> = None
 
@@ -716,18 +676,18 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
                     case None => 0
                 }
 
-                var arrData:Option<Array<UInt8>> = Option<Array<UInt8>>.None
-                if(isByteArrayStream){
-                    arrData = Array<UInt8>(size,item:0)
+                var arrData: Option<Array<UInt8>> = Option<Array<UInt8>>.None
+                if (isByteArrayStream) {
+                    arrData = Array<UInt8>(size, item: 0)
                     inputStream.read(arrData.getOrThrow())
-                }else{
-                    var arrDataTemp:Array<UInt8> = Array<UInt8>(2048,item:0)
-                    let listbuf:ArrayList<UInt8> = ArrayList<UInt8>()
-                    var read:Int64 = 0
-                    do{
+                } else {
+                    var arrDataTemp: Array<UInt8> = Array<UInt8>(2048, item: 0)
+                    let listbuf: ArrayList<UInt8> = ArrayList<UInt8>()
+                    var read: Int64 = 0
+                    do {
                         read = inputStream.read(arrDataTemp)
                         listbuf.appendAll(arrDataTemp[0..read])
-                    }while(read > 0)
+                    } while (read > 0)
                     arrData = listbuf.toArray()
                 }
                 // TODO 改为判断图片格式 区分gif和静态图片 保存图片格式到drawable
@@ -735,14 +695,15 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
                 if (this.transformationKey.tType == TransformationKey.TRANSFORMATION_DRAWABLE) {
                     result = decodeFromDataSub(dataSource, arrData.getOrThrow())
                 } else if (this.transformationKey.tType == TransformationKey.TRANSFORMATION_PIXELMAP) {
-                    let decoders: ArrayList<ResourceDecoder<Array<UInt8>, PixelMap>> = decodeHelper.
-                        getPixelMapResourceDecoders()
+                    let decoders: ArrayList<ResourceDecoder<Array<UInt8>, PixelMap>> = decodeHelper
+                        .getPixelMapResourceDecoders()
 
                     var i: Int64 = decoders.size - 1
                     while (i >= 0) {
                         let r: ResourceDecoder<Array<UInt8>, PixelMap> = decoders[i]
                         if (r.handles(arrData.getOrThrow(), decodeHelper.getOptions())) {
-                            let d: PixelMap = r.decode(arrData.getOrThrow(), this.width, this.height, decodeHelper.getOptions())
+                            let d: PixelMap = r.decode(arrData.getOrThrow(), this.width, this.height,
+                                decodeHelper.getOptions())
                             let res: DropletResource<PixelMap> = onResourceDecoded<PixelMap>(dataSource,
                                 PixelMapResource.obtain(d))
                             result = res.get() as DATA
@@ -753,8 +714,6 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
                 } else {
                     throw DropletException("error transformation type")
                 }
-
-
             } else if (d is GifDecoder) {
                 // TODO 待用
                 result = decodeFromDataSubTwo(dataSource, d)
@@ -768,25 +727,20 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
     }
 
     private func runGenerators(): Unit {
-
         var isStarted: Bool = false;
         while (!isCancelled && match (currentGenerator) {
                 case Some(x) => true
                 case _ => false
             }) {
-               isStarted = currentGenerator.getOrThrow().startNext()
+            isStarted = currentGenerator.getOrThrow().startNext()
             if (isStarted) {
                 break;
             }
             runStage = getNextStage(runStage)
             currentGenerator = getNextGenerator()
-
-            if (match (runStage) {
-                case RunStage.SOURCE => true
-                case _ => false
-            }) {
-                reschedule(RunReason.SWITCH_TO_SOURCE_SERVICE);
-                return;
+            if(runStage == RunStage.SOURCE){
+                reschedule(RunReason.SWITCH_TO_SOURCE_SERVICE)
+                return
             }
         }
         // We've run out of stages and generators, give up.
@@ -830,8 +784,7 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
             case RESOURCE_CACHE => return Some(ResourceCacheGenerator(decodeHelper, this));
             case DATA_CACHE => return Some(DataCacheGenerator(decodeHelper, this));
             case SOURCE => return Some(SourceGenerator(decodeHelper, this));
-            case FINISHED =>
-                return None;
+            case FINISHED => return None;
             case _ => throw DropletException("Unrecognized stage: ");
         }
     }
@@ -862,21 +815,14 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
         }
     }
 
-     func onResourceDecoded<Z>(dataSource: DataSource, decoded: DropletResource<Z>): DropletResource<Z> {
+    func onResourceDecoded<Z>(dataSource: DataSource, decoded: DropletResource<Z>): DropletResource<Z> {
         let transformationKey: TransformationKey = decodeHelper.getTransformationKey()
         let appliedTransformation: Option<AnyTransformation> = decodeHelper.getTransformation(transformationKey)
-        var transformed: DropletResource<Z> = decoded;
-        if (match (dataSource) {
-            case DataSource.RESOURCE_DISK_CACHE => false
-            case _ => true
-        }) {
-            if (match (appliedTransformation) {
-                case Some(x) => true
-                case _ => false
-            }) {
-                synchronized(mtxtrans){
-                    transformed = (appliedTransformation.getOrThrow().transform(decoded, width, height) as DropletResource<Z>).
-                    getOrThrow()
+        var transformed: DropletResource<Z> = decoded
+        if(dataSource != DataSource.RESOURCE_DISK_CACHE){
+            if(let Some(i) <- appliedTransformation){
+                synchronized(mtxtrans) {
+                    transformed = (i.transform(decoded, width, height) as DropletResource<Z>).getOrThrow()
                 }
             }
         }
@@ -904,46 +850,33 @@ public class DecodeJob <: DropletThread<Option<InputStream>> & FetcherReadyCallb
             encodeStrategy
         )
         if (isCacheable) {
-            if (match (encodeStrategy) {
-                case NONE => true
-                case _ => false
-            }) {
-                throw DropletException("encodeStrategy is null")
+            if(encodeStrategy == EncodeStrategy.NONE){
+                 throw DropletException("encodeStrategy is null")
             }
-
             let key: AnyKey
             match (encodeStrategy) {
                 case SOURCE => key = DataCacheKey(currentSourceKey.getOrThrow(), signature)
-
-                case TRANSFORMED =>
-                    key = ResourceCacheKey(
-                        decodeHelper.getArrayPool(),
-                        currentSourceKey.getOrThrow(),
-                        signature,
-                        width,
-                        height,
-                        appliedTransformation.getOrThrow(),
-                        transformationKey,
-                        options
-                    )
-
-                case _ => throw DropletException("Unknown strategy: ");
+                case TRANSFORMED => key = ResourceCacheKey(
+                    decodeHelper.getArrayPool(),
+                    currentSourceKey.getOrThrow(),
+                    signature,
+                    width,
+                    height,
+                    appliedTransformation.getOrThrow(),
+                    transformationKey,
+                    options
+                )
+                case _ => throw DropletException("Unknown strategy: ")
             }
-
             let lockedResult: LockedResource<Z> = LockedResource.obtain(transformed);
-
-            if (match (encoder) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                throw Exception("encoder is null")
+            if(encoder.isNone()){
+               throw Exception("encoder is null")
             }
             deferredEncodeManager = Some(
                 DeferredEncodeManager<Z>(key, (encoder.getOrThrow() as ResourceEncoder<Z>).getOrThrow(), lockedResult))
             result = lockedResult
         }
-
-        return result;
+        return result
     }
 }
 
@@ -953,28 +886,28 @@ public class ReleaseManager {
     private var isFailed: Bool = false
     private let mtx = ReentrantMutex()
 
-     func release(isRemovedFromQueue: Bool): Bool {
+    func release(isRemovedFromQueue: Bool): Bool {
         synchronized(mtx) {
             isReleased = true
             return isComplete(isRemovedFromQueue);
         }
     }
 
-     func onEncodeComplete(): Bool {
+    func onEncodeComplete(): Bool {
         synchronized(mtx) {
             isEncodeComplete = true
             return isComplete(false /*isRemovedFromQueue*/ );
         }
     }
 
-     func onFailed(): Bool {
+    func onFailed(): Bool {
         synchronized(mtx) {
             isFailed = true
             return isComplete(false /*isRemovedFromQueue*/ );
         }
     }
 
-     func reset(): Unit {
+    func reset(): Unit {
         synchronized(mtx) {
             isEncodeComplete = false
             isReleased = false
@@ -1012,39 +945,28 @@ public class LazyDiskCacheProvider <: DiskCacheProvider {
         this.factory = factory
     }
 
-     func clearDiskCacheIfCreated(): Unit {
+    func clearDiskCacheIfCreated(): Unit {
         synchronized(mtx) {
-            if (match (diskCache) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                return;
+            if(diskCache.isNone()){
+                return
             }
-            diskCache.getOrThrow().clear();
+            diskCache.getOrThrow().clear()
         }
     }
 
     public func getDiskCache(): DiskCache {
-        if (match (diskCache) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            synchronized(mtx) {
-                if (match (diskCache) {
-                    case Some(x) => false
-                    case _ => true
-                }) {
-                    diskCache = Some(factory.build())
+        if(diskCache.isNone()){
+             synchronized(mtx) {
+                if(diskCache.isNone()){
+                   diskCache = factory.build()
                 }
-                if (match (diskCache) {
-                    case Some(x) => false
-                    case _ => true
-                }) {
-                    throw Exception("droplet LazyDiskCacheProvider error")
+
+                if(diskCache.isNone()){
+                   throw Exception("droplet LazyDiskCacheProvider error")
                 }
             }
         }
-        return diskCache.getOrThrow();
+        return diskCache.getOrThrow()
     }
 }
 
@@ -1061,9 +983,8 @@ public class LoadStatus {
         this.engineJob = engineJob
     }
 
-
     // 取消解码 取消回调
-     func cancel(): Unit {
+    func cancel(): Unit {
         // Acquire the Engine lock so that a new request can't get access to a particular EngineJob
         // just after the EngineJob has been cancelled. Without this lock, we'd allow new requests
         // to find the cancelling EngineJob in our Jobs data structure. With this lock, the EngineJob
@@ -1091,17 +1012,18 @@ public class DeferredEncodeManager<Z> <: AnyDeferredEncodeManager {
         this.toEncode = Some(toEncode)
     }
 
-
     public func encode(diskCacheProvider: DiskCacheProvider, options: DropletOptions): Unit {
         try {
-            diskCacheProvider.getDiskCache().put(
-                key.getOrThrow(),
-                DataCacheWriter<DropletResource<Z>>(
-                    encoder.getOrThrow(),
-                    toEncode.getOrThrow(),
-                    options
-                )
-            );
+            diskCacheProvider
+                .getDiskCache()
+                .put(
+                    key.getOrThrow(),
+                    DataCacheWriter<DropletResource<Z>>(
+                        encoder.getOrThrow(),
+                        toEncode.getOrThrow(),
+                        options
+                    )
+                );
         } finally {
             toEncode.getOrThrow().unlock();
         }
@@ -1120,4 +1042,3 @@ public class DeferredEncodeManager<Z> <: AnyDeferredEncodeManager {
         toEncode = None
     }
 }
-

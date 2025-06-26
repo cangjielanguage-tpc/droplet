@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
  
 package droplet.droplet
@@ -139,34 +139,27 @@ public class DecodeHelper {
   }
 
    func getTransformation(transformationKey: TransformationKey): Option<AnyTransformation> {
-    var result: Option<AnyKey> = transformations.get(transformationKey);
-
-    if (match(result) {
-      case Some(x) => false
-      case _ => true
-    }) {
-      if (transformations.isEmpty() && isTransformationRequired) {
-        throw DropletException(
-            "Missing transformation for  xxxtransforms. If you wish to ignore unknown resource types, use the optional transformation methods.");
-      } else {
-
-        if(transformationKey.tType == TransformationKey.TRANSFORMATION_PIXELMAP) {
-          return UnitTransformation<PixelMap>.get();
-        } else if(transformationKey.tType == TransformationKey.TRANSFORMATION_INPUTSTREAM) {
-          return UnitTransformation<InputStream>.get();
-        } else if(transformationKey.tType == TransformationKey.TRANSFORMATION_DRAWABLE) {
-          return UnitTransformation<PixelMap>.get();
-        } else {
-          throw DropletException("Missing transformation for  xxxtransforms.")
+        var result: Option<AnyKey> = transformations.get(transformationKey)
+        if(result.isNone()){
+            if (transformations.isEmpty() && isTransformationRequired) {
+                throw DropletException("Missing transformation for  xxxtransforms. If you wish to ignore unknown resource types, use the optional transformation methods.");
+            } else {
+                if(transformationKey.tType == TransformationKey.TRANSFORMATION_PIXELMAP) {
+                  return UnitTransformation<PixelMap>.get()
+                } else if(transformationKey.tType == TransformationKey.TRANSFORMATION_INPUTSTREAM) {
+                  return UnitTransformation<InputStream>.get()
+                } else if(transformationKey.tType == TransformationKey.TRANSFORMATION_DRAWABLE) {
+                  return UnitTransformation<PixelMap>.get()
+                } else {
+                  throw DropletException("Missing transformation for  xxxtransforms.")
+                }
+            }
         }
-      }
+        if (let Some(i:AnyTransformation) <- result){
+            return i
+        }
+        throw DropletException("Missing transformation for  xxxtransforms.   error  !!!")
     }
-
-    if(result.getOrThrow() is AnyTransformation) {
-      return result.getOrThrow() as AnyTransformation;
-    }
-    throw DropletException("Missing transformation for  xxxtransforms.   error  !!!")
-  }
 
    func isResourceEncoderAvailable(resource: AnyDropletResource): Bool {
     // Gif格式不支持缓存变换后的数据 不需要判断gif
@@ -220,12 +213,10 @@ public class UnitTransformation<T> <: Transformation<T> {
   }
 
   public func transform(resource: AnyDropletResource, outWidth: Int64, outHeight: Int64): AnyDropletResource {
-    if(resource is DropletResource<T>) {
-      let r: DropletResource<T> = (resource as DropletResource<T>).getOrThrow()
-      return (transform(r, outWidth, outHeight) as AnyDropletResource).getOrThrow()
-    } else {
-      return resource
-    }
+    return  match (resource){
+              case r: DropletResource<T> => transform(r, outWidth, outHeight) as AnyDropletResource ?? resource
+              case _=> resource
+            }
   }
 
   public func transform(resource: DropletResource<T>, _: Int64, _: Int64): DropletResource<T> {

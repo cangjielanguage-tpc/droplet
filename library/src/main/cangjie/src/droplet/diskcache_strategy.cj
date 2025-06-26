@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
  
 package droplet.droplet
@@ -27,10 +27,7 @@ public class DiskCacheStrategyALL <: DiskCacheStrategy {
     }
 
     public func equals(other: DiskCacheStrategy): Bool {
-        if(other is DiskCacheStrategyALL) {
-            return true
-        }
-        return false
+        other is DiskCacheStrategyALL
     }
 
     public func isDataCacheable(dataSource: DataSource): Bool {
@@ -70,10 +67,7 @@ public class DiskCacheStrategyNONE <: DiskCacheStrategy {
     }
 
     public func equals(other: DiskCacheStrategy): Bool {
-        if(other is DiskCacheStrategyNONE) {
-            return true
-        }
-        return false
+        other is DiskCacheStrategyNONE
     }
 
     public func isDataCacheable(_: DataSource): Bool {
@@ -102,10 +96,7 @@ public class DiskCacheStrategyDATA <: DiskCacheStrategy {
     }
 
     public func equals(other: DiskCacheStrategy): Bool {
-        if(other is DiskCacheStrategyDATA) {
-            return true
-        }
-        return false
+        other is DiskCacheStrategyDATA
     }
 
     public func isDataCacheable(dataSource: DataSource): Bool {
@@ -139,10 +130,7 @@ public class DiskCacheStrategyRESOURCE <: DiskCacheStrategy {
     }
 
     public func equals(other: DiskCacheStrategy): Bool {
-        if(other is DiskCacheStrategyRESOURCE) {
-            return true
-        }
-        return false
+        other is DiskCacheStrategyRESOURCE
     }
 
     public func isDataCacheable(_: DataSource): Bool {
@@ -176,10 +164,7 @@ public class DiskCacheStrategyAUTOMATIC <: DiskCacheStrategy {
     }
 
     public func equals(other: DiskCacheStrategy): Bool {
-        if(other is DiskCacheStrategyAUTOMATIC) {
-            return true
-        }
-        return false
+        other is DiskCacheStrategyAUTOMATIC
     }
 
     public func isDataCacheable(dataSource: DataSource): Bool {

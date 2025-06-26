@@ -34,31 +34,23 @@ public abstract class AnimatableTarget<R> <: BaseTarget<R> & TransitionDrawableA
     }
 
     public func onLoadCleared(placeholder: Option<CJResourceDrawable>): Unit {
-        if (match(animatable) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            animatable.getOrThrow().stop();
+
+        if(let Some(i) <- animatable){
+             i.stop()
         }
-        setResourceInternal(Option<R>.None);
-        setCJResourceDrawable(placeholder,false);
+        setResourceInternal(Option<R>.None)
+        setCJResourceDrawable(placeholder,false)
     }
     
     public func onStart(): Unit {
-        if (match(animatable) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            animatable.getOrThrow().start();
+        if(let Some(i) <- animatable){
+           i.start()
         }
     }
 
     public func onStop(): Unit {
-        if (match(animatable) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            animatable.getOrThrow().stop();
+        if(let Some(i) <- animatable){
+            i.stop()
         }
     }
 
@@ -76,17 +68,14 @@ public abstract class AnimatableTarget<R> <: BaseTarget<R> & TransitionDrawableA
     }
 
     public func setCJResourceDrawable(drawable: Option<CJResourceDrawable>,isErrorPic:Bool): Unit {
-        if(match(drawable) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            drawable.getOrThrow().setDrawFuncCJResource(drawFuncCJResource)
-            drawable.getOrThrow().draw(isErrorPic)
+        if(let Some(i) <- drawable){
+            i.setDrawFuncCJResource(drawFuncCJResource)
+            i.draw(isErrorPic)
         }
     }
 
     public func getSize(cb: SizeReadyCallback): Unit {
-        cb.onSizeReady(width, height);
+        cb.onSizeReady(width, height)
     }
 
     protected func setResourceInternal(resource: Option<R>): Unit {
@@ -97,18 +86,17 @@ public abstract class AnimatableTarget<R> <: BaseTarget<R> & TransitionDrawableA
     }
 
     protected func maybeUpdateAnimatable(resource: Option<R>): Unit {
-        if(match(resource) {
-            case Some(x) => false
-            case _ => true
-        }) {
+
+        if(let Some(i) <- resource){
+            let r: R = i
+            if (r is Animatable) {
+                animatable = r as Animatable
+                animatable.getOrThrow().start()
+            } else {
+                animatable = None
+            }
+        }else{
             return
-        }
-        let r: R = resource.getOrThrow()
-        if (r is Animatable) {
-            animatable = r as Animatable
-            animatable.getOrThrow().start();
-        } else {
-            animatable = None;
         }
     }
 
@@ -127,13 +115,17 @@ public class DrawableTarget <: AnimatableTarget<Drawable> {
     }
 
     public func onResourceReady(resourceDraw: Drawable, transitionDraw: Option<DrawableTransition>): Unit {
-        if (match(transitionDraw) {
-            case Some(x) => false
-            case _ => true
-        } || !(transitionDraw.getOrThrow().transition(resourceDraw, this))) {
-            setResourceInternal(Some(resourceDraw))
-        } else {
-            maybeUpdateAnimatable(Some(resourceDraw))
+        if(let Some(i) <- transitionDraw){
+            //如果有值
+            let res = !(i.transition(resourceDraw, this))
+            if(res){
+                setResourceInternal(resourceDraw)
+            }else{
+                 maybeUpdateAnimatable(resourceDraw)
+            }
+        }else{
+            //如果没值
+            setResourceInternal(resourceDraw)
         }
     }
 
@@ -195,23 +187,24 @@ public class StringDrawableTarget <: AnimatableTarget<Drawable> {
     }
 
     public func onResourceReady(resource: Drawable, transition: Option<DrawableTransition>): Unit {
-        if (match(transition) {
-            case Some(x) => false
-            case _ => true
-        } || !(transition.getOrThrow().transition(resource, this))) {
-            setResourceInternal(Some(resource));
-        } else {
-            maybeUpdateAnimatable(Some(resource));
+        if(let Some(i) <- transition){
+            //如果有值
+            let res = !(i.transition(resource, this))
+            if(res){
+                setResourceInternal(resource)
+            }else{
+                maybeUpdateAnimatable(resource)
+            }
+        }else{
+            //如果没值
+             setResourceInternal(resource)
         }
     }
 
     protected func setResource(resource: Option<Drawable>): Unit {
-        if(match(resource) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            resource.getOrThrow().setDrawFunc(drawFunc)
-            resource.getOrThrow().draw(false)
+        if(let Some(i) <- resource){
+            i.setDrawFunc(drawFunc)
+            i.draw(false)
         }
     }
 
@@ -223,11 +216,8 @@ public class StringDrawableTarget <: AnimatableTarget<Drawable> {
     public override func hashCode(): Int64 {
         Utils.hashCodeWrite(width.hashCode(), reset: true)
         Utils.hashCodeWrite(height.hashCode())
-        if(match(request) {
-        case Some(x) => true
-        case _ => false
-        }) {
-            Utils.hashCodeWrite(request.getOrThrow().hashCode())
+        if(let Some(i) <- request){
+            Utils.hashCodeWrite(i.hashCode())
         }
         return Utils.hashCodeFinish()
     }

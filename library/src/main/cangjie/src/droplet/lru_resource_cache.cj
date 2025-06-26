@@ -21,12 +21,9 @@ public class LruResourceCache <: LruCache<AnyKey, AnyDropletResource> & MemoryCa
   }
 
   protected override func onItemEvicted(_: AnyKey, item: AnyDropletResource): Unit {
-    if (match(listener) {
-      case Some(x) => true
-      case _ => false
-    }) {
-      listener.getOrThrow().onResourceRemoved(item);
-    }
+        if(let Some(i) <- listener){
+            i.onResourceRemoved(item)
+        }
   }
 
   protected override func getSize(item: AnyDropletResource): Int64 {

@@ -20,10 +20,7 @@ public class LifecycleRequestManagerRetriever {
 
      func getDeviceLifecycle(key: String): DeviceLifecycle {
         let deviceLifecycle: Option<DeviceLifecycle> = deviceLifecycleMap.get(key)
-        if(match(deviceLifecycle) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if(deviceLifecycle.isNone()){
             let deviceLifecycleObj: DeviceLifecycle = DeviceLifecycle(key)
             deviceLifecycleMap.put(key, deviceLifecycleObj)
             return deviceLifecycleObj
@@ -39,32 +36,23 @@ public class LifecycleRequestManagerRetriever {
 
         var managerKey: String = Utils.getRequestManagerKey(key)
 
-        var result: Option<RequestManager> = lifecycleToRequestManager.get(managerKey);
-        if (match(result) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        var result: Option<RequestManager> = lifecycleToRequestManager.get(managerKey)
+
+        if(result.isNone()){
             let deviceLifecycle = getDeviceLifecycle(key)
-            var dropletLifecycle: LifecycleLifecycle = LifecycleLifecycle(deviceLifecycle);
-            result =
-                Some(factory.build(
-                    droplet,
-                    dropletLifecycle,
-                    context,
-                    managerKey));
-            
-            lifecycleToRequestManager.put(managerKey, result.getOrThrow());
-            
-            dropletLifecycle.addListener(DefaultLifecycleListener(lifecycleToRequestManager, managerKey,deviceLifecycleMap,key));
-                
+            var dropletLifecycle: LifecycleLifecycle = LifecycleLifecycle(deviceLifecycle)
+            result = factory.build(droplet,dropletLifecycle,context,managerKey)
+            lifecycleToRequestManager.put(managerKey, result.getOrThrow())
+            dropletLifecycle.addListener(DefaultLifecycleListener(lifecycleToRequestManager, managerKey,deviceLifecycleMap,key))
+
             // This is a bit of hack, we're going to start the RequestManager, but not the
             // corresponding Lifecycle. It's safe to start the RequestManager, but starting the
             // Lifecycle might trigger memory leaks. See b/154405040
             if (isParentVisible) {
-                result.getOrThrow().onStart();
+                result.getOrThrow().onStart()
             }
         }
-        return result.getOrThrow();
+        return result.getOrThrow()
     }
     
 }

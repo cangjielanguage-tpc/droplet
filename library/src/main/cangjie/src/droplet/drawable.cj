@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
  
 package droplet.droplet
@@ -14,6 +14,9 @@ public interface Drawable {
 }
 
 public class NoneDrawable <: Drawable {
+
+    private let noneDrawableType:Int64 = -1
+
     public override func getPixelMap(): PixelMap {
         let size: Size = Size(width: 1, height: 1)
         let arr: Array<UInt8> = Array<UInt8>(96, item: 0)
@@ -22,11 +25,13 @@ public class NoneDrawable <: Drawable {
     public override func draw(_:Bool): Unit {}
     public override func setDrawFunc(_: (PixelMap) -> Unit): Unit {}
     public override func getType(): Int64 {
-        return -1
+        return noneDrawableType
     }
 }
 
 public class PixelMapDrawable <: Drawable {
+
+    private let pixelMapDrawableType:Int64 = 1
     private let pixelMap: PixelMap
     private var drawFunc: ArrayList<(PixelMap) -> Unit> = ArrayList<(PixelMap) -> Unit>()
 
@@ -35,7 +40,7 @@ public class PixelMapDrawable <: Drawable {
     }
 
     public override func getType(): Int64 {
-        return 1
+        return pixelMapDrawableType
     }
 
     public override func getPixelMap(): PixelMap {
@@ -57,6 +62,7 @@ public class PixelMapDrawable <: Drawable {
 }
 
 public class CJResourceDrawable <: Drawable {
+    private let cJResourceDrawableType:Int64 = 3
     private let cjResource: CJResource
     private var drawFunc: ArrayList<(CJResource,Bool) -> Unit> = ArrayList<(CJResource,Bool) -> Unit>()
 
@@ -69,7 +75,7 @@ public class CJResourceDrawable <: Drawable {
     }
 
     public override func getType(): Int64 {
-        return 3
+        return cJResourceDrawableType
     }
 
     public override func getPixelMap(): PixelMap {

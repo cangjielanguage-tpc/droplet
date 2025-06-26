@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
  
 package droplet.droplet
@@ -22,38 +22,38 @@ public interface ArrayPool {
 
 public interface ArrayAdapterInterface<T> {
 
-  /** TAG for logging. */
-  func getTag(): String;
+    /** TAG for logging. */
+    func getTag(): String
 
-  /** Return the length of the given array. */
-  func getArrayLength(array: T): Int64;
+    /** Return the length of the given array. */
+    func getArrayLength(array: T): Int64
 
-  /** Allocate and return an array of the specified size. */
-  func newArray(length: Int64): T;
+    /** Allocate and return an array of the specified size. */
+    func newArray(length: Int64): T
 
-  /** Return the size of an element in the array in bytes (e.g. for int return 4). */
-  func getElementSizeInBytes(): Int64;
+    /** Return the size of an element in the array in bytes (e.g. for int return 4). */
+    func getElementSizeInBytes(): Int64
 }
 
 public class UInt8ArrayAdapter <: ArrayAdapterInterface<Array<UInt8>> {
-   public func getTag(): String {
-    return "ByteArrayPool"
+    public func getTag(): String {
+        return "ByteArrayPool"
     }
 
   /** Return the length of the given array. */
-  public func getArrayLength(array: Array<UInt8>): Int64 {
-    return array.size
-  }
+    public func getArrayLength(array: Array<UInt8>): Int64 {
+        return array.size
+    }
 
   /** Allocate and return an array of the specified size. */
-  public func newArray(length: Int64): Array<UInt8> {
-    return Array<UInt8>(length, item: 0)
-  }
+    public func newArray(length: Int64): Array<UInt8> {
+        return Array<UInt8>(length, item: 0)
+    }
 
   /** Return the size of an element in the array in bytes (e.g. for int return 4). */
-  public func getElementSizeInBytes(): Int64 {
-    return 1
-  }
+    public func getElementSizeInBytes(): Int64 {
+        return 1
+    }
   
 }
 
@@ -63,55 +63,55 @@ public class Key <: Poolable & Equatable<Key> & Hashable & ToString {
     public var arrType: Int64 = 0
 
     init(pool: KeyPool) {
-      this.pool = pool;
+        this.pool = pool
     }
 
     public operator func ==(right: Key): Bool {
-      this.equals(right)
+        this.equals(right)
     }
     public operator func !=(right: Key): Bool {
-      !this.equals(right)
+        !this.equals(right)
     } 
 
-     func initKey(length: Int64, arrType: Int64): Unit {
-      this.size = length;
-      this.arrType = arrType
+    func initKey(length: Int64, arrType: Int64): Unit {
+        this.size = length
+        this.arrType = arrType
     }
 
     public func equals(o: Any): Bool {
-      if (o is Key) {
-        let other: Key = (o as Key).getOrThrow();
-        return size == other.size && arrType == other.arrType;
-      }
-      return false;
+        if (o is Key) {
+            let other: Key = (o as Key).getOrThrow()
+            return size == other.size && arrType == other.arrType
+        }
+        return false;
     }
 
     public func toString(): String {
-      return "Key{size=${size}, arrType=${arrType}}";
+        return "Key{size=${size}, arrType=${arrType}}"
     }
 
     public func offer(): Unit {
-      pool.offer(this);
+        pool.offer(this)
     }
 
     public func hashCode(): Int64 {
-      Utils.hashCodeWrite(size, reset: true)
-      Utils.hashCodeWrite(arrType, reset: false)
-      return Utils.hashCodeFinish();
+        Utils.hashCodeWrite(size, reset: true)
+        Utils.hashCodeWrite(arrType, reset: false)
+        return Utils.hashCodeFinish()
     }
 
   }
 
 public class KeyPool <: BaseKeyPool<Key> {
 
-     func get(size: Int64, arrType: Int64): Key {
-      let result: Key = get();
-      result.initKey(size, arrType);
-      return result;
+    func get(size: Int64, arrType: Int64): Key {
+        let result: Key = get()
+        result.initKey(size, arrType)
+        return result
     }
 
     public override func create(): Key {
-      return Key(this);
+        return Key(this)
     }
 }
 
@@ -155,13 +155,9 @@ public class LruArrayPool <: ArrayPool {
             
             let current: Option<Int64> = sizes.get(key.size);
             var keySize: Int64 = 1
-            if(match(current) {
-                case Some(x) => true
-                case _ => false
-            }) {
-                keySize = current.getOrThrow() + 1
+            if(let Some(i) <- current){
+                keySize = i + 1
             }
-
             sizes.put(key.size, keySize);
             currentSize += arrayBytes;
             evictUInt8Arr();
@@ -174,12 +170,10 @@ public class LruArrayPool <: ArrayPool {
 
     private func evictToSizeUInt8Arr(size: Int64): Unit {
         while (currentSize > size) {
-            var evicted: Option<Array<UInt8>> = uint8GroupedMap.removeLast();
-            if(match(evicted) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                throw DropletException("evictToSizeUInt8Arr error")
+            var evicted: Option<Array<UInt8>> = uint8GroupedMap.removeLast()
+
+            if(evicted.isNone()){
+               throw DropletException("evictToSizeUInt8Arr error")
             }
 
             let ev = evicted.getOrThrow()
@@ -191,34 +185,29 @@ public class LruArrayPool <: ArrayPool {
     }
 
     private func decrementArrayOfSize(size: Int64, arrType: Int64): Unit {
-        let sizes: HashMap<Int64, Int64> = getSizesForAdapter(arrType);
-        let current: Option<Int64> = sizes.get(size);
-        if (match(current) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            throw DropletException("Tried to decrement empty size, size: ${size}");
+        let sizes: HashMap<Int64, Int64> = getSizesForAdapter(arrType)
+        let current: Option<Int64> = sizes.get(size)
+        if(current.isNone()){
+           throw DropletException("Tried to decrement empty size, size: ${size}")
         }
         let c = current.getOrThrow()
         if (c == 1) {
-            sizes.remove(size);
+            sizes.remove(size)
         } else {
-            sizes.put(size, c - 1);
+            sizes.put(size, c - 1)
         }
     }
 
     private func getSizesForAdapter(arrType: Int64): HashMap<Int64, Int64> {
-        var sizes: Option<HashMap<Int64, Int64>> = sortedSizes.get(arrType);
-        if (match(sizes) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            // TODO TreeMap
+        var sizes: Option<HashMap<Int64, Int64>> = sortedSizes.get(arrType)
+
+        if(sizes.isNone()){
+             // TODO TreeMap
             let s = HashMap<Int64, Int64>()
-            sizes = Some(s);
-            sortedSizes.put(arrType, s);
+            sizes = s
+            sortedSizes.put(arrType, s)
         }
-        return sizes.getOrThrow();
+        return sizes.getOrThrow()
     }
 
     private func isSmallEnoughForReuse(byteSize: Int64): Bool {
@@ -258,17 +247,14 @@ public class LruArrayPool <: ArrayPool {
     }
 
     private func getForKey(key: Key, arrType: Int64): Array<UInt8> {
-        let result: Option<Array<UInt8>> = getArrayForKey(key);
-        if (match(result) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            let r = result.getOrThrow()
-            currentSize -= uint8Adapter.getArrayLength(r) * uint8Adapter.getElementSizeInBytes();
-            decrementArrayOfSize(uint8Adapter.getArrayLength(r), arrType);
+        let result: Option<Array<UInt8>> = getArrayForKey(key)
+        if(let Some(i) <- result){
+            let r = i
+            currentSize -= uint8Adapter.getArrayLength(r) * uint8Adapter.getElementSizeInBytes()
+            decrementArrayOfSize(uint8Adapter.getArrayLength(r), arrType)
             return r
-        } else {
-            return uint8Adapter.newArray(key.size);
+        }else{
+            return uint8Adapter.newArray(key.size)
         }
     }
 
@@ -317,20 +303,16 @@ public class LruArrayPool <: ArrayPool {
 
     private func evictToSize(size: Int64): Unit {
         while (currentSize > size) {
-            let evicted: Option<Array<UInt8>> = uint8GroupedMap.removeLast();
-            if(match(evicted) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                throw DropletException("evicted error")
+            let evicted: Option<Array<UInt8>> = uint8GroupedMap.removeLast()
+            if(evicted.isNone()){
+               throw DropletException("evicted error")
             }
-
             let arrayLength = uint8Adapter.getArrayLength(evicted.getOrThrow())
-            let elementSizeBytes = uint8Adapter.getElementSizeInBytes();
+            let elementSizeBytes = uint8Adapter.getElementSizeInBytes()
 
-            let targetLength = arrayLength * elementSizeBytes;
+            let targetLength = arrayLength * elementSizeBytes
             currentSize = currentSize - targetLength
-            decrementArrayOfSize(uint8Adapter.getArrayLength(evicted.getOrThrow()), ARR_TYPE_U8);
+            decrementArrayOfSize(uint8Adapter.getArrayLength(evicted.getOrThrow()), ARR_TYPE_U8)
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
  
 package droplet.droplet
@@ -26,7 +26,7 @@ public class CustomMapItem<K, V> <: Hashable & ToString where K <: Hashable & To
 }
 
 public open class CustomMap<K, V> <: ToString & Equatable<CustomMap<K, V>> where K <: Hashable & ToString & Equatable<K>, V <: ToString & Equatable<V> {
-    public var list: ArrayList<CustomMapItem<K, V>> = ArrayList<CustomMapItem<K, V>>()
+     var list: ArrayList<CustomMapItem<K, V>> = ArrayList<CustomMapItem<K, V>>()
 
      func size(): Int64 {
         return list.size

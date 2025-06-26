@@ -170,11 +170,9 @@ public class GifFrameLoader {
         // // Get the delay before incrementing the pointer because the delay indicates the amount of time
         // // we want to spend on the current frame.
         // 解码
-        if(match(decodeFuture) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            decodeFuture = Some(spawn {
+
+        if(decodeFuture.isNone()){
+             decodeFuture = spawn {
                 for(i in 0..getFrameCount() - 1) {
                     gifDecoder.advance();
                     let (ret1, frame) = gifDecoder.getNextFrame();
@@ -188,9 +186,11 @@ public class GifFrameLoader {
                     mon.unlock()
                 }
                 isDecoding = false;
-            })
+            }
         }
     }
+
+
      func onFrameReady(): Unit {
         for (i in 0 .. callbacks.size) {
             let cb: FrameCallback = callbacks[i];

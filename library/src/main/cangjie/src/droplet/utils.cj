@@ -95,61 +95,39 @@ public class Utils {
     }
 
     public static func optionEquals<T>(o1: Option<T>, o2: Option<T>): Bool where T <: Equatable<T> {
-        if(match(o1) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            if(match(o2) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                return true
-            } else {
+        if(let Some(i) <- o1){
+            if(let Some(j) <- o2){
+                return i == j
+            }else{
                 return false
             }
-        } else {
-            if(match(o2) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                return false
-            } else {
-                return o1.getOrThrow() == o2.getOrThrow()
+        }else{
+            if(let Some(j) <- o2){
+                 return false
+            }else{
+                return true
             }
         }
-
         return false
     }
 
     public static func optionEqualsNotSame<T, T2>(o1: Option<T>, o2: Option<T2>): Bool where T <: Equatable<T> {
-        if(match(o1) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            if(match(o2) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                return true
-            } else {
-                return false
-            }
-        } else {
-            if(match(o2) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                return false
-            } else {
-                let o3: T2 = o2.getOrThrow()
+        if(let Some(i) <- o1){
+            if(let Some(j) <- o2){
+                let o3: T2 = j
                 if(o3 is T) {
-                    return o1.getOrThrow() == (o3 as T).getOrThrow()
+                    return i == (o3 as T).getOrThrow()
                 }
                 return false
-                
+            }else{
+                return false
+            }
+        }else{
+            return match(o2) {
+                case Some(x) => false
+                case _ => true
             }
         }
-
         return false
     }
 

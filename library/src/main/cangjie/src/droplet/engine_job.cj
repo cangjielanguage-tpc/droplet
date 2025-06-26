@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
  
 package droplet.droplet
@@ -113,21 +113,13 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
             cb.onResourceReady(engineResource.getOrThrow() as AnyDropletResource, dataSource.getOrThrow(), isLoadedFromAlternateCacheKey);
     }
 
-    public func onResourceReady(resource: AnyDropletResource, 
-                          dataSource: DataSource, 
-                          isLoadedFromAlternateCacheKey: Bool): Unit {
-
-                            synchronized (mtx) {
-                                if(resource is DropletResource<InputStream>) {
-                                } else if(resource is DropletResource<GifDrawable>) {
-                                } else if(resource is DropletResource<PixelMap>) {
-                                }
-                                this.resource = Some(resource);
-                                this.dataSource = Some(dataSource);
-                                this.isLoadedFromAlternateCacheKey = isLoadedFromAlternateCacheKey;
-                            }
-                            notifyCallbacksOfResult();
-
+    public func onResourceReady(resource: AnyDropletResource, dataSource: DataSource, isLoadedFromAlternateCacheKey: Bool): Unit {
+        synchronized (mtx) {
+            this.resource = resource
+            this.dataSource = dataSource
+            this.isLoadedFromAlternateCacheKey = isLoadedFromAlternateCacheKey
+        }
+        notifyCallbacksOfResult()
     }
 
     public func onLoadFailed(e: DropletException): Unit {
@@ -261,24 +253,17 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
 
      func cancel(): Unit {
         if (isDone()) {
-            return;
+            return
         }
 
-        isCancelled = true;
-        if(match(decodeJob) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            decodeJob.getOrThrow().cancel();
+        isCancelled = true
+        if(let Some(i) <- decodeJob){
+             i.cancel()
         }
-        
-        if(match(key) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            engineJobListener.onEngineJobCancelled(this, key.getOrThrow());
+
+        if(let Some(i) <- key){
+             engineJobListener.onEngineJobCancelled(this, i)
         }
-        
     }
 
      func callCallbackOnLoadFailed(cb: ResourceCallback): Unit {
@@ -286,9 +271,9 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
         // simpler to encapsulate here than to do so at the actual call point in the Request
         // implementation.
         try {
-            cb.onLoadFailed(this.exception.getOrThrow());
+            cb.onLoadFailed(this.exception.getOrThrow())
         } catch (e: Exception) {
-            throw DropletException("callCallbackOnLoadFailed: ${e}");
+            throw DropletException("callCallbackOnLoadFailed: ${e}")
         }
     }
 
@@ -298,53 +283,45 @@ public class EngineJob <: DecodeJobCallback & Equatable<EngineJob> {
                 case Some(x) => true
                 case _ => false
             }) {
-                engineResource.getOrThrow().acquire();
+                engineResource.getOrThrow().acquire()
             }
         }
     }
 
      func decrementPendingCallbacks(): Unit {
-        var toRelease: Option<AnyEngineResource> = None;
+        var toRelease: Option<AnyEngineResource> = None
         synchronized (mtx) {
-            stateVerifier.throwIfRecycled();
+            stateVerifier.throwIfRecycled()
             pendingCallbacks.fetchSub(1)
-            let decremented: Int64 = pendingCallbacks.load();
+            let decremented: Int64 = pendingCallbacks.load()
             if (decremented == 0) {
-                toRelease = engineResource;
-
-                release();
+                toRelease = engineResource
+                release()
             }
         }
 
-        if (match(toRelease) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            toRelease.getOrThrow().release();
+        if(let Some(i) <- toRelease){
+            i.release()
         }
     }
 
     private func release(): Unit {
         synchronized(mtx) {
-            if (match(key) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                throw IllegalArgumentException();
+            if(key.isNone()){
+                throw IllegalArgumentException()
             }
-            cbs.clear();
-            key = None;
-            engineResource = None;
-            resource = None;
-            hasLoadFailed = false;
-            isCancelled = false;
-            hasResource = false;
-            isLoadedFromAlternateCacheKey = false;
-            decodeJob.getOrThrow().release(/*isRemovedFromQueue=*/ false);
-            decodeJob = None;
-            dataSource = None;
+            cbs.clear()
+            key = None
+            engineResource = None
+            resource = None
+            hasLoadFailed = false
+            isCancelled = false
+            hasResource = false
+            isLoadedFromAlternateCacheKey = false
+            decodeJob.getOrThrow().release(/*isRemovedFromQueue=*/ false)
+            decodeJob = None
+            dataSource = None
         }
-        
     }
 
      func getCancelled(): Bool {

@@ -40,27 +40,19 @@ public class RequestOptions <: BaseRequestOptions<RequestOptions> {
     }
 
     public static func fitCenterTransform(): RequestOptions {
-        if (match(fitCenterOptions) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if(fitCenterOptions.isNone()){
             var r = RequestOptions()
-            fitCenterOptions = r.fitCenter(RequestOptions()).autoClone();
+            fitCenterOptions = r.fitCenter(RequestOptions()).autoClone()
         }
-        
-        return fitCenterOptions.getOrThrow();
+        return fitCenterOptions.getOrThrow()
     }
 
     public static func centerInsideTransform(): RequestOptions {
-        if (match(centerInsideOptions) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if(centerInsideOptions.isNone()){
             var r = RequestOptions()
-            centerInsideOptions = r.centerInside(RequestOptions()).autoClone();
+            centerInsideOptions = r.centerInside(RequestOptions()).autoClone()
         }
-
-        return centerInsideOptions.getOrThrow();
+        return centerInsideOptions.getOrThrow()
     }
 
     public static func decodeTypeOf(resourceTypeClass: ResourceTypeClass): RequestOptions {

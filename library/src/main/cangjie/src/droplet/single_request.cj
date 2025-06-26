@@ -23,6 +23,26 @@ enum Status {
     |
         /** Cleared by the user with a placeholder set, may be restarted. */
         CLEARED
+
+
+    operator func ==(that: Status): Bool {
+        match ((this, that)) {
+            case (PENDING, PENDING) => true
+            case (RUNNING, RUNNING) => true
+            case (WAITING_FOR_SIZE, WAITING_FOR_SIZE) => true
+            case (COMPLETE, COMPLETE) => true
+            case (FAILED, FAILED) => true
+            case (CLEARED, CLEARED) => true
+            case _ => false
+        }
+    }
+
+
+    operator func !=(that: Status): Bool {
+        !(this == that)
+    }
+
+
 }
 
 public interface AnySingleRequest {
@@ -269,21 +289,15 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
 
     public override func begin(): Unit {
         synchronized(requestLock) {
-            stateVerifier.throwIfRecycled();
+            stateVerifier.throwIfRecycled()
 
-            if (match (status) {
-                case Status.RUNNING => true
-                case _ => false
-            }) {
-                throw IllegalArgumentException("Cannot restart a running request");
+            if(status == Status.RUNNING){
+                throw IllegalArgumentException("Cannot restart a running request")
             }
 
-            if (match (status) {
-                case Status.COMPLETE => true
-                case _ => false
-            }) {
-                onResourceReady((resource.getOrThrow() as AnyDropletResource), DataSource.MEMORY_CACHE, /* isLoadedFromAlternateCacheKey= */ false);
-                return;
+            if(status == Status.COMPLETE){
+                onResourceReady((resource.getOrThrow() as AnyDropletResource), DataSource.MEMORY_CACHE, /* isLoadedFromAlternateCacheKey= */ false)
+                return
             }
 
             // Restarts for requests that are neither complete nor running can be treated as new requests
@@ -310,12 +324,9 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
                 case _ => false
             }) && canNotifyStatusChanged()) {
                 let d: Option<CJResourceDrawable> = getPlaceholderDrawable()
-                if (match (d) {
-                    case Some(x) => true
-                    case _ => false
-                }) {
-                    target.onLoadStarted(Some(d.getOrThrow()));
-                } else {
+                if(let Some(i) <- d){
+                    target.onLoadStarted(i)
+                }else{
                     target.onLoadStarted(Option<CJResourceDrawable>.None)
                 }
             }
@@ -335,11 +346,8 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
         target.removeCallback();
 
         // TODO Engine
-        if (match (loadStatus) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            loadStatus.getOrThrow().cancel()
+        if(let Some(i) <- loadStatus){
+            i.cancel()
             loadStatus = None
         }
     }
@@ -367,42 +375,30 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
                 case Status.CLEARED => "CLEARED"
                 case _ => "OTHER"
             }
-
-            if (match (status) {
-                case Status.CLEARED => true
-                case _ => false
-            }) {
-                return;
+            if(status == Status.CLEARED){
+                return
             }
-            cancel();
+            cancel()
             // Resource must be released before canNotifyStatusChanged is called.
-            if (match (resource) {
-                case Some(x) => true
-                case _ => false
-            }) {
+            if(let Some(i) <- resource){
                 toRelease = resource
                 resource = None
             }
             if (canNotifyCleared()) {
-                target.onLoadCleared(getPlaceholderDrawable());
+                target.onLoadCleared(getPlaceholderDrawable())
             }
 
             status = Status.CLEARED
         }
-
-        if (match (toRelease) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            // Engine
-            engine.release(toRelease.getOrThrow());
+        if(let Some(i) <- toRelease){
+             engine.release(i)
         }
     }
 
     public override func pause(): Unit {
         synchronized(requestLock) {
             if (isRunning()) {
-                clear();
+                clear()
             }
         }
     }
@@ -457,49 +453,39 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
 
     func setErrorPlaceholder(): Unit {
         if (!canNotifyStatusChanged()) {
-            return;
+            return
         }
 
-        var error: Option<CJResourceDrawable> = None;
+        var error: Option<CJResourceDrawable> = None
         // Either the model isn't null, or there was no fallback drawable set.
-        if (match (error) {
-            case Some(x) => false
-            case _ => true
-        }) {
+
+        if(error.isNone()){
             error = getErrorDrawable()
         }
         // The model isn't null, no fallback drawable was set or no error drawable was set.
-        if (match (error) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            error = getPlaceholderDrawable()
+        if(error.isNone()){
+           error = getPlaceholderDrawable()
         }
 
-        if (match (error) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            target.onLoadFailed(Option<CJResourceDrawable>.None);
-        } else {
-            target.onLoadFailed(Some(error.getOrThrow()));
+        if(let Some(i) <- error){
+            target.onLoadFailed(Some(i))
+        }else{
+            target.onLoadFailed(Option<CJResourceDrawable>.None)
         }
     }
 
     /** A callback method that should never be invoked directly. */
     public override func onSizeReady(width: Int64, height: Int64): Unit {
-        stateVerifier.throwIfRecycled();
+        stateVerifier.throwIfRecycled()
         synchronized(requestLock) {
 
-            if (match (status) {
-                case Status.WAITING_FOR_SIZE => false
-                case _ => true
-            }) {
-                return;
+            if(status != Status.WAITING_FOR_SIZE){
+                return
             }
+
             status = Status.RUNNING
 
-            var sizeMultiplier: Float32 = requestOptions.getSizeMultiplier();
+            var sizeMultiplier: Float32 = requestOptions.getSizeMultiplier()
             this.width = maybeApplySizeMultiplier(width, sizeMultiplier)
             this.height = maybeApplySizeMultiplier(height, sizeMultiplier)
 
@@ -528,10 +514,7 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
             // even though under any executor running on any thread but the main thread, the load would
             // have completed asynchronously.
             // 这是一个现在只对测试加载同步完成有用的破解，即使在除主线程外的任何线程上运行的任何执行器下，加载都会异步完成。
-            if (match (status) {
-                case Status.RUNNING => false
-                case _ => true
-            }) {
+            if(status != Status.RUNNING){
                 loadStatus = None
             }
         }
@@ -546,61 +529,42 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
     }
 
     private func canSetResource(): Bool {
-        if (match (requestCoordinator) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if(requestCoordinator.isNone()){
             return true
         }
         return requestCoordinator.getOrThrow().canSetImage(this);
     }
 
     private func canNotifyCleared(): Bool {
-        if (match (requestCoordinator) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if(requestCoordinator.isNone()){
             return true
         }
-        return requestCoordinator.getOrThrow().canNotifyCleared(this);
+        return requestCoordinator.getOrThrow().canNotifyCleared(this)
     }
 
     private func canNotifyStatusChanged(): Bool {
-        if (match (requestCoordinator) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if(requestCoordinator.isNone()){
             return true
         }
-        return requestCoordinator.getOrThrow().canNotifyStatusChanged(this);
+        return requestCoordinator.getOrThrow().canNotifyStatusChanged(this)
     }
 
     private func isFirstReadyResource(): Bool {
-        if (match (requestCoordinator) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            return true
+        if(requestCoordinator.isNone()){
+             return true
         }
         return !requestCoordinator.getOrThrow().getRoot().isAnyResourceSet()
     }
 
     private func notifyRequestCoordinatorLoadSucceeded(): Unit {
-        if (match (requestCoordinator) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            requestCoordinator.getOrThrow().onRequestSuccess(this);
-        } else {
+        if(let Some(i) <- requestCoordinator){
+           i.onRequestSuccess(this)
         }
     }
 
     private func notifyRequestCoordinatorLoadFailed(): Unit {
-        if (match (requestCoordinator) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            requestCoordinator.getOrThrow().onRequestFailed(this);
+        if(let Some(i) <- requestCoordinator){
+            i.onRequestFailed(this)
         }
     }
 
@@ -621,34 +585,23 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
         var toRelease: Option<AnyDropletResource> = None;
         synchronized(requestLock) {
             try {
-                if (match (resource) {
-                    case Some(x) => false
-                    case _ => true
-                }) {
+                if(resource.isNone()){
                     // TODO onLoadFailed
-                    var exception: DropletException = DropletException(
-                        "Expected to receive a Resource<R> with an object of ${transcodeTypeClass} inside, but instead got null."
-                    );
-                    onLoadFailed(exception);
-                    return;
+                    var exception: DropletException = DropletException("Expected to receive a Resource<R> with an object of ${transcodeTypeClass} inside, but instead got null.")
+                    onLoadFailed(exception)
+                    return
                 }
-
                 var received: Any = resource.getOrThrow().getAsAny();
-
                 // TODO 解码类型和资源类型不同的情况 正常应该执行不到
-
                 if (!canSetResource()) {
                     toRelease = resource
                     this.resource = None
                     // We can't put the status to complete before asking canSetResource().
                     status = Status.COMPLETE
-                    return;
+                    return
                 }
-
                 let a: Option<DropletResource<R>> = resource.getOrThrow() as DropletResource<R>
-
                 var b: Option<R> = received as R
-
                 // transcode
                 var s: Option<InputStream> = None
                 var g: Option<GifDrawable> = None
@@ -659,68 +612,32 @@ public class SingleRequest<R> <: AnySingleRequest & LoadRequest & SizeReadyCallb
                     s = received as InputStream
                 } else if (received is GifDrawable) {
                     g = received as GifDrawable
-
                     if (transcodeTypeClass == TransformationKey(TransformationKey.TRANSFORMATION_PIXELMAP)) {
                         pixelMap = Some(g.getOrThrow().getCurrentFrame())
-                    } else {
-                        // 从内存加载的Drawable
-                        if (match (dataSource) {
-                            case MEMORY_CACHE => true
-                            case _ => false
-                        }) {
-                            // TODO 复制一个新的GifDrawable
-                        }
-                    }
-                } else if (received is PixelMapDrawable) {
-                    // 从内存加载的Drawable
-                    if (match (dataSource) {
-                        case MEMORY_CACHE => true
-                        case _ => false
-                    }) {
-                        // TODO 复制一个新的PixelMapDrawable
                     }
                 }
-
                 // 文件下载
-                if (match (s) {
-                    case Some(x) => true
-                    case _ => false
-                }) {
-                    if (transcodeTypeClass == TransformationKey(TransformationKey.TRANSFORMATION_PIXELMAP)) {
-                        let inputStream: InputStream = s.getOrThrow()
+
+                if(let Some(kk) <- s){
+                     if (transcodeTypeClass == TransformationKey(TransformationKey.TRANSFORMATION_PIXELMAP)) {
+                        let inputStream: InputStream = kk
                         var size = match (inputStream as Seekable) {
                             case Some(v) => v.length
                             case None => 0
                         }
                         let buf: Array<UInt8> = Array<UInt8>(size, item: 0)
-
                         inputStream.read(buf)
                     }
                 }
-
                 // 图片显示
-                if (match (pixelMap) {
-                    case Some(x) => true
-                    case _ => false
-                }) {
-                    b = pixelMap.getOrThrow() as R
+                if(let Some(i) <- pixelMap){
+                     b = i as R
                 }
-
-                if (match (b) {
-                    case Some(x) => true
-                    case _ => false
-                }) {
-                } else {
-                }
-                onResourceReady(a, b.getOrThrow(), dataSource);
+                onResourceReady(a, b.getOrThrow(), dataSource)
             } finally {
-
                 // TODO engine
-                if (match (toRelease) {
-                    case Some(x) => true
-                    case _ => false
-                }) {
-                    engine.release(toRelease.getOrThrow())
+                if(let Some(i) <- toRelease){
+                     engine.release(i)
                 }
             }
         }

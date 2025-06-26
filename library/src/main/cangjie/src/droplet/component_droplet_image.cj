@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2024-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2024-2025. All rights reserved.
  */
 
 package droplet.droplet
@@ -622,7 +622,6 @@ public class DropletImageComponent {
                         p: PixelMap => launch {
                             isLoading = false
                             pixelMap = p
-                            AppLog.error("pix 进来主图")
 
                             if (let Some(i) <- dropletOption.transitionOption) {
                                 //创建动画对象

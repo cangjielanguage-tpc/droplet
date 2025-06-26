@@ -100,15 +100,12 @@ public open class LruCache<T, Y> where T <: DropletAny<T>, Y <: DropletAny<Y> {
    */
    func get(key: T): Option<Y> {
     synchronized(mtx) {
-        var entry: Option<MemoryEntry<Y>> = cache.get(key);
-        if(match(entry) {
-            case Some(x) => true
-            case _ => false
-        }) {
-          let e: MemoryEntry<Y> = entry.getOrThrow()
-          return Some(e.value)
-        } else {
-          return None
+        var entry: Option<MemoryEntry<Y>> = cache.get(key)
+        if(let Some(i) <- entry){
+            let e: MemoryEntry<Y> = i
+            return e.value
+        }else{
+            return None
         }
     }
   }
@@ -139,34 +136,23 @@ public open class LruCache<T, Y> where T <: DropletAny<T>, Y <: DropletAny<Y> {
    */
    public func put(key: T, item: Y): Option<Y> {
     synchronized(mtx) {
-        let itemSize: Int64 = getSize(item);
+        let itemSize: Int64 = getSize(item)
         if (itemSize >= maxSize) {
-            onItemEvicted(key, item);
-            return None;
+            onItemEvicted(key, item)
+            return None
         }
-
-        currentSize += itemSize;
-
-        var old: Option<MemoryEntry<Y>> = cache.put(key, MemoryEntry<Y>(item, itemSize));
-        
-        if (match(old) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            currentSize -= old.getOrThrow().size;
-
-            if (old.getOrThrow().value != item) {
-                onItemEvicted(key, old.getOrThrow().value);
+        currentSize += itemSize
+        var old: Option<MemoryEntry<Y>> = cache.put(key, MemoryEntry<Y>(item, itemSize))
+        if (let Some(i) <- old) {
+            currentSize -= i.size
+            if (i.value != item) {
+                onItemEvicted(key,i.value)
             }
         }
-        evict();
-
-        if(match(old) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            return Some(old.getOrThrow().value)
-        } else {
+        evict()
+        if(let Some(i) <- old){
+            return i.value
+        }else{
             return None
         }
     }
@@ -179,21 +165,18 @@ public open class LruCache<T, Y> where T <: DropletAny<T>, Y <: DropletAny<Y> {
    */
   public func remove(key: T): Option<Y> {
     synchronized(mtx) {
-        var entry: Option<MemoryEntry<Y>> = cache.remove(key);
-        if (match(entry) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            return None;
+        var entry: Option<MemoryEntry<Y>> = cache.remove(key)
+        if(entry.isNone()){
+           return None
         }
-        currentSize -= entry.getOrThrow().size;
-        return entry.getOrThrow().value;
+        currentSize -= entry.getOrThrow().size
+        return entry.getOrThrow().value
     }
   }
 
   /** Clears all items in the cache. */
   public func clearMemory(): Unit {
-    trimToSize(0);
+    trimToSize(0)
   }
 
   /**

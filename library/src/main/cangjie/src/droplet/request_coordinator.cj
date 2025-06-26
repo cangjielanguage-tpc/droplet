@@ -184,13 +184,10 @@ public class ErrorRequestCoordinator <: RequestCoordinator & LoadRequest {
   }
 
   private func parentCanSetImage(): Bool {
-    if(match(parent) {
-        case Some(x) => false
-        case _ => true
-    }) {
-        return true
-    } else {
-        return parent.getOrThrow().canSetImage(this);
+    if(let Some(i) <- parent){
+         return i.canSetImage(this)
+    }else{
+         return true
     }
   }
 
@@ -207,24 +204,18 @@ public class ErrorRequestCoordinator <: RequestCoordinator & LoadRequest {
   }
 
   private func parentCanNotifyCleared(): Bool {
-    if(match(parent) {
-        case Some(x) => false
-        case _ => true
-    }) {
+    if(let Some(i) <- parent){
+        return i.canNotifyCleared(this)
+    }else{
         return true
-    } else {
-        return parent.getOrThrow().canNotifyCleared(this);
     }
   }
 
   private func parentCanNotifyStatusChanged(): Bool {
-    if(match(parent) {
-        case Some(x) => false
-        case _ => true
-    }) {
+    if(let Some(i) <- parent){
+        return i.canNotifyStatusChanged(this)
+    }else{
         return true
-    } else {
-        return parent.getOrThrow().canNotifyStatusChanged(this);
     }
   }
 
@@ -250,15 +241,12 @@ public class ErrorRequestCoordinator <: RequestCoordinator & LoadRequest {
   public override func onRequestSuccess(request: LoadRequest): Unit {
     synchronized (requestLock) {
       if (request.equals(primary)) {
-        primaryState = RequestState.SUCCESS;
+        primaryState = RequestState.SUCCESS
       } else if (request.equals(error)) {
-        errorState = RequestState.SUCCESS;
+        errorState = RequestState.SUCCESS
       }
-      if(match(parent) {
-        case Some(x) => true
-        case _ => false
-      }) {
-        parent.getOrThrow().onRequestSuccess(this);
+      if(let Some(i) <- parent){
+          i.onRequestSuccess(this)
       }
     }
   }
@@ -266,37 +254,29 @@ public class ErrorRequestCoordinator <: RequestCoordinator & LoadRequest {
   public override func onRequestFailed(request: LoadRequest): Unit {
     synchronized (requestLock) {
       if (!request.equals(error)) {
-        primaryState = RequestState.FAILED;
+        primaryState = RequestState.FAILED
         if (errorState != RequestState.RUNNING) {
-          errorState = RequestState.RUNNING;
-          error.begin();
+          errorState = RequestState.RUNNING
+          error.begin()
         }
-        return;
+        return
       }
-
-      errorState = RequestState.FAILED;
-
-    if(match(parent) {
-        case Some(x) => true
-        case _ => false
-      }) {
-        parent.getOrThrow().onRequestFailed(this);
+      errorState = RequestState.FAILED
+      if(let Some(i) <- parent){
+          i.onRequestFailed(this)
       }
     }
   }
 
   public func getRoot(): RequestCoordinator {
     synchronized (requestLock) {
-        if(match(parent) {
-        case Some(x) => true
-        case _ => false
-      }) {
-        return parent.getOrThrow().getRoot()
-      } else {
-        return this
-      }
+          if(let Some(i) <- parent){
+            return i.getRoot()
+          }else{
+             return this
+          }
+        }
     }
-  }
 
   public override func hashCode(): Int64 {
     Utils.hashCodeWrite(this.primary.hashCode(), reset: true)
@@ -353,14 +333,11 @@ public class ThumbnailRequestCoordinator <: RequestCoordinator & LoadRequest {
   }
 
   private func parentCanSetImage(): Bool {
-    if(match(parent) {
-        case Some(x) => false
-        case _ => true
-    }) {
+     if(let Some(i) <- parent){
+        return i.canSetImage(this)
+     }else{
         return true
-    } else {
-        return parent.getOrThrow().canSetImage(this);
-    }
+     }
   }
 
   /**
@@ -382,25 +359,19 @@ public class ThumbnailRequestCoordinator <: RequestCoordinator & LoadRequest {
   }
 
   private func parentCanNotifyCleared(): Bool {
-    if(match(parent) {
-        case Some(x) => false
-        case _ => true
-    }) {
+    if(let Some(i) <- parent){
+        return i.canNotifyCleared(this)
+    }else{
         return true
-    } else {
-        return parent.getOrThrow().canNotifyCleared(this);
     }
   }
 
   private func parentCanNotifyStatusChanged(): Bool {
-    if(match(parent) {
-        case Some(x) => false
-        case _ => true
-    }) {
+     if(let Some(i) <- parent){
+        return i.canNotifyStatusChanged(this)
+     }else{
         return true
-    } else {
-        return parent.getOrThrow().canNotifyStatusChanged(this);
-    }
+     }
   }
 
   public override func isAnyResourceSet(): Bool {
@@ -412,21 +383,19 @@ public class ThumbnailRequestCoordinator <: RequestCoordinator & LoadRequest {
   public override func onRequestSuccess(request: LoadRequest): Unit {
     synchronized (requestLock) {
       if (request.equals(thumb)) {
-        thumbStatecj = RequestState.SUCCESS;
-        return;
+        thumbStatecj = RequestState.SUCCESS
+        return
       }
-      fullStatecj = RequestState.SUCCESS;
-      if(match(parent) {
-        case Some(x) => true
-        case _ => false
-      }) {
-        parent.getOrThrow().onRequestSuccess(this);
+      fullStatecj = RequestState.SUCCESS
+
+      if(let Some(i) <- parent){
+           i.onRequestSuccess(this)
       }
       // Clearing the thumb is not necessarily safe if the thumb is being displayed in the Target,
       // as a layer in a cross fade for example. The only way we know the thumb is not being
       // displayed and is therefore safe to clear is if the thumb request has not yet completed.
       if (!thumbStatecj.isComplete()) {
-        thumb.clear();
+        thumb.clear()
       } else {
       }
     }
@@ -435,30 +404,23 @@ public class ThumbnailRequestCoordinator <: RequestCoordinator & LoadRequest {
   public override func onRequestFailed(request: LoadRequest): Unit {
     synchronized (requestLock) {
       if (!request.equals(full)) {
-        thumbStatecj = RequestState.FAILED;
-        return;
+        thumbStatecj = RequestState.FAILED
+        return
       }
-      fullStatecj = RequestState.FAILED;
-
-    if(match(parent) {
-        case Some(x) => true
-        case _ => false
-      }) {
-        parent.getOrThrow().onRequestFailed(this);
+      fullStatecj = RequestState.FAILED
+      if(let Some(i) <- parent){
+          i.onRequestFailed(this)
       }
     }
   }
 
   public override func getRoot(): RequestCoordinator {
     synchronized (requestLock) {
-        if(match(parent) {
-        case Some(x) => true
-        case _ => false
-      }) {
-        return parent.getOrThrow().getRoot()
-      } else {
-        return this
-      }
+       if(let Some(i) <- parent){
+           return i.getRoot()
+       }else{
+           return this
+       }
     }
   }
 

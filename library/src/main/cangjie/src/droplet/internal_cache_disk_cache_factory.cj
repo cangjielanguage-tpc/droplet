@@ -38,14 +38,11 @@ public class InternalCacheDirectoryGetter <: CacheDirectoryGetter {
 
         // TODO 缓存文件夹
         var cacheDirectory: DropletFile = DropletFile("/data/storage/el2/base/haps/entry/diskcachetemp")
-        if (match(this.diskCacheName) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            return DropletFile(cacheDirectory, this.diskCacheName.getOrThrow());
-        }
 
-        return cacheDirectory;
+        if(let Some(i) <- this.diskCacheName){
+             return DropletFile(cacheDirectory,i)
+        }
+        return cacheDirectory
     }
 }
 
