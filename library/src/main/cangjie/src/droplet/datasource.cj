@@ -31,6 +31,24 @@ public enum DataSource <: ToString {
       case NONE => "DataSourceNONE"
     }
   }
+
+
+      operator func ==(that: DataSource): Bool {
+        match ((this, that)) {
+            case (LOCAL, LOCAL) => true
+            case (REMOTE, REMOTE) => true
+            case (DATA_DISK_CACHE, DATA_DISK_CACHE) => true
+            case (RESOURCE_DISK_CACHE, RESOURCE_DISK_CACHE) => true
+            case (MEMORY_CACHE, MEMORY_CACHE) => true
+            case (NONE, NONE) => true
+            case _ => false
+        }
+    }
+
+    operator func !=(that: DataSource): Bool {
+          !(this == that)
+    }
+
 }
 
 public enum EncodeStrategy <: ToString {
@@ -53,5 +71,21 @@ public enum EncodeStrategy <: ToString {
       case NONE => "EncodeStrategyNONE"
     }
   }
+
+
+    operator func ==(that: EncodeStrategy): Bool {
+        match ((this, that)) {
+            case (SOURCE, SOURCE) => true
+            case (TRANSFORMED, TRANSFORMED) => true
+            case (NONE, NONE) => true
+            case _ => false
+        }
+    }
+
+    operator func !=(that: EncodeStrategy): Bool {
+          !(this == that)
+    }
+
+
 }
 

@@ -15,13 +15,7 @@ public class Jobs {
 
    func get(key: AnyKey, onlyRetrieveFromCache: Bool): Option<EngineJob> {
     let oo: HashMap<AnyKey, EngineJob> = getJobMap(onlyRetrieveFromCache)
-    let o: Option<EngineJob> = oo.get(key);
-    if(match(o) {
-      case Some(x) => true
-      case _ => false
-    }) {
-    } else {
-    }
+    let o: Option<EngineJob> = oo.get(key)
     return o
   }
 

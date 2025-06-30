@@ -38,13 +38,10 @@ public class DropletContext {
 
      func getDefaultRequestOptions(): RequestOptions {
         synchronized (mtx) {
-            if (match(defaultRequestOptions) {
-                    case Some(x) => false
-                    case _ => true
-                }) {
-                defaultRequestOptions = Some(defaultRequestOptionsFactory.build().lock());
+            if(defaultRequestOptions.isNone()){
+                defaultRequestOptions = defaultRequestOptionsFactory.build().lock()
             }
-            return defaultRequestOptions.getOrThrow();
+            return defaultRequestOptions.getOrThrow()
         }
     }
 

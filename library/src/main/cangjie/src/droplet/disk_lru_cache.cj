@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
 
 package droplet.droplet
@@ -134,44 +134,36 @@ public class DiskLruCache {
             // If we ended on a truncated line, rebuild the journal before appending to it.
 
             journalWriter = Some(journalFile.getStringWriter());
-        } finally {
-            if(match(journalFile.file) {
-                case Some(x) => true
-                case _ => false
-            }) {
-            }
+        } catch (e:Exception){
+            AppLog.error(e.toString())
         }
     }
 
     private func readJournalLine(line: String): Unit {
         var firstSpace: Int64 = line.indexOf(' '.toString()).getOrThrow()
         if (firstSpace == -1) {
-            throw Exception("unexpected journal line: ${line}");
+            throw Exception("unexpected journal line: ${line}")
         }
 
-        var keyBegin: Int64 = firstSpace + 1;
+        var keyBegin: Int64 = firstSpace + 1
         var secondSpace: Option<Int64> = line.indexOf(' '.toString(), keyBegin)
-        let key: String;
-        if (match(secondSpace) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        let key: String
+
+        if(let Some(i) <- secondSpace){
+            key = line[keyBegin .. i]
+        }else{
             key = line[keyBegin..]
             if (firstSpace == REMOVE.size && line.startsWith(REMOVE)) {
-                lruEntries.remove(key);
-                return;
+                lruEntries.remove(key)
+                return
             }
-        } else {
-            key = line[keyBegin .. secondSpace.getOrThrow()]
         }
 
-        var entry: Option<DiskEntry> = lruEntries.get(key);
-        if (match(entry) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            entry = Some(DiskEntry(key, this));
-            lruEntries.put(key, entry.getOrThrow());
+        var entry: Option<DiskEntry> = lruEntries.get(key)
+
+        if(entry.isNone()){
+            entry = DiskEntry(key, this)
+            lruEntries.put(key, entry.getOrThrow())
         }
 
         var secondSpaceTrue: Bool = match(secondSpace) {
@@ -192,7 +184,7 @@ public class DiskLruCache {
         } else if (secondSpaceFalse && firstSpace == READ.size && line.startsWith(READ)) {
             // This work was already done by calling lruEntries.get().
         } else {
-            throw Exception("unexpected journal line: " + line);
+            throw Exception("unexpected journal line: " + line)
         }
     }
 
@@ -206,25 +198,22 @@ public class DiskLruCache {
         while(i < lruEntries.list.size) {
             var entry: DiskEntry = lruEntries.list[i].v
 
-            if (match(entry.currentEditor) {
-                case Some(x) => false
-                case _ => true
-            }) {
+            if(entry.currentEditor.isSome()){
+                entry.currentEditor = None
                 var t = 0
                 while(t < valueCount) {
-                    size += entry.lengths[t];
-                    t++
-                }
-                i++
-            } else {
-                entry.currentEditor = None;
-                var t = 0
-                while(t < valueCount) {
-                    deleteIfExistsStatic(entry.getCleanFile(t));
-                    deleteIfExistsStatic(entry.getDirtyFile(t));
+                    deleteIfExistsStatic(entry.getCleanFile(t))
+                    deleteIfExistsStatic(entry.getDirtyFile(t))
                     t++
                 }
                 lruEntries.remove(lruEntries.list[i].k)
+            }else{
+                var t = 0
+                while(t < valueCount) {
+                    size += entry.lengths[t]
+                    t++
+                 }
+                i++
             }
         }
     }
@@ -235,46 +224,36 @@ public class DiskLruCache {
     */
     private func rebuildJournal(): Unit {
         synchronized(mtx) {
-            if (match(journalWriter) {
-                case Some(x) => true
-                case _ => false
-            }) {
-            }
 
             var writercj: StringWriter<File> = journalFileTmp.getStringWriter()
-            writercj.write(MAGIC);
-            writercj.write("\n");
-            writercj.write(VERSION_1);
-            writercj.write("\n");
-            writercj.write(appVersion.toString());
-            writercj.write("\n");
-            writercj.write(valueCount.toString());
-            writercj.write("\n");
-            writercj.write("\n");
+            writercj.write(MAGIC)
+            writercj.write("\n")
+            writercj.write(VERSION_1)
+            writercj.write("\n")
+            writercj.write(appVersion.toString())
+            writercj.write("\n")
+            writercj.write(valueCount.toString())
+            writercj.write("\n")
+            writercj.write("\n")
 
             var i=0
             while(i < lruEntries.list.size) {
                 var entry: DiskEntry = lruEntries.list[i].v
-
-                if (match(entry.currentEditor) {
-                    case Some(x) => true
-                    case _ => false
-                }) {
-                    writercj.write("${DIRTY}${' '}${entry.key}${'\n'}");
-                } else {
-                    writercj.write("${CLEAN}${' '}${entry.key}${entry.getLengths()}${'\n'}");
+                if(entry.currentEditor.isSome()){
+                     writercj.write("${DIRTY}${' '}${entry.key}${'\n'}")
+                }else{
+                     writercj.write("${CLEAN}${' '}${entry.key}${entry.getLengths()}${'\n'}")
                 }
-
                 i++
             }
 
             writercj.flush()
 
             if (journalFile.exists()) {
-                renameToStatic(journalFile, journalFileBackup, true);
+                renameToStatic(journalFile, journalFileBackup, true)
             }
-            renameToStatic(journalFileTmp, journalFile, false);
-            journalFileBackup.delete();
+            renameToStatic(journalFileTmp, journalFile, false)
+            journalFileBackup.delete()
 
             journalWriter = Some(journalFile.getStringWriter())
         }
@@ -307,21 +286,19 @@ public class DiskLruCache {
             checkNotClosed();
             for(r in lruEntries.getIterator()) {
             }
-            var entry: Option<DiskEntry> = lruEntries.get(key);
-            if (match(entry) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                return None;
+            var entry: Option<DiskEntry> = lruEntries.get(key)
+
+            if(entry.isNone()){
+                return None
             }
 
             if (!entry.getOrThrow().readable) {
-                return None;
+                return None
             }
 
             for(f in entry.getOrThrow().cleanFiles) {
                 if (!f.exists()) {
-                    return None;
+                    return None
                 }
             }
 
@@ -350,37 +327,35 @@ public class DiskLruCache {
 
      func edit(key: String, expectedSequenceNumber: Int64): Option<Editor> {
         synchronized(mtx) {
-            checkNotClosed();
-            var entry: Option<DiskEntry> = lruEntries.get(key);
+            checkNotClosed()
+            var entry: Option<DiskEntry> = lruEntries.get(key)
             var entryNull: Bool = match(entry) {
                 case Some(x) => false
                 case _ => true
             }
             if (expectedSequenceNumber != ANY_SEQUENCE_NUMBER && (entryNull || 
             entry.getOrThrow().sequenceNumber != expectedSequenceNumber)) {
-                return None; // Value is stale.
+                return None // Value is stale.
             }
             if (entryNull) {
-                entry = Some(DiskEntry(key, this));
-                lruEntries.put(key, entry.getOrThrow());
-            } else if (match(entry.getOrThrow().currentEditor) {
-                case Some(x) => true
-                case _ => false
-            }) {
-                return None; // Another edit is in progress.
+                entry = Some(DiskEntry(key, this))
+                lruEntries.put(key, entry.getOrThrow())
+            }else{
+                if(let Some(k) <- entry.getOrThrow().currentEditor){
+                    return None
+                }
             }
-
-            var editor: Editor = Editor(entry.getOrThrow(), this.valueCount);
-            entry.getOrThrow().currentEditor = Some(editor);
+            var editor: Editor = Editor(entry.getOrThrow(), this.valueCount)
+            entry.getOrThrow().currentEditor = Some(editor)
 
             // Flush the journal before creating files to prevent file leaks.
             
-            journalWriter.getOrThrow().write(DIRTY);
-            journalWriter.getOrThrow().write(' ');
-            journalWriter.getOrThrow().write(key);
-            journalWriter.getOrThrow().write('\n');
-            flushWriter(journalWriter.getOrThrow());
-            return editor;
+            journalWriter.getOrThrow().write(DIRTY)
+            journalWriter.getOrThrow().write(' ')
+            journalWriter.getOrThrow().write(key)
+            journalWriter.getOrThrow().write('\n')
+            flushWriter(journalWriter.getOrThrow())
+            return editor
         }
     }
 
@@ -498,15 +473,10 @@ public class DiskLruCache {
      func executorServiceSubmit(): Unit {
         spawn {
             synchronized (mtx) {
-                if (match(journalWriter) {
-                    case Some(x) => false
-                    case _ => true
-                }) {
-                }
-                trimToSize();
+                trimToSize()
                 if (journalRebuildRequired()) {
-                    rebuildJournal();
-                    redundantOpCount = 0;
+                    rebuildJournal()
+                    redundantOpCount = 0
                 }
             }
         }
@@ -529,47 +499,44 @@ public class DiskLruCache {
     */
      func remove(key: String): Bool {
         synchronized(mtx) {
-            checkNotClosed();
-            var entry: Option<DiskEntry> = lruEntries.get(key);
-            if (match(entry) {
-                case Some(x) => false
-                case _ => true
-            } || match(entry.getOrThrow().currentEditor) {
-                case Some(x) => true
-                case _ => false
-            }) {
-                return false;
+            checkNotClosed()
+            var entry: Option<DiskEntry> = lruEntries.get(key)
+            if(let Some(j) <- entry){
+                if(j.currentEditor.isSome()){
+                    return false
+                }
+            }else{
+                return false
             }
-
             var i=0
             while(i < valueCount) {
-                var file: DropletFile = entry.getOrThrow().getCleanFile(i);
+                var file: DropletFile = entry.getOrThrow().getCleanFile(i)
                 let flagA = file.exists()
                 let flagB = file.delete()
                 if (flagA && !flagB) {
-                    throw Exception("droplet error: failed to delete ");
+                    throw Exception("droplet error: failed to delete ")
                 }
-                size -= entry.getOrThrow().lengths[i];
-                entry.getOrThrow().lengths[i] = 0;
+                size -= entry.getOrThrow().lengths[i]
+                entry.getOrThrow().lengths[i] = 0
 
                 i++
             }
 
-            redundantOpCount++;
-            journalWriter.getOrThrow().write(REMOVE);
-            journalWriter.getOrThrow().write(' ');
-            journalWriter.getOrThrow().write(key);
-            journalWriter.getOrThrow().write('\n');
+            redundantOpCount++
+            journalWriter.getOrThrow().write(REMOVE)
+            journalWriter.getOrThrow().write(' ')
+            journalWriter.getOrThrow().write(key)
+            journalWriter.getOrThrow().write('\n')
             journalWriter.getOrThrow().flush()
 
-            lruEntries.remove(key);
+            lruEntries.remove(key)
 
             if (journalRebuildRequired()) {
                 // 开线程
                 executorServiceSubmit()
             }
 
-            return true;
+            return true
         }
     }
 
@@ -585,11 +552,8 @@ public class DiskLruCache {
     }
 
     private func checkNotClosed(): Unit {
-        if (match(journalWriter) {
-                case Some(x) => false
-                case _ => true
-            }) {
-            throw Exception("droplet error: cache is closed");
+        if(journalWriter.isNone()){
+            throw Exception("droplet error: cache is closed")
         }
     }
 
@@ -603,31 +567,21 @@ public class DiskLruCache {
     }
 
     /** Closes this cache. Stored values will remain on the filesystem. */
-     func close(): Unit{
+     func close(): Unit {
         synchronized(mtx) {
-            if (match(journalWriter) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                return; // Already closed.
+            if(journalWriter.isNone()){
+                return
             }
-
             var i=0
             while(i < lruEntries.list.size) {
                 var entry: DiskEntry = lruEntries.list[i].v
-
-                if (match(entry.currentEditor) {
-                    case Some(x) => true
-                    case _ => false
-                }) {
-                    entry.currentEditor.getOrThrow().abort();
+                if(let Some(k) <- entry.currentEditor){
+                    k.abort()
                 }
-
                 i++
             }
-
-            trimToSize();
-            journalWriter = None;
+            trimToSize()
+            journalWriter = None
         }
     }
 
@@ -748,13 +702,9 @@ public class Editor <: DropletAny<Editor> {
             }
             var clearFile: DropletFile = entry.getCleanFile(index)
 
-            if(match(clearFile.file) {
-                case Some(x) => true
-                case _ => false
-            }) {
-                return Some(clearFile.getStringReader().readToEnd())
+            if(let Some(i) <- clearFile.file){
+                 return clearFile.getStringReader().readToEnd()
             }
-
             return None
         }
     }

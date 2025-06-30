@@ -19,28 +19,28 @@ public class SourceGenerator <: DataFetcherGenerator & FetcherReadyCallback {
     }
 
     private func startNextBegin(): Bool {
-        if (match (dataToCache) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            let data: Any = dataToCache.getOrThrow();
+
+        if(let Some(i) <- dataToCache){
+            let data: Any = i
             dataToCache = None
             try {
-                let isDataInCache: Bool = cacheData(data);
+                let isDataInCache: Bool = cacheData(data)
                 // If we failed to write the data to cache, the cacheData method will try to decode the
                 // original data directly instead of going through the disk cache. Since cacheData has
                 // already called our callback at this point, there's nothing more to do but return.
                 if (!isDataInCache) {
-                    return true;
+                    return true
                 }
             // If we were able to write the data to cache successfully, we now need to proceed to call
             // the sourceCacheGenerator below to load the data from cache.
             } catch (e: Exception) {
+                AppLog.error("exception=${e.toString()}")
                 // An IOException means we weren't able to write data to cache or we weren't able to rewind
                 // it after a disk cache write failed. In either case we can just move on and try the next
                 // fetch below.
             }
         }
+
         return false
     }
 
@@ -66,10 +66,7 @@ public class SourceGenerator <: DataFetcherGenerator & FetcherReadyCallback {
 
         let modelLoaders: Option<ArrayList<ModelLoader>> = helper.getModelLoaders()
 
-        if (match (modelLoaders) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if(modelLoaders.isNone()){
             return true
         }
 
@@ -88,52 +85,31 @@ public class SourceGenerator <: DataFetcherGenerator & FetcherReadyCallback {
             case None => 0
         }
 
-        if (match (o) {
-            case Some(x) => true
-            case _ => false
-        }) {
-
-            let oo = o.getOrThrow()
-
-            onDataReadyInternal(oo, helper.getDataSource(), ModelKey(model));
-
+        if(let Some(i) <- o){
+            let oo = i
+            onDataReadyInternal(oo, helper.getDataSource(), ModelKey(model))
             return true
-        } else {
+        }else{
             onDataFetcherFailed()
             return true
         }
-
-        return true;
+        return true
     }
 
      func onDataReadyInternal(data: Option<Any>, dataSource: DataSource, sourceKey: Option<AnyKey>): Unit {
-        let diskCacheStrategy: DiskCacheStrategy = helper.getDiskCacheStrategy();
-        if (match (data) {
-            case Some(x) => true
-            case _ => false
-        } && diskCacheStrategy.isDataCacheable(dataSource)) {
-            dataToCache = data
-            // We might be being called back on someone else's thread. Before doing anything, we should
-            // reschedule to get back onto Droplet's thread. Then once we're back on Droplet's thread, we'll
-            // get called again and we can write the retrieved data to cache.
-            cb.reschedule();
-        } else {
-            if (match (originalKey) {
-                case Some(x) => true
-                case _ => false
-            }) {
-                cb.onDataFetcherReady(
-                    sourceKey.getOrThrow(),
-                    data,
-                    dataSource
-                );
-            } else {
-                cb.onDataFetcherReady(
-                    sourceKey.getOrThrow(),
-                    data,
-                    dataSource
-                );
+        let diskCacheStrategy: DiskCacheStrategy = helper.getDiskCacheStrategy()
+        if(let Some(i) <- data){
+            if(diskCacheStrategy.isDataCacheable(dataSource)){
+                dataToCache = data
+                // We might be being called back on someone else's thread. Before doing anything, we should
+                // reschedule to get back onto Droplet's thread. Then once we're back on Droplet's thread, we'll
+                // get called again and we can write the retrieved data to cache.
+                cb.reschedule()
+            }else{
+                cb.onDataFetcherReady(sourceKey.getOrThrow(),data,dataSource)
             }
+        }else{
+             cb.onDataFetcherReady(sourceKey.getOrThrow(),data,dataSource)
         }
     }
 
@@ -154,26 +130,17 @@ public class SourceGenerator <: DataFetcherGenerator & FetcherReadyCallback {
             diskCache.put(newOriginalKey, writer);
 
             let cache: Option<DropletFile> = diskCache.get(newOriginalKey)
-            if (match (cache) {
-                case Some(x) => true
-                case _ => false
-            }) {
+            if(cache.isSome()){
                 originalKey = Some(newOriginalKey)
                 sourceCacheGenerator = Some(DataCacheGenerator(helper, this))
                 // We were able to write the data to cache.
-                return true;
-            } else {
-                cb.onDataFetcherReady(
-                    ModelKey(helper.getModel()),
-                    data,
-                    helper.getDataSource()
-                );
+                return true
+            }else{
+                cb.onDataFetcherReady(ModelKey(helper.getModel()),data,helper.getDataSource())
             }
         }
-
         // We failed to write the data to cache.
-        return false;
-
+        return false
     }
 
     public func cancel(): Unit {

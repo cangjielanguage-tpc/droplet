@@ -1,25 +1,19 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
- 
-package droplet.droplet
 
+package droplet.droplet
 
 /**
  * Decodes {@link Bitmap}s from {@link GifDecoder}s representing a particular frame of a particular
  * GIF image.
  */
-
 public class GifFrameResourceDecoder {
-  public init() {
-  }
-
-
+    public init() {
+    }
 
     func decode(source: GifDecoder): PixelMap {
-    let (ret, firstFrame) = source.getNextFrame();
-    return firstFrame
-  }
-
-
+        let (ret, firstFrame) = source.getNextFrame();
+        return firstFrame
+    }
 }

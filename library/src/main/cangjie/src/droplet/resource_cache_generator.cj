@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
  
 package droplet.droplet
@@ -25,13 +25,6 @@ public class ResourceCacheGenerator <: DataFetcherGenerator {
     let transformationKey: TransformationKey = helper.getTransformationKey()
     // 查询缓存
     let a = helper.getTransformation(transformationKey)
-    if(match(a){
-        case Some(x) => true
-        case None => false
-    }) {
-    } else {
-    }
-
     currentKey = Some(ResourceCacheKey( // NOPMD AvoidInstantiatingObjectsInLoops
                 helper.getArrayPool(),
                 ModelKey(helper.getModel()),
@@ -44,17 +37,15 @@ public class ResourceCacheGenerator <: DataFetcherGenerator {
 
         cacheFile = helper.getDiskCache().get(currentKey.getOrThrow());
 
-        if(match(cacheFile) {
-        case Some(x) => true
-        case _ => false
-      }) {
-        
-        // cacheFile to inputstream
-        let outStream: ByteArrayStream = cacheFile.getOrThrow().toByteArrayStream()
-        // TODO 关闭 or seek
-        cb.onDataFetcherReady(ModelKey(helper.getModel()), Some(outStream), DataSource.RESOURCE_DISK_CACHE);
-        return true
-      }
+
+        if(let Some(i) <- cacheFile){
+            // cacheFile to inputstream
+            let outStream: ByteArrayStream = i.toByteArrayStream()
+            // TODO 关闭 or seek
+            cb.onDataFetcherReady(ModelKey(helper.getModel()), outStream, DataSource.RESOURCE_DISK_CACHE);
+            return true
+        }
+
       return false;
     } finally {
     }

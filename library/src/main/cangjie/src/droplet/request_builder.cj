@@ -205,20 +205,14 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
     }
 
     public func getThumbnailBuilder(): Option<AnyRequestBuilder> {
-        if (match (thumbnailBuilder) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if(thumbnailBuilder.isNone()){
             return None
         }
         return (thumbnailBuilder.getOrThrow() as AnyRequestBuilder)
     }
 
     public func getErrorBuilder(): Option<AnyRequestBuilder> {
-        if (match (errorBuilder) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if(errorBuilder.isNone()){
             return None
         }
         return (errorBuilder.getOrThrow() as AnyRequestBuilder)
@@ -323,37 +317,28 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         return into(target, targetListener, /*options=*/ this);
     }
 
-    func into<Y, Y2>(target: Y, targetListener: RequestListener<TranscodeType>, options: Y2): Y where Y <: Target<TranscodeType>,
-        Y2 <: BaseRequestOptions<Y2> & Cloneable<Y2> {
+    func into<Y, Y2>(target: Y, targetListener: RequestListener<TranscodeType>, options: Y2): Y where Y <: Target<TranscodeType>,Y2 <: BaseRequestOptions<Y2> & Cloneable<Y2> {
         if (!isModelSet) {
-            throw IllegalArgumentException("You must call #load() before calling #into()");
+            throw IllegalArgumentException("You must call #load() before calling #into()")
         }
-
-        var request: LoadRequest = buildRequest<Y2>(target, targetListener, options);
-
+        var request: LoadRequest = buildRequest<Y2>(target, targetListener, options)
         var previous: Option<LoadRequest> = target.getRequest()
-        if (match (previous) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            if (request.isEquivalentTo(previous.getOrThrow()) &&
-                !isSkipMemoryCacheWithCompletePreviousRequest(options, previous.getOrThrow())) {
+        if (let Some(i) <- previous) {
+            if (request.isEquivalentTo(i) &&!isSkipMemoryCacheWithCompletePreviousRequest(options,i)) {
                 // If the request is completed, beginning again will ensure the result is re-delivered,
                 // triggering RequestListeners and Targets. If the request is failed, beginning again will
                 // restart the request, giving it another chance to complete. If the request is already
                 // running, we can let it continue running without interruption.
-                if (!previous.getOrThrow().isRunning()) {
-                    previous.getOrThrow().begin();
+                if (!i.isRunning()) {
+                    i.begin()
                 }
-                return target;
+                return target
             }
         }
-
-        requestManager.clear(target);
-        target.setRequest(request);
-        requestManager.track(target, request);
-
-        return target;
+        requestManager.clear(target)
+        target.setRequest(request)
+        requestManager.track(target, request)
+        return target
     }
 
     private func isSkipMemoryCacheWithCompletePreviousRequest(options: AnyRequestOptions, previous: LoadRequest): Bool {
@@ -424,42 +409,31 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
         overrideHeight: Int64,
         requestOptions: Y2
     ): LoadRequest where Y2 <: BaseRequestOptions<Y2> & Cloneable<Y2> {
-        if (match (thumbnailBuilder) {
-            case Some(x) => true
-            case _ => false
-        }) {
+        if (let Some(i) <- thumbnailBuilder) {
             // Recursive case: contains a potentially recursive thumbnail request builder.
             if (isThumbnailBuilt) {
-                throw IllegalStateException(
-                    "You cannot use a request as both the main request and a "
-                    + "thumbnail, consider using clone() on the request(s) passed to thumbnail()");
+                throw IllegalStateException("You cannot use a request as both the main request and a "+ "thumbnail, consider using clone() on the request(s) passed to thumbnail()");
             }
-
             // TODO TransitionOptions
             // TransitionOptions<?, ? super TranscodeType> thumbTransitionOptions = thumbnailBuilder.getOrThrow().transitionOptions;
 
             // Apply our transition by default to thumbnail requests but avoid overriding custom options
             // that may have been applied on the thumbnail request explicitly.
-            if (thumbnailBuilder.getOrThrow().isDefaultTransitionOptionsSet) {
-                // TODO TransitionOptions
-                // thumbTransitionOptions = transitionOptions;
-            }
 
-            var thumbPriority: Priority = if (thumbnailBuilder.getOrThrow().isPrioritySet()) {
-                thumbnailBuilder.getOrThrow().getPriority()
+            var thumbPriority: Priority = if (i.isPrioritySet()) {
+                i.getPriority()
             } else {
-                getThumbnailPriority(priority);
+                getThumbnailPriority(priority)
             }
 
-            var thumbOverrideWidth: Int64 = thumbnailBuilder.getOrThrow().getOverrideWidth();
-            var thumbOverrideHeight: Int64 = thumbnailBuilder.getOrThrow().getOverrideHeight();
-            if (Utils.isValidDimensions(overrideWidth, overrideHeight)
-                && !thumbnailBuilder.getOrThrow().isValidOverride()) {
+            var thumbOverrideWidth: Int64 = i.getOverrideWidth()
+            var thumbOverrideHeight: Int64 = i.getOverrideHeight()
+            if (Utils.isValidDimensions(overrideWidth, overrideHeight) && !i.isValidOverride()) {
                 thumbOverrideWidth = requestOptions.getOverrideWidth()
                 thumbOverrideHeight = requestOptions.getOverrideHeight()
             }
 
-            var coordinator: ThumbnailRequestCoordinator = ThumbnailRequestCoordinator(requestLock, parentCoordinator);
+            var coordinator: ThumbnailRequestCoordinator = ThumbnailRequestCoordinator(requestLock, parentCoordinator)
             var fullRequest: LoadRequest = obtainRequest<Y2>(
                 requestLock,
                 target,
@@ -469,9 +443,9 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
                 priority,
                 overrideWidth,
                 overrideHeight
-            );
+            )
             isThumbnailBuilt = true
-            var thumbRequest: LoadRequest = thumbnailBuilder.getOrThrow().buildRequestRecursive<RequestBuilder<TranscodeType>>(
+            var thumbRequest: LoadRequest = i.buildRequestRecursive<RequestBuilder<TranscodeType>>(
                 requestLock,
                 target,
                 targetListener,
@@ -479,11 +453,11 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
                 thumbPriority,
                 thumbOverrideWidth,
                 thumbOverrideHeight,
-                thumbnailBuilder.getOrThrow()
-            );
+                i
+            )
             isThumbnailBuilt = false
-            coordinator.setRequests(fullRequest, thumbRequest);
-            return coordinator;
+            coordinator.setRequests(fullRequest, thumbRequest)
+            return coordinator
         } else if (thumbSizeMultiplier != 0.0) {
             var coordinator: ThumbnailRequestCoordinator = ThumbnailRequestCoordinator(requestLock, parentCoordinator);
             var fullRequest: LoadRequest = obtainRequest<Y2>(

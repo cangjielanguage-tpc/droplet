@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
 
 package droplet.droplet
@@ -72,47 +72,45 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
 
     protected static let ONLY_RETRIEVE_FROM_CACHE = 1 << 19;
 
-    public var sizeMultiplier: Float32 = 1.0f32;
+    private var sizeMultiplier: Float32 = 1.0f32;
 
     // 属性
-    public var fields: Int64 = 0;
+    private var fields: Int64 = 0;
 
     public var isLocked: Bool = false;
 
     public var isAutoCloneEnabled: Bool = false;
 
-    public var options: DropletOptions = DropletOptions();
+    private var options: DropletOptions = DropletOptions();
 
-    public var isScaleOnlyOrNoTransform: Bool = true;
+    private var isScaleOnlyOrNoTransform: Bool = true;
 
-    public var isTransformationAllowed: Bool = true;
+    private var isTransformationAllowed: Bool = true;
 
-    public var isTransformationRequired: Bool = false;
+    private var isTransformationRequired: Bool = false;
 
-    public var resourceTypeClass: ResourceTypeClass = ResourceTypeClass.RESOURCE_TYPE_NONE
+    private var resourceTypeClass: ResourceTypeClass = ResourceTypeClass.RESOURCE_TYPE_NONE
 
-    public var transformations: CachedHashCodeArrayMap<TransformationKey, AnyKey> = CachedHashCodeArrayMap<TransformationKey, AnyKey>(
+    private var transformations: CachedHashCodeArrayMap<TransformationKey, AnyKey> = CachedHashCodeArrayMap<TransformationKey, AnyKey>(
         );
 
-    public var errorPlaceholder: Option<CJResourceDrawable> = None;
+    private var errorPlaceholder: Option<CJResourceDrawable> = None;
 
-    public var placeholderDrawable: Option<CJResourceDrawable> = None;
+    private var placeholderDrawable: Option<CJResourceDrawable> = None;
 
-    public var priority: Priority = Priority.NORMAL;
-    public var isCacheable: Bool = true
+    private var priority: Priority = Priority.NORMAL;
+    private var isCacheable: Bool = true
 
-    public var overrideWidth: Int64 = 0;
-    public var overrideHeight: Int64 = 0;
+    private var overrideWidth: Int64 = 0;
+    private var overrideHeight: Int64 = 0;
 
-    public var onlyRetrieveFromCache: Bool = false;
+    private var onlyRetrieveFromCache: Bool = false;
 
-    public var signature: AnyKey = EmptySignature.obtain();
+    private var signature: AnyKey = EmptySignature.obtain();
 
-    public var diskCacheStrategy: DiskCacheStrategy = DiskCacheStrategyALL();
+    private var diskCacheStrategy: DiskCacheStrategy = DiskCacheStrategyALL();
 
-    public var transitionOption: Option<TransitionOption> = Option<TransitionOption>.None
-
-    public var placeholderFunc:Option<(PixelMap)->Unit> = Option<(PixelMap)->Unit>.None
+    private var placeholderFunc:Option<(PixelMap)->Unit> = Option<(PixelMap)->Unit>.None
 
     public func getFields(): Int64 {
         return fields

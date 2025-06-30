@@ -42,11 +42,8 @@ public class PreloadTarget<R> <: CustomTarget<R> {
     public override func hashCode(): Int64 {
         Utils.hashCodeWrite(width.hashCode(), reset: true)
         Utils.hashCodeWrite(height.hashCode())
-        if (match (request) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            Utils.hashCodeWrite(request.getOrThrow().hashCode())
+        if(let Some(i) <- request){
+            Utils.hashCodeWrite(i.hashCode())
         }
         return Utils.hashCodeFinish()
     }

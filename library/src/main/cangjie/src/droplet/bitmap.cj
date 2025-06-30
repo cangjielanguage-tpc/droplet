@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
  
 package droplet.droplet
@@ -72,8 +72,7 @@ public class CommonBitmap {
     file.close()
   }
 
-  public func allocCdata() {
-
+  func allocCdata() {
     ptr = unsafe { malloc(UIntNative(len)) }
     cdata = unsafe { CPointer<UInt8>(ptr) }
   }
@@ -112,8 +111,8 @@ public class CommonBitmap {
        }
   }
 
-  public func release() {
-    unsafe { free(ptr) }
+  func release() {
+    unsafe { free(ptr)}
   }
 
    func at(y: Int32, x: Int32, ch: Int32): UInt8 {

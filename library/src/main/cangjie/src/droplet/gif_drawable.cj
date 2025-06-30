@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
  
 package droplet.droplet
@@ -7,6 +7,7 @@ package droplet.droplet
 
 public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
 
+    private let gifDrawableType: Int64 = 2
     public static var UNI_CODE: Int64 = 0
     public var uniCode: Int64;
 
@@ -55,7 +56,7 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
     }
 
     public override func getType(): Int64 {
-        return 2
+        return gifDrawableType
     }
 
     public override func draw(_:Bool): Unit {
@@ -118,19 +119,16 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
     }
 
     private func notifyAnimationEndToListeners(): Unit {
-        if (match(animationCallbacks) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            let list = animationCallbacks.getOrThrow()
+        if(let Some(j) <- animationCallbacks){
+            let list = j
             for(i in 0 .. list.size) {
-                list[i].onAnimationEnd(this);
+                list[i].onAnimationEnd(this)
             }
         }
     }
 
     private func resetLoopCount(): Unit {
-        loopCount = 0;
+        loopCount = 0
     }
 
     private func startRunning(): Unit {
@@ -140,11 +138,11 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
 
         // If we have only a single frame, we don't want to decode it endlessly.
         if (frameLoader.getFrameCount() == 1) {
-            invalidateSelf();
+            invalidateSelf()
         } else if (!isRunningBool) {
-            isRunningBool = true;
-            frameLoader.subscribe(this);
-            invalidateSelf();
+            isRunningBool = true
+            frameLoader.subscribe(this)
+            invalidateSelf()
         }
     }
 
@@ -166,21 +164,15 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
     }
 
     public override func registerAnimationCallback(animationCallback: AnimationCallback): Unit {
-        if (match(animationCallbacks) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            animationCallbacks = Some(ArrayList<AnimationCallback>());
+        if(animationCallbacks.isNone()){
+           animationCallbacks = ArrayList<AnimationCallback>()
         }
-        animationCallbacks.getOrThrow().append(animationCallback);
+        animationCallbacks.getOrThrow().append(animationCallback)
     }
 
     public override func unregisterAnimationCallback(animationCallback: AnimationCallback): Bool {
-        if (match(animationCallbacks) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            return false;
+        if(animationCallbacks.isNone()){
+            return false
         }
         let list: ArrayList<AnimationCallback> = animationCallbacks.getOrThrow()
         for(i in 0 .. list.size) {
@@ -190,15 +182,12 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
                 break
             }
         }
-        return true;
+        return true
     }
 
     public override func clearAnimationCallbacks(): Unit {
-        if (match(animationCallbacks) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            animationCallbacks.getOrThrow().clear();
+        if(let Some(i) <- animationCallbacks){
+           i.clear()
         }
     }
 

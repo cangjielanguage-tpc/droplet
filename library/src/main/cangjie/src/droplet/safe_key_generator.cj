@@ -5,28 +5,25 @@
 package droplet.droplet
 
 public class SafeKeyGenerator {
-    private var loadIdToSafeHash: LruCache<AnyKey, DropletString> = LruCache<AnyKey, DropletString>(1000);
+    private var loadIdToSafeHash: LruCache<AnyKey, DropletString> = LruCache<AnyKey, DropletString>(1000)
     private static let md5: MD5 = MD5()
     private let mtx = ReentrantMutex()
     private let mtxLoadIdToSafeHash = ReentrantMutex()
 
      func getSafeKey(key: AnyKey): String {
-        var safeKey: Option<DropletString> = None;
+        var safeKey: Option<DropletString> = None
         synchronized (mtxLoadIdToSafeHash) {
-          safeKey = loadIdToSafeHash.get(key);
+          safeKey = loadIdToSafeHash.get(key)
         }
-        if (match(safeKey) {
-          case Some(x) => false
-          case _ => true
-        }) {
-          let str = calculateHexStringDigest(key)
-          let dropletStr = DropletString(str)
-          safeKey = Some(dropletStr);
+        if(safeKey.isNone()){
+            let str = calculateHexStringDigest(key)
+            let dropletStr = DropletString(str)
+            safeKey = dropletStr
         }
         synchronized (mtxLoadIdToSafeHash) {
-          loadIdToSafeHash.put(key, safeKey.getOrThrow());
+          loadIdToSafeHash.put(key, safeKey.getOrThrow())
         }
-        return safeKey.getOrThrow().str;
+        return safeKey.getOrThrow().str
         
     }
 
@@ -60,28 +57,25 @@ public class WriteLock <: Equatable<WriteLock> {
 }
 
 public class WriteLockPool {
-  private static let MAX_POOL_SIZE: Int64 = 10;
-  private let pool: ArrayDeque<WriteLock> = ArrayDeque<WriteLock>();
+  private static let MAX_POOL_SIZE: Int64 = 10
+  private let pool: ArrayDeque<WriteLock> = ArrayDeque<WriteLock>()
   private let mtx = ReentrantMutex()
 
    func obtain(): WriteLock {
-    var result: Option<WriteLock>;
+    var result: Option<WriteLock>
     synchronized (mtx) {
-      result = pool.poll();
+      result = pool.poll()
     }
-    if (match(result) {
-      case Some(x) => false
-      case _ => true
-    }) {
-      return WriteLock();
+    if(result.isNone()){
+        return WriteLock()
     }
-    return result.getOrThrow();
+    return result.getOrThrow()
   }
 
    func offer(writeLock: WriteLock): Unit {
     synchronized (mtx) {
       if (pool.size() < MAX_POOL_SIZE) {
-        pool.offer(writeLock);
+        pool.offer(writeLock)
       }
     }
   }

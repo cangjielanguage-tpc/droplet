@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2024. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2023-2025. All rights reserved.
  */
  
 package droplet.droplet
@@ -129,14 +129,11 @@ public class DropletFile <: DropletAny<DropletFile> {
     }
 
      func safeOpenFile() {
-        if(match(this.file) {
-            case Some(x) => true
-            case _ => false
-        }) {
-            if(this.file.getOrThrow().isClosed()) {
+        if(let Some(i) <- this.file){
+            if(i.isClosed()) {
                 openFile()
             }
-        } else {
+        }else{
             openFile()
         }
     }
@@ -201,30 +198,19 @@ public class DropletFile <: DropletAny<DropletFile> {
         return false
     }
 
-     func delete(): Bool {
-        if(isFile()) {
-            if(match(this.file) {
-                case Some(x) => true
-                case _ => false
-            }) {
-                this.file.getOrThrow().close()
-                File.delete(this.filePath)
-                return true
-            } else {
-                File.delete(this.filePath)
-                return true
+    func delete(): Bool {
+        if (isFile()) {
+            if (let Some(i) <- this.file) {
+                i.close()
             }
-            
-        } else if(isDirectory()) {
-            if(match(this.directory) {
-                case Some(x) => true
-                case _ => false
-            }) {
+            File.delete(this.filePath)
+            return true
+        } else if (isDirectory()) {
+            if (let Some(i) <- this.directory) {
                 Directory.delete(this.filePath)
                 return true
             }
         }
-
         return false
     }
 

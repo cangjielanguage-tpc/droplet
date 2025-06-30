@@ -33,43 +33,24 @@ public class DropletBuilder {
 
     public func build(context: StageContext) {
 
-        if (match(arrayPool) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            arrayPool = Some(LruArrayPool(4 * 1024 * 1024));
+        if(arrayPool.isNone()){
+             arrayPool = LruArrayPool(4 * 1024 * 1024)
         }
 
-        if (match(memoryCache) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            memoryCache = Some(LruResourceCache(8192*1000*1000));
+        if(memoryCache.isNone()){
+             memoryCache = LruResourceCache(8192*1000*1000)
         }
 
-        if (match(activeResources) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            activeResources = Some(ActiveResources(8192*1000*1000));
+        if(activeResources.isNone()){
+            activeResources = ActiveResources(8192*1000*1000)
         }
 
-        if (match(diskCacheFactory) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            diskCacheFactory = Some(InternalCacheDiskCacheFactory());
+        if(diskCacheFactory.isNone()){
+            diskCacheFactory = InternalCacheDiskCacheFactory()
         }
 
-        if (match(engine) {
-            case Some(x) => false
-            case _ => true
-        }) {
-            engine = Some(Engine(
-                    memoryCache.getOrThrow(),
-                    activeResources.getOrThrow(),
-                    diskCacheFactory.getOrThrow(),
-                    ));
+        if(engine.isNone()){
+            engine = Engine(memoryCache.getOrThrow(),activeResources.getOrThrow(),diskCacheFactory.getOrThrow())
         }
 
         return Droplet(RequestManagerRetriever(), defaultRequestOptionsFactory, memoryCache.getOrThrow(), activeResources.getOrThrow(), context, engine.getOrThrow(), arrayPool.getOrThrow())
@@ -132,16 +113,10 @@ public class Droplet <: ActiveResourceRemovedListener {
     }
 
     public static func get(context: StageContext): Droplet {
-        if (match(droplet) {
-            case Some(x) => false
-            case _ => true
-        }) {
+        if(droplet.isNone()){
             synchronized (mtx) {
-                if (match(droplet) {
-                    case Some(x) => false
-                    case _ => true
-                }) {
-                    checkAndInitializeDroplet(context);
+                if(droplet.isNone()){
+                     checkAndInitializeDroplet(context)
                 }
             }
         }

@@ -142,18 +142,13 @@ public class Downsampler {
               requestedHeight
                 )
 
-
-    if(match(result) {
-        case Some(x) => true
-        case _ => false
-    }) {
-        let pixelMap: PixelMap = result.getOrThrow()
+    if(let Some(i) <- result){
+        let pixelMap: PixelMap = i
         let drawable: PixelMapDrawable = PixelMapDrawable(pixelMap)
-        return Some(PixelMapDrawableResource.obtain(drawable));
-    } else {
+        return PixelMapDrawableResource.obtain(drawable)
+    }else{
         return None
     }
-      
   }
 
   private static func calculateScaling(
@@ -203,17 +198,13 @@ public class Downsampler {
 
     let result = decodePixelMap(imageReader, requestedWidth, requestedHeight, options)
 
-    if(match(result) {
-        case Some(x) => true
-        case _ => false
-    }) {
-        let pixelMap: PixelMap = result.getOrThrow()
+    if(let Some(i) <- result){
+        let pixelMap: PixelMap = i
         let drawable: PixelMapDrawable = PixelMapDrawable(pixelMap)
-        return Some(drawable);
-    } else {
+        return drawable
+    }else{
         return None
     }
-      
   }
 
   private func decodePixelMap(
@@ -293,17 +284,11 @@ public class Downsampler {
 
     let downsampled: Option<PixelMap> = imageReader.decodePixelMap(finalWidth, finalHeight)
 
-    if(match(downsampled) {
-        case Some(x) => false
-        case _ => true
-    }) {
+    if(downsampled.isNone()){
         return None
     }
-
     // calculateScaling 缩放图片适合显示区域  scaling 缩放倍数
-
     // TODO 缩放图片resize
-
     return downsampled
   }
 

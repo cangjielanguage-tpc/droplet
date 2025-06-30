@@ -73,18 +73,12 @@ public class RequestFutureTarget<R> <: FutureTarget<R> & RequestListener<R> {
   }
 
   public func get(): Option<R> {
-    if(match(this.future) {
-      case Some(x) => true
-      case _ => false
-    }) {
-      let f: Future<Option<R>> = this.future.getOrThrow()
-      let o1: Option<R> = f.get()
-      if(match(o1) {
-        case Some(x) => true
-        case _ => false
-      }) {
-        return o1
-      }
+    if(let Some(i) <- this.future){
+          let f: Future<Option<R>> = i
+          let o1: Option<R> = f.get()
+          if(let Some(j) <- o1){
+              return j
+          }
     }
     return resource
   }
@@ -133,11 +127,8 @@ public class RequestFutureTarget<R> <: FutureTarget<R> & RequestListener<R> {
   public override func hashCode(): Int64 {
     Utils.hashCodeWrite(width.hashCode(), reset: true)
     Utils.hashCodeWrite(height.hashCode())
-    if(match(request) {
-      case Some(x) => true
-      case _ => false
-    }) {
-      Utils.hashCodeWrite(request.getOrThrow().hashCode())
+    if(let Some(i) <- request){
+       Utils.hashCodeWrite(i.hashCode())
     }
     return Utils.hashCodeFinish()
   }

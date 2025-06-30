@@ -49,86 +49,70 @@ public class LinkedEntry<K, V> <: Equatable<LinkedEntry<K, V>> where K <: Equata
     } 
 
      func equals(right: LinkedEntry<K, V>): Bool {
-        if(match(this.key) {
-            case Some(x) => true
-            case _ => false
-        } && match(right.key) {
-                case Some(x) => true
-                case _ => false
-            }) {
+        var thiskeySome = false
+        var rightkeySome = false
+        if(this.key.isSome()){
+            thiskeySome = true
+        }
+        if(right.key.isSome()){
+            rightkeySome = true
+        }
+
+        if(thiskeySome && rightkeySome){
             return this.key.getOrThrow() == right.key.getOrThrow()
-        } else if(match(this.key) {
-            case Some(x) => false
-            case _ => true
-        } && match(right.key) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                return true
-        } else {
+        }else if(!thiskeySome && !rightkeySome){
+            return true
+        }else{
             return false
         }
     }
 
      func toString(): String {
-        return if(match(this.key) {
-            case Some(x) => true
-            case _ => false
-        }) {"None"} else {this.key.getOrThrow().toString()} 
+        if(let Some(i) <- this.key){
+            i.toString()
+        }else{
+            "None"
+        }
     }
   }
 
 public class GroupedLinkedMap<K, V> where K <: Poolable & Hashable & Equatable<K> & ToString {
-  private let head: LinkedEntry<K, V> = LinkedEntry<K, V>();
-  private let keyToEntry: HashMap<K, LinkedEntry<K, V>>  = HashMap<K, LinkedEntry<K, V>>();
+  private let head: LinkedEntry<K, V> = LinkedEntry<K, V>()
+  private let keyToEntry: HashMap<K, LinkedEntry<K, V>>  = HashMap<K, LinkedEntry<K, V>>()
 
    func put(key: K, value: V): Unit {
-    var entry: Option<LinkedEntry<K, V>> = keyToEntry.get(key);
-
-    if(match(entry) {
-        case Some(x) => false
-        case _ => true
-    }) {
-      entry = Some(LinkedEntry<K, V>(Some(key)));
-      makeTail(entry.getOrThrow());
-      let b = keyToEntry.put(key, entry.getOrThrow());
-    } else {
-      key.offer();
+    var entry: Option<LinkedEntry<K, V>> = keyToEntry.get(key)
+    if(entry.isSome()){
+        key.offer()
+    }else{
+        entry = LinkedEntry<K, V>(key)
+        makeTail(entry.getOrThrow())
+        let b = keyToEntry.put(key, entry.getOrThrow())
     }
-
-    entry.getOrThrow().add(value);
+    entry.getOrThrow().add(value)
   }
 
    func get(key: K): Option<V> {
-    var entry: Option<LinkedEntry<K, V>> = keyToEntry.get(key);
-    if (match(entry) {
-        case Some(x) => false
-        case _ => true
-    }) {
-      entry = Some(LinkedEntry<K, V>(Some(key)))
-      let b = keyToEntry.put(key, entry.getOrThrow());
-    } else {
-      key.offer();
+    var entry: Option<LinkedEntry<K, V>> = keyToEntry.get(key)
+
+    if(entry.isSome()){
+      key.offer()
+    }else{
+      entry = LinkedEntry<K, V>(key)
+      let b = keyToEntry.put(key, entry.getOrThrow())
     }
-
     let en = entry.getOrThrow()
-
-    makeHead(en);
-
-    return en.removeLast();
+    makeHead(en)
+    return en.removeLast()
   }
 
    func removeLast(): Option<V> {
-    var last: LinkedEntry<K, V> = head.prev.getOrThrow();
-
+    var last: LinkedEntry<K, V> = head.prev.getOrThrow()
     while (!last.equals(head)) {
-      let removed: Option<V> = last.removeLast();
-      if (match(removed) {
-        case Some(x) => true
-        case _ => false
-      }) {
-        return removed;
-      } else {
+      let removed: Option<V> = last.removeLast()
+      if(removed.isSome()){
+         return removed
+      }else{
         // We will clean up empty lru entries since they are likely to have been one off or
         // unusual sizes and
         // are not likely to be requested again so the gc thrash should be minimal. Doing so will
@@ -136,15 +120,13 @@ public class GroupedLinkedMap<K, V> where K <: Poolable & Hashable & Equatable<K
         // removeLast operation in the future and prevent our linked list from growing to
         // arbitrarily large
         // sizes.
-        removeEntry(last);
-        keyToEntry.remove(last.key.getOrThrow());
-        last.key.getOrThrow().offer();
+        removeEntry(last)
+        keyToEntry.remove(last.key.getOrThrow())
+        last.key.getOrThrow().offer()
       }
-
-      last = last.prev.getOrThrow();
+      last = last.prev.getOrThrow()
     }
-
-    return None;
+    return None
   }
 
    func toString(): String {

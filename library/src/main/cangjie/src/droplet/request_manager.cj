@@ -137,21 +137,17 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
 
     func untrack(t: AnyTarget): Bool {
         synchronized(mtx) {
-            var request: Option<LoadRequest> = t.getRequest();
+            var request: Option<LoadRequest> = t.getRequest()
             // If the Target doesn't have a request, it's already been cleared.
-            if (match (request) {
-                case Some(x) => false
-                case _ => true
-            }) {
-                return true;
+            if(request.isNone()){
+                return true
             }
-
             if (requestTracker.clearAndRemove(request.getOrThrow())) {
-                targetTracker.untrack(t);
-                t.setRequest(Option<LoadRequest>.None);
-                return true;
+                targetTracker.untrack(t)
+                t.setRequest(Option<LoadRequest>.None)
+                return true
             } else {
-                return false;
+                return false
             }
             return false
         }
