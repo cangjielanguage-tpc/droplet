@@ -1,4 +1,3 @@
-
 ## droplet
 
 ### 介绍
@@ -13,9 +12,133 @@
 - 支持过渡动画
 - 支持自定义组件方式加载
 
-### 1 Droplet 图片处理库
 
-#### 1.1 Droplet 全局单例对象类
+### 1 示例
+
+```cangjie
+
+package ohos_app_cangjie_entry
+
+import ohos.component.*
+import ohos.state_manage.*
+import ohos.state_macro_manage.*
+import ohos.base.*
+import ohos.ability.*
+
+import ohos_app_cangjie_entry.js.globalAbilityContext
+import cj_res_entry.app
+import droplet.droplet.*
+
+@Entry
+@Component
+class MyView {
+
+	@State var label: String = "MyView"
+
+    @State
+    var option: DropletRequestOption = DropletRequestOption (
+         //网络图片
+         loadSrc: "http://www....../testjpg.jpg", 
+         //本地图片
+         loadSrc: "/data/storage/el1/bundle/testjpg.jpg",   
+         //加载raw文件图片
+         loadSrc："raw1.png"  //要加载的raw文件夹下图片名称
+         //读取res下的资源文件
+         loadSrcRes: @r(app.media.startIcon), //loadSrc和loadSrcRes二选一 loadSrc优先
+        
+         placeholder: @r(app.media.loading),             // 占位图使用本地资源icon_loading（可选）自己定义
+         errholder: @r(app.media.img),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
+         strategy: DiskCacheStrategyDATA(),       // 磁盘缓存策略（可选）
+         signature:"1111", //不同的signature可保证缓存key的唯一    （可选）   
+         transformCate:RoundedCorners(50), //transform效果 （可选）
+         transitionOption:TransitionOption(TransitionType.Opacity,0.0,1.0,1000)  //过渡动画 （可选）
+    )
+
+    protected open func aboutToAppear(){
+        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(label)  //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致,
+                                                                               //组件没设置label,就调用空参的onAppear                      
+    }               
+    
+    protected open func aboutToDisappear(){
+        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(label) //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致
+                                                                            //组件没设置label,就调用空参的onDisAppear
+    }
+
+    func build() {
+        Column(30) {
+            Column() {
+                DropletImageComponent(
+                    //控件宽度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
+                    imageViewWidth: Length(50, unitType: LengthType.percent), 
+                    //控件高度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
+                    imageViewHeight: Length(120.0, unitType: LengthType.vp), 
+                    //图片相对控件对齐方式 默认ImageFit.Scale 可选
+                    imageFit: ImageFit.Contain,
+                    //context对象
+                    globalContext:globalAbilityContext, //(必选)
+                    //droplet选项
+                    dropletOption: option,//(必选)
+                    // 生命周期标签 （可选） 同一个页面不同组件保持相同的标签,或者都不加,
+                    label: label
+                    )
+            }.width(100.percent)
+        }
+    }
+
+}
+
+```
+
+执行结果如下：
+图片在手机正常显示
+
+```shell
+load成功
+```
+
+
+### 2 参数说明
+
+
+### DropletImageComponent 参数列表
+| 参数名称            | 入参内容                             | 功能简介                          |
+|---------------------|--------------------------------------|-------------------------------|
+| globalContext       | Option<AbilityContext>               | 上下文对象（必选）                     |
+| imageViewWidth      | Length                               | 控件宽度（可选）建议设置 默认为100.percent   |
+| imageViewHeight     | Length                               | 控件高度（可选）建议设置 默认为100.percent |
+| imageFit            | ImageFit                             | 主题填充效果（可选）默认为ImageFit.Scale   |
+| label               | String                               | 生命周期标签（可选）                    |
+| option              | Option<DropletRequestOption>         | droplet其他参数选项（必选）             |
+
+
+
+### DropletRequestOption 参数列表
+| 参数名称                    | 入参内容                                      | 功能简介                                              |
+|-------------------------|-------------------------------------------|---------------------------------------------------|
+| loadSrc                 | String                                    | 图片url 可加载网络图片,本地图片和raw文件夹下图片 和loadSrcRes 二选一 必选   |
+| loadSrcRes              | Option<CJResource>                        | 图片url 可加载resource下的资源文件 和loadSrcRes 二选一loadSrc 必选 |
+| placeholder             | Option<CJResource>                        | 占位图                                               |
+| errholder               | Option<CJResource>                        | 错误图                                               |
+| strategy                | Option<DiskCacheStrategy>                 | 图片加载缓存策略                                          |
+| transformCate           | Option<PixelMapTransformation>            | 图片变换对象                                            |
+| transformListCate       | Option<ArrayList<PixelMapTransformation>> | 多个图片变换对象                                          |
+| isSkipMemory            | Option<Bool>                              | 是否禁用内存缓存                                          |
+| overrideWH              | Option<(Int64, Int64)>                    | 指定预期pixelmap的宽高，不指定就是默认控件宽高                       |
+| applyRequestOption      | Option<RequestOptions>                    | 要运行的一些设置选项                                        |
+| onlyRetrieveFromCache   | Option<Bool>                              | 是否只从缓存读取数据                                        |
+| dontTransform           | Option<Bool>                              | 是否禁用动画                                            |
+| useDefaultRequestOption | Option<RequestOptions>                    | 要运行的一些默认设置选项                                      |
+| thumbnail               | Option<Float32>                           | 缩略图为原图的缩放比例                                       |
+| thumbnaildrawable       | Option<RequestBuilder<Drawable>>          | 缩略图为指定图片 由于和原图加载先后随机不一定保证能看到                      
+| signature               | Option<String>                            | 图片唯一标记选项                                          |
+| transitionOption        | Option<TransitionOption>                  | 过渡动画选项                                            |
+
+
+
+
+### 3 Droplet 图片处理库
+
+#### 3.1 Droplet 全局单例对象类
 
 ```cangjie
 public class Droplet {
@@ -40,34 +163,30 @@ public class Droplet {
      * 根据页面标记，获取绑定的图片请求管理器实例对象，每个页面有一个单独的图片请求管理器。
      * 
      * @参数 context - AbilityContext数据类型，上下文
-     * @参数 label - String数据类型，标签，用于绑定生命周期,同一个页面的不同组件保持label相同
+     * @参数 label - String数据类型，标签，用于绑定生命周期
      * @返回值 RequestManager 图片请求管理器
      */
     public static func withContext(context: AbilityContext, label: String): RequestManager
 
     /**
      * 页面生命周期事件绑定函数，需在页面显示回调函数中调用。
-     * onAppear和onDisAppear一起使用或一起不使用
      */
     public func onAppear(): Unit
 
     /**
      * 页面生命周期事件绑定函数，需在页面显示回调函数中调用。
-     * onAppear和onDisAppear一起使用或一起不使用，key和组件的label保持一致     
-     *
+     * 
      * @参数 key - String数据类型
      */
     public func onAppear(key: String): Unit
 
     /**
      * 页面生命周期事件绑定函数，需在页面隐藏回调函数中调用
-     * onAppear和onDisAppear一起使用或一起不使用
      */
     public func onDisAppear(): Unit
 
     /**
      * 页面生命周期事件绑定函数，需在页面隐藏回调函数中调用
-     * onAppear和onDisAppear一起使用或一起不使用,key和组件的label保持一致      
      * 
      * @参数 key - String数据类型
      */
@@ -76,15 +195,22 @@ public class Droplet {
     /**
      * 清空MemoryCache 注：不是活跃内存缓存
      * 
-     * @参数 key - String数据类型
      */
     public func clearMemory(): Unit
+    
+    /**
+     * 取消对应url的网络请求，不获取网络请求结果
+     * 
+     * @参数 url - String数据类型 对应图片的url
+     */
+    public func cancelHttpRequest(url:String):Unit
+
 
     
 }
 ```
 
-#### 1.2 RequestManager 图片请求管理器
+#### 3.2 RequestManager 图片请求管理器
 
 ```cangjie
 public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleListener & Equatable<RequestManager> {
@@ -115,7 +241,7 @@ public class RequestManager <: ModelTypes<RequestBuilder<Drawable>> & LifecycleL
 }
 ```
 
-#### 2.1 BaseRequestOptions<T> 基本请求参数设置
+#### 3.3 BaseRequestOptions<T> 基本请求参数设置
 
 ```cangjie
 public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequestOptions<T> {
@@ -243,7 +369,7 @@ public open class BaseRequestOptions<T> <: AnyRequestOptions where T <: BaseRequ
 }
 ```
 
-#### 1.4 RequestBuilder 请求构建器
+#### 3.4 RequestBuilder 请求构建器
 
 ```cangjie
 public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<TranscodeType>> 
@@ -273,10 +399,29 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
      */
     public func into(f: (PixelMap) -> Unit, r: (CJResource) -> Unit, width: Int64, height: Int64): Target<TranscodeType>
     
+    
+    /**
+     * 预加载图片带参数,直接将图片加载到内存,带参数是预期加载指定宽和高的pixelmap,当宽和高小于0的时候会抛出异常
+     * 
+     * @参数 width Int64类型，预期加载图片的宽
+     * @参数 height Int64类型，预期加载图片的高
+     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     */
+    public func preload(width: Int64, height: Int64):Target<TranscodeType>
+
+    
+    /**
+     * 预加载图片不带参数,直接将图片加载到内存,不带参数默认是预期加载原图宽高的pixelmap,用这个无法命中内存缓存key
+     *
+     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     */
+    public func preload():Target<TranscodeType>
+
+    
     /**
      * 加载图片不显示
      *
-     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     * @返回值 FutureTarget<TranscodeType> - FutureTarget<TranscodeType>数据类型
      */
     public func submit(): FutureTarget<TranscodeType> 
     
@@ -285,7 +430,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
      *
      * @参数 width  Int64，图片宽
      * @参数 height  Int64，图片高
-     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     * @返回值 FutureTarget<TranscodeType> - FutureTarget<TranscodeType>数据类型
      */
     public func submit(width: Int64, height: Int64): FutureTarget<TranscodeType>
     
@@ -301,7 +446,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
      * 缩略图为原图缩放,参数是缩小的倍数 值在0-1之间,根据缩略图和原图的加载速度差异不保证必现
      *
      * @参数 sizeMultiplier  Float32，缩放的倍数
-     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     * @返回值 RequestBuilder<TranscodeType> - RequestBuilder<TranscodeType>数据类型
      */
     public func thumbnail(sizeMultiplier: Float32): RequestBuilder<TranscodeType>
     
@@ -309,7 +454,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
      * 缩略图为指定图的缩放,根据缩略图和原图的加载速度差异不保证必现
      *
      * @参数 thumbnailRequest  Option<RequestBuilder<TranscodeType>>，指定的缩略图
-     * @返回值 Target<TranscodeType> - Target<TranscodeType>数据类型
+     * @返回值 RequestBuilder<TranscodeType> - RequestBuilder<TranscodeType>数据类型
      */
     public func thumbnail(thumbnailRequest: Option<RequestBuilder<TranscodeType>>): RequestBuilder<TranscodeType> {
 
@@ -348,7 +493,7 @@ public class RequestBuilder<TranscodeType> <: BaseRequestOptions<RequestBuilder<
 }
 ```
 
-#### 1.5 RequestListener 请求监听器
+#### 3.5 RequestListener 请求监听器
 ```cangjie
 public interface RequestListener<R> {
     /**
@@ -358,8 +503,8 @@ public interface RequestListener<R> {
      * @参数 model - Model数据类型，图片模型
      * @参数 target - Target<R>数据类型，图片请求构建器
      * @参数 dataSource - DataSource数据类型，数据源
-     * @参数 isFirstResource - Boolean数据类型，是否是第一个资源
-     * @返回值 Boolean 是否消费事件 true：消费事件，停止后续加载流程，取消图片显示流程 false：不消费事件，继续图片加载流程，图片正常显示
+     * @参数 isFirstResource - Bool数据类型，是否是第一个资源
+     * @返回值 Bool 是否消费事件 true：消费事件，停止后续加载流程，取消图片显示流程 false：不消费事件，继续图片加载流程，图片正常显示
      */
     func onResourceReady(resource: R, model: Model, target: Target<R>, dataSource: DataSource, isFirstResource: Bool): Bool;
 
@@ -369,14 +514,14 @@ public interface RequestListener<R> {
      * @参数 e - DropletException数据类型，图片加载异常
      * @参数 model - Model数据类型，图片模型
      * @参数 target - Target<R>数据类型，图片请求构建器
-     * @参数 isFirstResource - Boolean数据类型，是否是第一个资源
-     * @返回值 Boolean 是否消费事件 true：消费事件，停止后续加载流程，不显示错误图 false：继续图片加载流程，显示错误图
+     * @参数 isFirstResource - Bool数据类型，是否是第一个资源
+     * @返回值 Bool 是否消费事件 true：消费事件，停止后续加载流程，不显示错误图 false：继续图片加载流程，显示错误图
      */
     func onLoadFailed(e: DropletException, model: Model, target: Target<R>, isFirstResource: Bool): Bool;
 }
 ```
 
-#### 1.6 GifDrawable 
+#### 3.6 GifDrawable 
 ```cangjie
 public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
     /**
@@ -423,7 +568,7 @@ public class GifDrawable <: Drawable & Animatable2 & FrameCallback {
 }
 ```
 
-#### 1.7 TransitionOption
+#### 3.7 TransitionOption
 ```cangjie
 public class TransitionOption {
    
@@ -511,7 +656,7 @@ public class TransitionOption {
 }
 ```    
     
-#### 1.8 StringKey    
+#### 3.8 StringKey    
 ```cangjie 
 
 public class StringKey <: AnyKey {
@@ -527,7 +672,7 @@ public class StringKey <: AnyKey {
 
 ```
 
-#### 1.9 TransitionType
+#### 3.9 TransitionType
 ```cangjie
  
 public enum TransitionType {
@@ -539,9 +684,9 @@ public enum TransitionType {
 
 ```
 
-### 2 图片变换接口
+### 4 图片变换接口
 
-#### 2.1 CenterCrop
+#### 4.1 CenterCrop
 
 ```cangjie
 public class CenterCrop <: PixelMapTransformation {
@@ -552,7 +697,7 @@ public class CenterCrop <: PixelMapTransformation {
 }
 ```
 
-#### 2.2 CenterInside
+#### 4.2 CenterInside
 
 ```cangjie
 public class CenterInside <: PixelMapTransformation {
@@ -563,7 +708,7 @@ public class CenterInside <: PixelMapTransformation {
 }
 ```
 
-#### 2.3 CircleCrop
+#### 4.3 CircleCrop
 
 ```cangjie
 public class CircleCrop <: PixelMapTransformation {
@@ -574,7 +719,7 @@ public class CircleCrop <: PixelMapTransformation {
 }
 ```
 
-#### 2.4 FitCenter
+#### 4.4 FitCenter
 
 ```cangjie
 public class FitCenter <: PixelMapTransformation {
@@ -585,7 +730,7 @@ public class FitCenter <: PixelMapTransformation {
 }
 ```
 
-#### 2.5 Rotate
+#### 4.5 Rotate
 
 ```cangjie
 public class Rotate <: PixelMapTransformation {
@@ -598,7 +743,7 @@ public class Rotate <: PixelMapTransformation {
 }
 ```
 
-#### 2.6 RoundedCorners
+#### 4.6 RoundedCorners
 
 ```cangjie
 public class RoundedCorners <: PixelMapTransformation {
@@ -611,7 +756,7 @@ public class RoundedCorners <: PixelMapTransformation {
 }
 ```
 
-#### 2.7 GranularRoundedCorners
+#### 4.7 GranularRoundedCorners
 
 ```cangjie
 public class GranularRoundedCorners <: PixelMapTransformation {
@@ -628,70 +773,3 @@ public class GranularRoundedCorners <: PixelMapTransformation {
 ```
 
 
-### 3 示例
-
-```cangjie
-
-package ohos_app_cangjie_entry
-
-import ohos.component.*
-import ohos.state_manage.*
-import ohos.state_macro_manage.*
-import ohos.base.*
-import ohos.ability.*
-
-import cj_res_entry.app
-import droplet.droplet.*
-
-@Entry
-@Component
-class MyView {
-
-	@State var text: String = ""
-
-    @State var textTmp: String = ""
-
-    var transitionOption:TransitionOption = TransitionOption(TransitionType.Opacity,0.0,1.0,1000) //透明度
-    
-    @State
-    var option: DropletRequestOption = DropletRequestOption (
-        // 加载一张本地的jpg资源（必选）
-        loadSrc: "/data/storage/el1/bundle/testjpg.jpg",    // (必选) jpg 注意这里是本地路径，必须本地有这张图片，才能加载 或者自己填写网络图片
-        placeholder: Option<CJResource>.Some(@r(app.media.loading)),             // 占位图使用本地资源icon_loading（可选）自己定义
-        errholder: Option<CJResource>.Some(@r(app.media.img)),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
-        strategy: Option<DiskCacheStrategy>.Some(DiskCacheStrategyDATA()),       // 磁盘缓存策略（可选）
-        label: Option<String>.Some("page"),                                       // 生命周期标签 （可选） 同一个页面不同组件建议用相同的标签,或者都不加,
-                                                                                  //这样每个页面的组件会用相同的requestManager管理生命周期  
-        signature:Option<String>.Some("1111"),                                  //不同的signature可保证缓存key的唯一    （可选）   
-        transformCate:Option<PixelMapTransformation>.Some(RoundedCorners(50)), //transform动画 （可选）
-        transitionOption:Option<TransitionOption>.Some(transitionOption)  //过渡动画 （可选）
-    )
-
-    protected open func aboutToAppear(){
-        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(option.label) //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致,
-                                                                              //组件没设置label,就调用空参的onAppear                                                    
-    }
-    
-    protected open func aboutToDisappear(){
-        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(option.label) //onAppear和onDisAppear一起使用或一起不使用,参数和组件的label保持一致
-                                                                                 //组件没设置label,就调用空参的onDisAppear
-    }
-
-    func build() {
-        Column(30) {
-            Column() {
-                DropletImageComponent(globalContext:globalAbilityContext,option: option, beginFn: {=> text = "begin";AppLog.error("droplet begin")}, endFn: {=> textTmp = "end";AppLog.error("droplet  end")})
-            }.width(100.percent)
-        }
-    }
-
-}
-
-```
-
-执行结果如下：
-图片在手机正常显示
-
-```shell
-load成功
-```
