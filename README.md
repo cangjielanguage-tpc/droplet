@@ -160,9 +160,9 @@ class MyView {
             Column() {
                 DropletImageComponent(
                     //控件宽度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewWidth: Length(50, unitType: LengthType.percent), 
+                    imageViewWidth: 50.percent, 
                     //控件高度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewHeight: Length(120.0, unitType: LengthType.vp), 
+                    imageViewHeight: 120.vp, 
                     //图片相对控件对齐方式 默认ImageFit.Scale 可选
                     imageFit: ImageFit.Contain,
                     //context对象
@@ -213,16 +213,16 @@ load成功
 
     var option: DropletRequestOption = DropletRequestOption(
         loadSrc: urlList[i],
-        placeholder: Option<CJResource>.Some(@r(app.media.loading)),
-        errholder: Option<CJResource>.Some(@r(app.media.img)),
+        placeholder: @r(app.media.loading),
+        errholder: @r(app.media.img),
         overrideWH: (1400, 1400)
     )
 
     DropletImageComponent(
         globalContext: stageContext.getOrThrow(),
         dropletOption: option,
-        imageViewWidth: Length(50.0, unitType: LengthType.percent),
-        imageViewHeight: Length(20.0, unitType: LengthType.percent),
+        imageViewWidth: 50.percent,
+        imageViewHeight: 20.percent,
     )
 
 ```
