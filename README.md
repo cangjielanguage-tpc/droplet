@@ -144,15 +144,16 @@ class MyView {
          strategy: DiskCacheStrategyDATA(),       // 磁盘缓存策略（可选）
          signature:"1111", //不同的signature可保证缓存key的唯一    （可选）   
          transformCate:RoundedCorners(50), //transform效果 （可选）
-         transitionOption:TransitionOption(TransitionType.Opacity,0.0,1.0,1000)  //过渡动画 （可选）
+         transitionOption:TransitionOption(TransitionType.Opacity,0.0,1.0,1000),  //过渡动画 （可选）
+         imageFit: ImageFit.Contain //图片相对控件对齐方式 默认ImageFit.Scale 可选
     )
 
     protected open func aboutToAppear(){
-        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(label)  //onAppear和onDisAppear一起使用，参数和组件的label保持一致,
+        Droplet.get(getStageContext(globalAbilityContext.getOrThrow())).onAppear(label)  //onAppear和onDisAppear一起使用，参数和组件的label保持一致,
     }               
     
     protected open func aboutToDisappear(){
-        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(label) //onAppear和onDisAppear一起使用,参数和组件的label保持一致
+        Droplet.get(getStageContext(globalAbilityContext.getOrThrow())).onDisAppear(label) //onAppear和onDisAppear一起使用,参数和组件的label保持一致
     }
 
     func build() {
@@ -162,11 +163,9 @@ class MyView {
                     //控件宽度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
                     imageViewWidth: 50.percent, 
                     //控件高度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewHeight: 120.vp, 
-                    //图片相对控件对齐方式 默认ImageFit.Scale 可选
-                    imageFit: ImageFit.Contain,
+                    imageViewHeight: 120.vp,
                     //context对象
-                    globalContext:globalAbilityContext, //(必选)
+                    globalContext:getStageContext(globalAbilityContext.getOrThrow()), //(必选)
                     //droplet选项
                     dropletOption: option,//(必选)
                     // 生命周期标签 同一个页面不同组件保持相同的标签,
