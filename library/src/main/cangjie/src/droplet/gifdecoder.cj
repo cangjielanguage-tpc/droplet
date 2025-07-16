@@ -30,8 +30,6 @@ public abstract  class GifDecoder {
 
   public func getHeight():Int32
 
-  public func getData():ByteBuffer
-
   /**
    * Returns the current status of the decoder.
    *

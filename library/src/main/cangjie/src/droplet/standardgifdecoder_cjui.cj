@@ -55,9 +55,6 @@ public class StandardGifDecoder <: GifDecoder {
     return height;
   }
 
-  public func getData():ByteBuffer {
-    return ByteBuffer()
-  }
 
   public func getStatus():Int32 {
     return 0
