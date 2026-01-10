@@ -30,6 +30,7 @@ public class NoneDrawable <: Drawable {
 }
 
 public class PixelMapDrawable <: Drawable {
+    private static let mtx = ReentrantMutex()
 
     private let pixelMapDrawableType:Int64 = 1
     private let pixelMap: PixelMap
@@ -48,16 +49,20 @@ public class PixelMapDrawable <: Drawable {
     }
 
     public override func draw(_:Bool): Unit {
-        if(this.drawFunc.size > 0) {
-            for(f in this.drawFunc) {
-                f(this.pixelMap)
+       synchronized(mtx){
+           if(this.drawFunc.size > 0) {
+                for(f in this.drawFunc) {
+                    f(this.pixelMap)
+                }
             }
         }
     }
 
     public override func setDrawFunc(drawFunc: (PixelMap) -> Unit): Unit {
-        this.drawFunc.clear()
-        this.drawFunc.add(drawFunc)
+        synchronized(mtx){
+            this.drawFunc.clear()
+            this.drawFunc.add(drawFunc)
+        }
     }
 }
 
