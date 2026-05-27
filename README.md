@@ -5,7 +5,7 @@
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v1.0.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v1.0.0-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v1.0.5-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/project-open-brightgreen" style="display: inline-block;" />
 </p>
 
@@ -259,9 +259,18 @@ load成功
 
 ## 约束与限制
 
-DevEco Studio (5.1.0) Release
-Cangjie Support Plugin 5.1.0.828
-Cangjie Compiler: 1.0.0
+在下述版本验证通过:
+
+| 编号 | 依赖构建工具                           | 版本号       |
+  |----|----------------------------------|-----------|
+| 1  | **DevEco Studio**                | 5.1.1.851 |
+| 2  | **cjc**                          | v1.0.5    |
+
+droplet依赖三方库：
+
+| 编号 | 依赖三方库         | 版本号      |
+  |----|---------------|----------|
+| 1  | stdx          | v1.0.1.1 |
 
 ## 开源协议
 
