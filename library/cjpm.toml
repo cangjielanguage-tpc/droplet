@@ -16,7 +16,7 @@
 [ffi]
   [ffi.c]
     [ffi.c.glwrapper]
-      path = "../droplet_ffi/build/default/intermediates/cmake/default/obj/${ABI}"
+        path = "./build/default/intermediates/libs/default/${ABI}"
 
 [package]
   cjc-version = "0.48.2"

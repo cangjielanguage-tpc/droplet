@@ -41,10 +41,6 @@
     {
       "name": "library",
       "srcPath": "./library"
-    },
-    {
-      "name": "droplet_ffi",
-      "srcPath": "./droplet_ffi"
     }
   ]
 }
