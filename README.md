@@ -90,12 +90,8 @@ droplet是一个图像加载缓存库，致力于更高效、更轻便、更简�
     {
       "name": "library",
       "srcPath": "./thirdparty/droplet/library"
-    },
-    {
-      "name": "droplet_ffi",
-      "srcPath": "./thirdparty/droplet/droplet_ffi"
     }
-   把droplet库的两个依赖变为modeule依赖形式.然后同步项目
+   把droplet库的依赖变为modeule依赖形式.然后同步项目
 4. 在自己项目的enrty里的oh-package.json5里的dependencies里加上 "library": "file:../thirdparty/droplet/library",然后同步项目
     "dependencies": {
     "library": "file:../thirdparty/droplet/library"
