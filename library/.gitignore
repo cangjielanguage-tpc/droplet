@@ -4,8 +4,7 @@
 /build
 /.cxx
 /.test
-BuildProfile.ets
-oh-package-lock.json5
-/src/main/cangjie/build-script-cache
 **/IDL_Dependencies_List~
 **/build-script-cache
+BuildProfile.ets
+cjpm.lock

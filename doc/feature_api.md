@@ -69,9 +69,9 @@ class MyView {
             Column() {
                 DropletImageComponent(
                     //控件宽度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewWidth: Length(50, unitType: LengthType.percent), 
+                    imageViewWidth: 50.percent, 
                     //控件高度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewHeight: Length(120.0, unitType: LengthType.vp), 
+                    imageViewHeight: 120.vp, 
                     //图片相对控件对齐方式 默认ImageFit.Scale 可选
                     imageFit: ImageFit.Contain,
                     //context对象

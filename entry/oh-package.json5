@@ -6,6 +6,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "droplet": "file:../library"
+    "library": "file:../library"
   }
 }
+
