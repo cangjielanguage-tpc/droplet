@@ -3,6 +3,8 @@
 /.preview
 /build
 /.cxx
-/src/main/cangjie/build-script-cache
+/.test
 **/IDL_Dependencies_List~
 **/build-script-cache
+oh-package-lock.json5
+cjpm.lock

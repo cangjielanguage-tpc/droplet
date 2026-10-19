@@ -3,7 +3,8 @@
     "name": "library",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "default",
+      "tablet",
     ]
   }
 }

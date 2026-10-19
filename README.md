@@ -3,9 +3,9 @@
 </div>
 
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v1.0.0-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v2.0.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.53.19-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v1.1.3-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/project-open-brightgreen" style="display: inline-block;" />
 </p>
 
@@ -90,12 +90,8 @@ droplet是一个图像加载缓存库，致力于更高效、更轻便、更简�
     {
       "name": "library",
       "srcPath": "./thirdparty/droplet/library"
-    },
-    {
-      "name": "droplet_ffi",
-      "srcPath": "./thirdparty/droplet/droplet_ffi"
     }
-   把droplet库的两个依赖变为modeule依赖形式.然后同步项目
+   把droplet库的依赖变为modeule依赖形式.然后同步项目
 4. 在自己项目的enrty里的oh-package.json5里的dependencies里加上 "library": "file:../thirdparty/droplet/library",然后同步项目
     "dependencies": {
     "library": "file:../thirdparty/droplet/library"
@@ -119,54 +115,53 @@ import ohos.state_macro_manage.*
 import ohos.base.*
 import ohos.ability.*
 
-import ohos_app_cangjie_entry.js.globalAbilityContext
-import cj_res_entry.app
-import droplet.droplet.*
+import droplet.*
+import ohos.resource_manager.__GenerateResource__
+import droplet.TransitionType as DropletTransitionType
 
 @Entry
 @Component
-class MyView {
+class EntryView {
 
-	@State var label: String = "MyView"
+	@State var label: String = "EntryView"
 
     @State
     var option: DropletRequestOption = DropletRequestOption (
          //网络图片
-         loadSrc: "http://www....../testjpg.jpg", 
+         //loadSrc: "http://www....../testjpg.jpg",
          //本地图片
-         //loadSrc: "/data/storage/el1/bundle/testjpg.jpg",   
+         //loadSrc: "/data/storage/el1/bundle/testjpg.jpg",
          //加载raw文件图片
          //loadSrc："raw1.png"  //要加载的raw文件夹下图片名称
          //读取res下的资源文件
-         //loadSrcRes: @r(app.media.startIcon), //loadSrc和loadSrcRes二选一 二者都存在的话loadSrc优先
+         loadSrcRes: @r(app.media.cat), //loadSrc和loadSrcRes二选一 二者都存在的话loadSrc优先
          placeholder: @r(app.media.loading),             // 占位图使用本地资源icon_loading（可选）自己定义
-         errholder: @r(app.media.img),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
+         errholder: @r(app.media.error),                   // 失败占位图使用本地资源icon_failed（可选） 自己定义
          strategy: DiskCacheStrategyDATA(),       // 磁盘缓存策略（可选）
-         signature:"1111", //不同的signature可保证缓存key的唯一    （可选）   
+         signature:"1111", //不同的signature可保证缓存key的唯一    （可选）
          transformCate:RoundedCorners(50), //transform效果 （可选）
-         transitionOption:TransitionOption(TransitionType.Opacity,0.0,1.0,1000)  //过渡动画 （可选）
+         transitionOption:TransitionOption(DropletTransitionType.Opacity,0.0,1.0,1000),  //过渡动画 （可选）
+         imageFit: ImageFit.Contain //图片相对控件对齐方式 默认ImageFit.Scale 可选
     )
 
     protected open func aboutToAppear(){
-        Droplet.get(globalAbilityContext.getOrThrow()).onAppear(label)  //onAppear和onDisAppear一起使用，参数和组件的label保持一致,
-    }               
-    
+        Droplet.get(getStageContext(globalAbilityContext.getOrThrow())).onAppear(label)  //onAppear和onDisAppear一起使用，参数和组件的label保持一致,
+    }
+
     protected open func aboutToDisappear(){
-        Droplet.get(globalAbilityContext.getOrThrow()).onDisAppear(label) //onAppear和onDisAppear一起使用,参数和组件的label保持一致
+        Droplet.get(getStageContext(globalAbilityContext.getOrThrow())).onDisAppear(label) //onAppear和onDisAppear一起使用,参数和组件的label保持一致
     }
 
     func build() {
         Column(30) {
             Column() {
                 DropletImageComponent(
-                    //控件宽度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewWidth: Length(50, unitType: LengthType.percent), 
-                    //控件高度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent) 
-                    imageViewHeight: Length(120.0, unitType: LengthType.vp), 
-                    //图片相对控件对齐方式 默认ImageFit.Scale 可选
-                    imageFit: ImageFit.Contain,
+                    //控件宽度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent)
+                    imageViewWidth: 50.percent,
+                    //控件高度 支持百分比和vp 可选 //建议都设置(宽高默认为100%percent)
+                    imageViewHeight: 120.vp,
                     //context对象
-                    globalContext:globalAbilityContext, //(必选)
+                    globalContext:getStageContext(globalAbilityContext.getOrThrow()), //(必选)
                     //droplet选项
                     dropletOption: option,//(必选)
                     // 生命周期标签 同一个页面不同组件保持相同的标签,
@@ -175,10 +170,10 @@ class MyView {
                         pixelMap =>
                         var width = pixelMap.getImageInfo().size.width
                         var height = pixelMap.getImageInfo().size.height
-                        AppLog.error("droplet--- resourceFn width=${width} height=${height}") 
+                        AppLog.error("droplet--- resourceFn width=${width} height=${height}")
                     }, //加载成功的回调 可以获取显示在控件上的图片的宽和高
                     failedFn: {
-                        e => AppLog.error("droplet--- failedFn")
+                        e:DropletException => AppLog.error("droplet--- failedFn")
                     }  //加载失败的回调
                 )
             }.width(100.percent)
@@ -186,7 +181,6 @@ class MyView {
     }
 
 }
-
 
 ```
 
@@ -213,16 +207,16 @@ load成功
 
     var option: DropletRequestOption = DropletRequestOption(
         loadSrc: urlList[i],
-        placeholder: Option<CJResource>.Some(@r(app.media.loading)),
-        errholder: Option<CJResource>.Some(@r(app.media.img)),
+        placeholder: @r(app.media.loading),
+        errholder: @r(app.media.img),
         overrideWH: (1400, 1400)
     )
 
     DropletImageComponent(
         globalContext: stageContext.getOrThrow(),
         dropletOption: option,
-        imageViewWidth: Length(50.0, unitType: LengthType.percent),
-        imageViewHeight: Length(20.0, unitType: LengthType.percent),
+        imageViewWidth: 50.percent,
+        imageViewHeight: 20.percent,
     )
 
 ```
@@ -235,7 +229,7 @@ load成功
    
          var url = "https://xxxxxxxx"
 
-         Droplet.withContext(globalAbilityContext.getOrThrow())
+         Droplet.withContext(stageContext.getOrThrow())
                 .load(url)
                 .listener(
                     {
@@ -261,9 +255,21 @@ load成功
 
 ## 约束与限制
 
-DevEco Studio (5.0.11.100)
-Cangjie Support Plugin 5.0.11.100
-Cangjie Compiler: 0.53.19
+在下述版本验证通过:
+
+| 编号 | 依赖构建工具                                       | 版本号       |
+|----|----------------------------------------------|-----------|
+| 1  | **DevEco Studio**                            | 6.1.1.280 |
+| 2  | **cjc**                                      | v1.1.3    |
+| 3  | **DevEco Studio-Cangjie Plugin 6.1.1 Beta1** | 6.1.1.280 |
+| 4  | **compatibility-sdk-6.1.1.280**              | 6.1.1.280 |
+
+droplet依赖三方库：
+
+| 编号 | 依赖三方库         | 版本号      |
+  |----|---------------|----------|
+| 1  | stdx          | v1.1.3.1 |
+
 
 ## 开源协议
 
